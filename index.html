@@ -10,19 +10,19 @@
   
   <style>
     :root {
-      --bg-primary: #F8FAFC;
-      --bg-card: #FFFFFF;
-      --text-primary: #0F172A;
-      --text-secondary: #475569;
-      --text-muted: #94A3B8;
-      --border-color: #E2E8F0;
-      --accent: #4F46E5;
-      --accent-hover: #4338CA;
-      --success: #10B981;
-      --warning: #F59E0B;
-      --error: #EF4444;
-      --tab-bg: #F1F5F9;
-      --tab-active: #FFFFFF;
+      --bg-primary: #f8f9fa;
+      --bg-card: #ffffff;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border-color: #e5e7eb;
+      --accent: #000000;
+      --accent-hover: #333333;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --tab-bg: #e8e8e8;
+      --tab-active: #ffffff;
       --form-width: 900px;
       --form-height: 900px;
       --overlay-width: 385px;
@@ -792,6 +792,7 @@
          const ext = selectedFile.name.split('.').pop().toLowerCase();
          if (!ALLOWED_EXTS.includes(ext)) { uploadStatus.textContent = 'Недопустимый тип файла'; mainUploadBtn.classList.remove('loading'); mainUploadBtn.disabled = false; selectedFile = null; fileInput.value = ''; return; }
          const safeName = sanitize(selectedFile.name); const safeFolder = sanitize(session.user.id); const filePath = `${safeFolder}/${Date.now()}_${safeName}`;
+         const fileNameForDB = selectedFile.name; // Store file name before XHR to avoid null reference
          uploadProgress.style.display = 'block'; uploadProgress.value = 0; uploadStatus.textContent = '0%';
          const xhr = new XMLHttpRequest();
          xhr.open('POST', `${window.SUPABASE_URL}/storage/v1/object/${BUCKET}/${filePath}`);
@@ -803,7 +804,7 @@
              mainUploadBtn.classList.remove('loading'); mainUploadBtn.disabled = false; selectedFile = null; fileInput.value = '';
              if (xhr.status >= 200 && xhr.status < 300) {
                  uploadStatus.textContent = 'Загрузка завершена...';
-                 try { const { data: insertedRow, error: regErr } = await supabase.from(TABLE).insert({ user_login: window.USER_LOGIN || '', file_path: filePath, file_name: selectedFile.name, file_ext: ext }).select('*').single(); if (regErr) throw regErr; uploadStatus.textContent = `Файл поставлен в очередь: ${insertedRow.file_number}`; loadHistory(); }
+                 try { const {  insertedRow, error: regErr } = await supabase.from(TABLE).insert({ user_login: window.USER_LOGIN || '', file_path: filePath, file_name: fileNameForDB, file_ext: ext }).select('*').single(); if (regErr) throw regErr; uploadStatus.textContent = `Файл поставлен в очередь: ${insertedRow.file_number}`; loadHistory(); }
                  catch (err) { uploadStatus.textContent = 'Ошибка записи в БД'; console.error(err); }
              } else { uploadStatus.textContent = 'Ошибка загрузки файла'; }
          };
