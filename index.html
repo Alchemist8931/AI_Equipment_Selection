@@ -2,66 +2,129 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>APP</title>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-  <!-- Montserrat for Slideshow -->
+  <title>AI Equipment Selection</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
   
   <style>
     :root {
+      /* Dark Theme Variables */
+      --bg: #09090b;
+      --bg-deep: #050507;
+      --bg-elevated: #111114;
+      --bg-card: rgba(20, 20, 24, 0.85);
+      --fg: #e8e8ec;
+      --fg-warm: #f2f0ed;
+      --fg-muted: #7a7a85;
+      --fg-dim: #45454f;
+      --accent: #f0ebe4;
+      --accent-warm: #e8e2d8;
+      --accent-soft: rgba(240, 235, 228, 0.06);
+      --accent-muted: rgba(240, 235, 228, 0.03);
+      --border: rgba(240, 235, 228, 0.1);
+      --border-subtle: rgba(240, 235, 228, 0.05);
+      --glow: rgba(240, 235, 228, 0.15);
+
+      /* App Specific Variables */
       --form-width: 900px;
       --form-height: 900px;
       --overlay-width: 385px;
-      --loader-line-color: #2C2C2B;
-      --loader-line-width: 10px;
-      --loader-line-height: 70px;
-      --fon: #ffffff;
-      --content-color: #2C2C2B;
-      --black-color: #1f1f1f;
-      --scrollbar-color: #e0e0e0;
+      --scrollbar-color: rgba(240, 235, 228, 0.2);
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Comfortaa', sans-serif; }
-    html, body { width: 100vw; height: 100vh; background: none; color: var(--content-color); overflow: hidden !important; position: relative; }
 
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body { 
+      width: 100vw; 
+      height: 100vh; 
+      background: var(--bg); 
+      color: var(--fg); 
+      overflow: hidden !important; 
+      position: relative; 
+      font-family: 'SN Pro', sans-serif;
+    }
+
+    /* === Atmospheric Background Layers === */
+    .grain-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.03;
+    }
+    .grain-layer svg { width: 100%; height: 100%; }
+
+    .floating-orbs {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.4;
+      will-change: transform;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(200, 195, 185, 0.08) 0%, transparent 70%);
+      top: -200px; right: -100px;
+      animation: orbFloat1 25s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(180, 175, 165, 0.05) 0%, transparent 70%);
+      bottom: -100px; left: -50px;
+      animation: orbFloat2 30s ease-in-out infinite;
+    }
+    @keyframes orbFloat1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-40px, 40px); } }
+    @keyframes orbFloat2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, -30px); } }
+
+    .cursor-glow {
+      position: fixed;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(240, 235, 228, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      will-change: transform, left, top;
+    }
+    body:hover .cursor-glow { opacity: 1; }
+
+    /* === Main App Styles === */
     .glass3d {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
-      border-radius: 12px;
-      box-shadow: 0 0 0.75px hsl(205 20% 10% / 0.2), 0.7px 0.8px 1.2px -0.4px hsl(205 20% 10% / 0.1), 1.3px 1.5px 2.2px -0.8px hsl(205 20% 10% / 0.1), 2.3px 2.6px 3.9px -1.2px hsl(205 20% 10% / 0.1), 3.9px 4.4px 6.6px -1.7px hsl(205 20% 10% / 0.1), 6.5px 7.2px 10.9px -2.1px hsl(205 20% 10% / 0.1), 8px 9px 14px -2.5px hsl(205 20% 10% / 0.2);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     }
 
-    /* Прелоадер */
+    /* Preloader */
     #preloader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 10px; opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease; z-index: 9999; }
     #preloader.visible { opacity: 1; visibility: visible; }
     #preloader.fade-out { opacity: 0; visibility: hidden; }
-    .line { width: var(--loader-line-width); height: var(--loader-line-height); background-color: var(--content-color); animation: bounce 1.5s infinite ease-in-out; border-radius: 4px; }
+    .line { width: 10px; height: 70px; background-color: var(--fg-warm); animation: bounce 1.5s infinite ease-in-out; border-radius: 4px; }
     .line:nth-child(2) { animation-delay: 0.3s; }
     .line:nth-child(3) { animation-delay: 0.6s; }
     .line:nth-child(5) { animation-delay: 1.2s; }
     @keyframes bounce { 0%,20%,50%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-30px); } 60% { transform: translateY(-15px); } }
 
-    /* Логин/регистрация */
-    #login-wrapper { 
-      opacity: 0; 
-      transition: opacity 0.5s ease; 
-      width: 100%; 
-      height: 100%; 
-      position: relative; 
-      z-index: 100; 
-      pointer-events: none;
-    }
-    #login-wrapper.show { 
-      opacity: 1; 
-      pointer-events: auto;
-    }
-    .container { width: var(--form-width); height: var(--form-height); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); overflow: hidden; position: relative; z-index: 100; }
-    .overlay { position: absolute; top: 0; left: 0; width: var(--overlay-width); height: 100%; background: #1B1C1D; border-radius: 10px; transition: left 1s ease; z-index: 9999 !important; pointer-events: auto !important; }
-    .overlay.open-sign-up { left: calc(var(--form-width) - var(--overlay-width)); }
+    /* Login/Register */
+    #login-wrapper { opacity: 0; transition: opacity 0.5s ease; width: 100%; height: 100%; position: relative; z-index: 100; pointer-events: none; }
+    #login-wrapper.show { opacity: 1; pointer-events: auto; }
+    .container { width: var(--form-width); height: var(--form-height); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 16px; overflow: hidden; position: relative; z-index: 100; border: 1px solid var(--border); background: var(--bg-elevated); }
+    .overlay { position: absolute; top: 0; left: 0; width: var(--overlay-width); height: 100%; background: var(--bg); border-radius: 16px 0 0 16px; transition: left 1s ease; z-index: 9999 !important; pointer-events: auto !important; border-right: 1px solid var(--border); }
+    .overlay.open-sign-up { left: calc(var(--form-width) - var(--overlay-width)); border-radius: 0 16px 16px 0; border-right: none; border-left: 1px solid var(--border); }
     .overlay .sign-in, .overlay .sign-up { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 30px; display: flex; flex-direction: column; justify-content: center; gap: 15px; transition: opacity 0.5s; pointer-events: auto; z-index: 10000; }
     .overlay .sign-in { opacity: 1; pointer-events: auto; }
     .overlay .sign-up { opacity: 0; pointer-events: none; }
@@ -71,21 +134,26 @@
     .form .sign-in, .form .sign-up { width: 50%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; opacity: 0; transition: opacity 0.5s; z-index: 500; }
     .form .sign-in.show { display: flex; opacity: 1; }
     .form .sign-up.show { display: flex; opacity: 1; }
-    .modalFORM { display: flex; flex-direction: column; gap: 20px; background-color: var(--fon); padding: 20px; width: 380px; border-radius: 10px; z-index: 200; }
-    .modalFORM h3 { font-size: 26px; font-weight: 500; text-align: center; text-transform: uppercase; color: var(--content-color); margin: 0; }
-    .inputField { width: 98%; padding: 8px; font-size: 14px; font-weight: 500; border-radius: 10px; outline: 1px solid var(--content-color); border: 0; background-color: var(--fon); outline-offset: 3px; transition: 0.25s; }
-    .inputField:focus { outline-offset: 5px; }
-    .button-submit { width: 100%; padding: 12px; background-color: var(--content-color); border: 1px solid var(--content-color); color: var(--fon); font-size: 14px; font-weight: 600; border-radius: 10px; height: 40px; cursor: pointer; transition: all 0.4s; }
-    .button-submit:hover { color: var(--content-color); background-color: var(--fon); }
-    .button-submit2 { padding: 12px; background-color: var(--fon); border: 1px solid var(--fon); color: var(--content-color); font-size: 14px; font-weight: 600; border-radius: 10px; height: 40px; width: 100%; cursor: pointer; transition: all 0.4s; margin-top: 26px; }
-    .button-submit2:hover { color: var(--fon); background-color: var(--content-color); }
+    
+    .modalFORM { display: flex; flex-direction: column; gap: 20px; background: var(--bg-card); backdrop-filter: blur(10px); padding: 30px; width: 380px; border-radius: 12px; z-index: 200; border: 1px solid var(--border); }
+    .modalFORM h3 { font-size: 26px; font-weight: 500; text-align: center; text-transform: uppercase; color: var(--fg-warm); margin: 0; }
+    
+    .inputField { width: 98%; padding: 12px; font-size: 14px; font-weight: 500; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); outline: none; transition: all 0.3s ease; color: var(--fg); }
+    .inputField:focus { border-color: var(--accent); background: rgba(255,255,255,0.05); }
+    .inputField::placeholder { color: var(--fg-dim); }
+    
+    .button-submit { width: 100%; padding: 12px; background: var(--fg-warm); border: none; color: var(--bg); font-size: 14px; font-weight: 600; border-radius: 8px; height: 40px; cursor: pointer; transition: all 0.4s; }
+    .button-submit:hover { background: var(--accent); box-shadow: 0 0 20px var(--glow); transform: translateY(-2px); }
+    
+    .button-submit2 { padding: 12px; background: transparent; border: 1px solid var(--border); color: var(--fg); font-size: 14px; font-weight: 600; border-radius: 8px; height: 40px; width: 100%; cursor: pointer; transition: all 0.4s; margin-top: 26px; }
+    .button-submit2:hover { background: var(--accent-soft); border-color: var(--fg-muted); }
 
     /* DB Disconnect */
-    #db-disconnect-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: 2000; }
+    #db-disconnect-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: 2000; }
     #db-disconnect-overlay.show { opacity: 1; pointer-events: auto; }
     .loading-wave { position: absolute; bottom: 20px; right: 20px; width: 1000px; height: 0; display: flex; justify-content: center; align-items: flex-end; opacity: 0; transition: opacity 1s ease; }
     #db-disconnect-overlay.show .loading-wave { opacity: 1; }
-    .loading-bar { width: 20px; height: 40px; margin: 0 5px; background-color: #6b252c; border-radius: 5px; animation: loading-wave-animation 1s ease-in-out infinite; }
+    .loading-bar { width: 20px; height: 40px; margin: 0 5px; background-color: var(--accent); border-radius: 5px; animation: loading-wave-animation 1s ease-in-out infinite; }
     .loading-bar:nth-child(2) { animation-delay: 0.1s; }
     .loading-bar:nth-child(3) { animation-delay: 0.3s; }
     .loading-bar:nth-child(4) { animation-delay: 0.5s; }
@@ -96,20 +164,22 @@
 
     #home_wave { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: -1; }
     
-    /* === Стили из modal9.html === */
+    /* Modal 9 App Styles */
     .spec-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease; z-index: 10; }
     .spec-modal.visible { opacity: 1; visibility: visible; }
 
-    /* Верхнее окно (фиксированное) */
-    .modal9-top-window { color: var(--black-color, var(--content-color)); position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 1930px; height: 180px; padding: 20px; padding-top: 15px; padding-bottom: 15px; box-sizing: border-box; overflow: visible; padding-right: 360px; z-index: 30; }
+    /* Top Window */
+    .modal9-top-window { color: var(--fg); position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 1930px; height: 160px; padding: 20px; box-sizing: border-box; overflow: visible; z-index: 30; }
     .modal9-top-body { display: flex; flex-direction: column; gap: 16px; }
-    nav.nav_copy { display:flex; gap:8px; margin-bottom:10px; position:relative; background:#333; border-radius:6px; overflow:hidden; width: 400px; }
-    nav.nav_copy .slider { position:absolute; top:0; left:0; width:49%; height:100%; background:#f5f5f5; border-radius:6px; transition:left 0.3s; }
-    nav.nav_copy .tab { flex:1; text-align:center; color:#f5f5f5; z-index:1; padding:6px 12px; border:1px solid #ccc; border-radius:4px; cursor:pointer; transition:background-color 0.3s; user-select:none; }
-    nav.nav_copy .tab.active { color:var(--content-color); }
+    
+    nav.nav_copy { display:flex; gap:8px; margin-bottom:10px; position:relative; background: rgba(255,255,255,0.03); border-radius:6px; overflow:hidden; width: 400px; border: 1px solid var(--border); }
+    nav.nav_copy .slider { position:absolute; top:0; left:0; width:49%; height:100%; background: var(--fg-warm); border-radius:6px; transition:left 0.3s; }
+    nav.nav_copy .tab { flex:1; text-align:center; color: var(--fg-muted); z-index:1; padding:6px 12px; cursor:pointer; transition:color 0.3s; user-select:none; }
+    nav.nav_copy .tab.active { color: var(--bg); }
     
     .spec-history-list { width: 100%; margin-top: 10px; overflow-x: auto; overflow-y: hidden; height: 100%; }
-    .spec-history-item { display:flex; justify-content:space-between; padding:4px 8px;}
+    .spec-history-item { display:flex; justify-content:space-between; padding:4px 8px; transition: background 0.2s; border-radius: 4px; }
+    .spec-history-item:hover { background: var(--accent-soft); }
     
     .history-controls { width:100%; display:flex; justify-content:center; margin:12px 0 0; }
     .history-load-more { min-width:200px; display:inline-flex; align-items:center; justify-content:center; }
@@ -117,183 +187,197 @@
 
     .input-container { position: relative; width: auto; }
     .status-field-wrapper { display: inline-flex; align-items: center; gap: 6px; }
-    .status-icon { font-family: 'Material Symbols Outlined'; font-size: 24px; line-height: 1; color: #878787; transition: color 0.3s ease, text-shadow 0.3s ease; user-select: none; }
-    .input-container.overflow::after { content: ''; position: absolute; top: 0; right: 0; width: 20px; height: 100%; pointer-events: none; background: linear-gradient(to left, var(--fon, #f5f5f5), rgba(245,245,245,0)); }
-    .styled_input_bar { width: auto; padding: 10px; font-size: 14px; border: 1px solid var(--content-color); border-radius: 8px; background-color: transparent; color: var(--content-color); outline: none; transition: all 0.3s ease; box-sizing: border-box; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .styled_input_bar::placeholder { color: grey; transition: all 0.3s ease; }
-    .styled_input_bar:hover { border-color: grey; }
-    .styled_input_bar:hover::placeholder { color: transparent; }
-    .input-label { position: absolute; left: 10px; top: 10px; transform: translateY(-50%); font-size: 10px; background-color: var(--fon, #f5f5f5); color: var(--content-color); pointer-events: none; transition: all 0.3s ease; }
-    .styled_input_bar:hover + .input-label, .styled_input_bar:not(:placeholder-shown) + .input-label { top: -2px; left: 10px; font-size: 13px; color: var(--content-color); background-color: var(--fon, #f5f5f5); padding: 0 8px; }
-    .styled_input_bar:not(:hover):not(:placeholder-shown) + .input-label { color: grey; }
-    .spec-history-item.input-row { gap: 10px; flex-wrap: nowrap; width: max-content; }
-    .copy-tooltip { position: fixed; background: #333; color: #f5f5f5; padding: 2px 6px; border-radius: 4px; font-size: 12px; pointer-events: none; z-index: 11000; }
-    .spec-context-menu { position: absolute; display: none; min-width: 220px; background: #f5f5f5; color: var(--black-color, #1f1f1f); border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 8px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); padding: 6px 0; z-index: 4000; }
-    .spec-context-menu.visible { display: block; }
-    .spec-context-menu button { width: 100%; padding: 8px 16px; border: none; background: none; font-size: 14px; text-align: left; color: inherit; cursor: pointer; }
-    .spec-context-menu button:hover, .spec-context-menu button:focus { background: rgba(0, 0, 0, 0.05); outline: none; }
+    .status-icon { font-family: 'Material Symbols Outlined'; font-size: 24px; line-height: 1; color: var(--fg-muted); transition: color 0.3s ease, text-shadow 0.3s ease; user-select: none; }
+    .input-container.overflow::after { content: ''; position: absolute; top: 0; right: 0; width: 20px; height: 100%; pointer-events: none; background: linear-gradient(to left, var(--bg-card), transparent); }
     
-    .tooltip-overlay { position:fixed; inset:0; background:var(--content-color); opacity:1; display:flex; align-items:center; justify-content:center; z-index:10000; }
-    .tooltip-modal { position:relative; background:#f5f5f5; border:1px solid rgba(0,0,0,0.10); border-radius:10px; padding:10px; width:1320px; max-width:90vw; max-height:90vh; overflow-y:auto; margin:30px; display:inline-block; }
+    .styled_input_bar { width: auto; padding: 10px; font-size: 14px; border: 1px solid var(--border); border-radius: 8px; background-color: transparent; color: var(--fg); outline: none; transition: all 0.3s ease; box-sizing: border-box; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .styled_input_bar::placeholder { color: var(--fg-dim); transition: all 0.3s ease; }
+    .styled_input_bar:hover { border-color: var(--fg-muted); background: rgba(255,255,255,0.02); }
+    .styled_input_bar:focus { border-color: var(--accent); background: rgba(255,255,255,0.03); }
+    
+    .input-label { position: absolute; left: 10px; top: 10px; transform: translateY(-50%); font-size: 10px; background-color: var(--bg-elevated); color: var(--fg-muted); pointer-events: none; transition: all 0.3s ease; padding: 0 5px; }
+    .styled_input_bar:hover + .input-label, .styled_input_bar:not(:placeholder-shown) + .input-label { top: -2px; left: 10px; font-size: 11px; color: var(--accent); background-color: var(--bg-elevated); padding: 0 5px; }
+    
+    .spec-history-item.input-row { gap: 10px; flex-wrap: nowrap; width: max-content; }
+    .copy-tooltip { position: fixed; background: var(--fg-warm); color: var(--bg); padding: 4px 8px; border-radius: 4px; font-size: 12px; pointer-events: none; z-index: 11000; }
+    .spec-context-menu { position: absolute; display: none; min-width: 220px; background: var(--bg-elevated); color: var(--fg); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); padding: 6px 0; z-index: 4000; }
+    .spec-context-menu.visible { display: block; }
+    .spec-context-menu button { width: 100%; padding: 8px 16px; border: none; background: none; font-size: 14px; text-align: left; color: inherit; cursor: pointer; transition: background 0.2s; }
+    .spec-context-menu button:hover, .spec-context-menu button:focus { background: var(--accent-soft); outline: none; }
+    
+    .tooltip-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter: blur(5px); display:flex; align-items:center; justify-content:center; z-index:10000; }
+    .tooltip-modal { position:relative; background: var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; width:1320px; max-width:90vw; max-height:90vh; overflow-y:auto; margin:30px; display:inline-block; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     .tooltip-modal::-webkit-scrollbar { width:6px; }
-    .tooltip-modal::-webkit-scrollbar-track { background:#e0e0e0; }
-    .tooltip-modal::-webkit-scrollbar-thumb { background:var(--content-color); border-radius:10px; }
-    .ans5-close { position:absolute; top:4px; right:8px; font-size:24px; background:none; border:none; cursor:pointer; }
+    .tooltip-modal::-webkit-scrollbar-track { background:transparent; }
+    .tooltip-modal::-webkit-scrollbar-thumb { background:var(--border); border-radius:10px; }
+    .ans5-close { position:absolute; top:8px; right:10px; font-size:24px; background:none; border:none; cursor:pointer; color: var(--fg-muted); transition: color 0.2s; }
+    .ans5-close:hover { color: var(--fg); }
 
     .modalRow { display:flex; gap:10px; margin-top:10px; }
     .modalColumn { display:flex; flex-direction:column; gap:10px; }
-    .registry-checkboxes { display:flex; flex-direction:column; margin-top:10px; }
-    .registry-checkboxes .checkbox-item { display:flex; align-items:center; gap:6px; }
-    .modalCONTEINERpost { display: flex; border-radius: 6px; background: transparent; border: none; }
-    .status-display { width: auto; padding: 10px; font-size: 14px; border: 1px solid var(--content-color); border-radius: 8px; background-color: transparent; color: var(--content-color); box-sizing: border-box; text-align: left; transition: opacity 1s, filter 1s; text-transform: uppercase; text-align: center; }
-    .status-display.error { border-color: red; }
+    .registry-checkboxes { display:flex; flex-direction:column; margin-top:10px; opacity: 0.8; }
+    .registry-checkboxes .checkbox-item { display:flex; align-items:center; gap:6px; font-size: 12px; color: var(--fg-muted); }
+    .registry-checkboxes input[type="checkbox"] { accent-color: var(--accent); }
+    
+    .modalCONTEINERpost { display: flex; border-radius: 8px; background: transparent; border: none; }
+    .status-display { width: auto; padding: 10px; font-size: 14px; border: 1px solid var(--border); border-radius: 8px; background-color: transparent; color: var(--fg); box-sizing: border-box; text-align: left; transition: opacity 1s, filter 1s; text-transform: uppercase; text-align: center; }
+    .status-display.error { border-color: #ff4d4d; color: #ff4d4d; }
     .status-display.fade { opacity: 0; filter: blur(2px); }
     .fade-toggle { transition: opacity 0.5s, filter 0.5s; }
     .fade-toggle.hidden { opacity: 0; filter: blur(2px); pointer-events: none; }
-    .status-display + .input-label { top: -2px; left: 10px; font-size: 13px; color: grey; background-color: #f5f5f5; padding: 0 8px; }
-    .input-container:hover .status-display + .input-label { color: var(--content-color); }
     .fade-in { animation: fadeIn 0.5s ease; }
-
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* Нижнее модальное окно (фиксированное с прокруткой внутри) */
-    .modal9-window { color:var(--black-color, var(--content-color)); position: fixed; top: 200px; bottom: 0; left: 50%; transform: translateX(-50%); width: 1930px; padding: 20px; padding-left: 20px; padding-right: 10px; box-sizing: border-box; z-index: 10; display: flex; flex-direction: column; }
+    /* Bottom Window */
+    .modal9-window { color: var(--fg); position: fixed; top: 190px; bottom: 0; left: 50%; transform: translateX(-50%); width: 1930px; padding: 20px; box-sizing: border-box; z-index: 10; display: flex; flex-direction: column; }
     .modal9-content { width: 100%; height: 100%; box-sizing: border-box; overflow-y: auto; overflow-x: visible; padding-right: 10px; }
     .modal9-content::-webkit-scrollbar{width:6px;}
     .modal9-content::-webkit-scrollbar-track{background:transparent;}
-    .modal9-content::-webkit-scrollbar-thumb{background:var(--content-color);border-radius:10px;}
+    .modal9-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
 
     .file-upload__modal { display:flex; align-items:flex-start; }
     .file-upload-form { width:fit-content; height:fit-content; display:flex; align-items:center; justify-content:center; }
     .file-upload-label input { display:none; }
-    .file-upload-label { cursor:pointer; background-color:#ddd; padding:10px 20px; border-radius:8px; border:1px dashed rgb(82,82,82); }
-    .file-upload-design { display:flex; flex-direction:column; align-items:center; justify-content:space-between; height:100%; }
-    .file-upload-design .darkmatter-btn { width:100%; }
+    .file-upload-label { cursor:pointer; background: var(--accent-soft); padding:10px 20px; border-radius:8px; border:1px dashed var(--border); transition: all 0.3s; }
+    .file-upload-label:hover { background: rgba(240, 235, 228, 0.1); border-color: var(--fg-muted); }
+    .file-upload-design { display:flex; flex-direction:column; align-items:center; justify-content:space-between; height:100%; gap: 5px; }
     .browse-button { width:100%; }
-    .upload-status-wrapper { display:flex; flex-direction:column; align-items:flex-start; margin-left:10px; }
-    .js-dropzone.drag { background: rgba(255,255,255,0.1); }
+    .upload-status-wrapper { display:flex; flex-direction:column; align-items:flex-start; margin-left:15px; color: var(--fg-muted); font-size: 13px; }
+    .js-dropzone.drag { background: rgba(255,255,255,0.02); }
 
-    .darkmatter-btn { background:var(--content-color); border:1px solid #333; color: #ddd; padding:5px 5px; width: 245px; border-radius:8px; font-size:16px; cursor:pointer; position:relative; overflow:hidden; transition:all 0.3s ease; z-index:1; }
-    .darkmatter-btn:hover { color:#fff; }
-    .darkmatter-btn:active { transform:scale(0.95); }
-    .darkmatter-btn .loader { display:none; position:absolute; inset:0; margin:auto; width:16px; height:16px; border:2px solid #b56aff; border-top-color:transparent; border-radius:50%; animation:spin 1s linear infinite; }
+    .darkmatter-btn { background: var(--fg-warm); border:none; color: var(--bg); padding:8px 12px; width: 245px; border-radius:8px; font-size:14px; cursor:pointer; position:relative; overflow:hidden; transition:all 0.3s ease; z-index:1; font-weight: 600; }
+    .darkmatter-btn:hover { background: var(--accent); box-shadow: 0 0 15px var(--glow); transform: translateY(-1px); }
+    .darkmatter-btn:active { transform:scale(0.98); }
+    .darkmatter-btn .loader { display:none; position:absolute; inset:0; margin:auto; width:16px; height:16px; border:2px solid rgba(0,0,0,0.2); border-top-color:var(--bg); border-radius:50%; animation:spin 1s linear infinite; }
     @keyframes spin { from{transform:rotate(0);} to{transform:rotate(360deg);} }
     .darkmatter-btn.loading .loader { display:block; }
     .darkmatter-btn.loading .button-text { visibility:hidden; }
 
     .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-    .toggle-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: #fff; transition: .4s; border-radius: 50%; }
-    input:checked + .toggle-slider { background-color: var(--content-color); }
-    input:checked + .toggle-slider:before { transform: translateX(20px); }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-elevated); transition: .4s; border-radius: 34px; border: 1px solid var(--border); }
+    .toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 2px; background-color: var(--fg-muted); transition: .4s; border-radius: 50%; }
+    input:checked + .toggle-slider { background-color: var(--accent-soft); border-color: var(--accent); }
+    input:checked + .toggle-slider:before { transform: translateX(19px); background-color: var(--fg-warm); }
 
     .block1-wrapper{ height:100%; overflow-y:auto; overflow-x:hidden; }
     .spec-container { margin-bottom:10px; margin-right:50px; padding-top:10px;}
+    
+    /* Progress Steps */
     .spec-progress.multistep { display:flex; gap:10px; margin:0 10px; width:calc(100% - 20px); }
     .spec-progress.multistep .step { flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:2px; }
-    .spec-progress.multistep .step-body { display:flex; gap:8px; margin-left:20px; }
-    .spec-progress.multistep .step-body .darkmatter-btn { height:auto; padding:0 5px; width:245px; }
-    .spec-progress.multistep .step-body .darkmatter-btn:disabled, .spec-progress.multistep .step-body .darkmatter-btn.disabled { opacity:0.5; cursor:default; pointer-events:none; }
-    .spec-progress.multistep .bar { width:100%; height:6px; background:#000; opacity:0.25; border-radius:2px; transition:opacity 0.3s, box-shadow 0.3s; }
-    .spec-progress.multistep .step.active .bar { opacity:1; box-shadow:0 0 4px var(--content-color); }
-    .spec-progress.multistep .label { font-size:12px; text-align:center; }
+    .spec-progress.multistep .step-body { display:flex; gap:8px; margin-left:20px; align-items: center; }
+    .spec-progress.multistep .step-body .darkmatter-btn { height:auto; padding:6px 10px; width:200px; font-size: 12px; }
+    .spec-progress.multistep .step-body .darkmatter-btn:disabled { opacity:0.4; cursor:default; pointer-events:none; }
+    .spec-progress.multistep .bar { width:100%; height:2px; background: var(--fg-dim); opacity:0.5; border-radius:2px; transition:opacity 0.3s, background 0.3s; }
+    .spec-progress.multistep .step.active .bar { opacity:1; background: var(--accent); box-shadow:0 0 4px var(--glow); }
+    .spec-progress.multistep .label { font-size:11px; color: var(--fg-muted); }
     .spec-progress.multistep .icons { display:flex; gap:4px; align-items:center; }
-    .spec-progress.multistep .icons .material-symbols-outlined { font-size:18px; color:var(--content-color); }
+    .spec-progress.multistep .icons .material-symbols-outlined { font-size:16px; color:var(--fg-muted); }
+    .spec-progress.multistep .step.active .label { color: var(--fg); }
+    .spec-progress.multistep .step.active .icons .material-symbols-outlined { color: var(--accent); }
+    
     .spec-header { background:transparent; cursor:pointer; font-weight:700; }
-    .group-close { float:right; background:none; border:none; cursor:pointer; }
+    .group-close { float:right; background:none; border:none; cursor:pointer; color: var(--fg-muted); transition: color 0.2s; }
+    .group-close:hover { color: var(--fg); }
 
-    #modal9-container .glass3d { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--content-color); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); box-shadow: 0 0 0.75px hsl(205 20% 10% / 0.2), 0.7px 0.8px 1.2px -0.4px hsl(205 20% 10% / 0.1), 1.3px 1.5px 2.2px -0.8px hsl(205 20% 10% / 0.1), 2.3px 2.6px 3.9px -1.2px hsl(205 20% 10% / 0.1), 3.9px 4.4px 6.6px -1.7px hsl(205 20% 10% / 0.1), 6.5px 7.2px 10.9px -2.1px hsl(205 20% 10% / 0.1), 8px 9px 14px -2.5px hsl(205 20% 10% / 0.2); }
+    /* Action Buttons */
+    .spec-action-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+    .spec-action-btn { display: inline-flex; align-items: center; justify-content: center; position: relative; overflow: hidden; min-width: 160px; height: 34px; padding: 0 20px; border: none; border-radius: 8px; background: var(--bg-elevated); color: var(--fg); font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); transition: all 0.3s ease; }
+    .spec-action-btn:hover { background: var(--fg-warm); color: var(--bg); border-color: var(--fg-warm); box-shadow: 0 0 15px rgba(240, 235, 228, 0.2); }
+    .spec-action-btn--excel { border-color: #307750; background: rgba(48, 119, 80, 0.1); color: #5fd47a; }
+    .spec-action-btn--excel:hover { background: #5fd47a; color: #000; border-color: #5fd47a; }
 
-   .spec-action-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
-    .spec-action-btn { display: inline-flex; align-items: center; justify-content: center; position: relative; overflow: hidden; min-width: 174px; height: 30px; padding: 0 24px; border: none; border-radius: 8px; background-color: #307750; color: #fff; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; cursor: pointer; box-shadow: 4px 8px 10px -3px rgba(0, 0, 0, 0.356); transition: transform 0.25s ease, box-shadow 0.25s ease; z-index: 0; }
-    .spec-action-btn--excel { background-color: #307750; }
-    .spec-action-btn--copy { background-color: #30333c; }
-    .spec-action-btn--help { background-color: #6a5b4a; }
-
-    .modal9-updates { position: absolute; top: 15px; right: 20px; width: 800px; max-height: 54px; padding: 10px 10px; border-radius: 14px; background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(48, 119, 80, 0.45); box-shadow: 0 18px 26px -16px rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; gap: 14px; overflow-y: auto; cursor: pointer; transition: max-height 0.35s ease, box-shadow 0.35s ease; z-index: 10000; }
-    .modal9-updates.is-expanded { max-height: 800px; box-shadow: 0 24px 42px -10px rgba(0, 0, 0, 0.75); }
-    .modal9-updates-toggle { padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(48, 119, 80, 0.6); background: rgba(48, 119, 80, 0.25); color: var(--content-color); font-size: 12px; cursor: pointer; }
-    .modal9-update-card { padding: 14px 16px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(48, 119, 80, 0.3); box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.8); display: flex; flex-direction: column; gap: 8px; }
+    /* Updates Panel */
+    .modal9-updates { position: absolute; top: 15px; right: 20px; width: 700px; max-height: 54px; padding: 12px 15px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border); backdrop-filter: blur(20px); display: flex; flex-direction: column; gap: 10px; overflow-y: auto; cursor: pointer; transition: max-height 0.35s ease; z-index: 10000; }
+    .modal9-updates.is-expanded { max-height: 600px; }
+    .modal9-updates-header { display: flex; justify-content: space-between; align-items: center; }
+    .modal9-updates-title { font-size: 12px; font-weight: 600; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .modal9-updates-toggle { font-size: 11px; color: var(--accent); background: none; border: 1px solid var(--border); padding: 2px 8px; border-radius: 4px; cursor: pointer; }
+    .modal9-updates-body { display: none; margin-top: 5px; }
+    .modal9-updates.is-expanded .modal9-updates-body { display: block; }
+    .modal9-update-card { padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.02); margin-bottom: 8px; border: 1px solid var(--border-subtle); }
+    .modal9-update-title { font-size: 13px; font-weight: 600; color: var(--fg); margin-bottom: 4px; }
+    .modal9-update-body { font-size: 12px; color: var(--fg-muted); line-height: 1.5; }
 
     /* === SLIDESHOW STYLES === */
     .slideshow-container {
       position: relative;
-      width: 100%; /* Full width of the modal column */
-      min-width: 800px; /* Ensure enough space for content */
-      height: auto; /* Dynamic height */
+      width: 100%;
+      min-width: 800px;
+      height: auto;
       min-height: 300px;
       overflow: hidden;
-      border-radius: 16px;
-      background: #f5f5f5;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+      border-radius: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
       margin-left: 10px;
     }
 
     .slide {
-      position: relative; /* Relative for dynamic height */
+      position: relative;
       width: 100%;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 1.5s ease;
-      display: none; /* Hidden by default */
+      transition: opacity 1s ease;
+      display: none;
     }
 
     .slide.active {
       opacity: 1;
       pointer-events: auto;
-      display: block; /* Show active slide */
+      display: block;
     }
 
     .slide-content {
-      padding: 20px 30px; /* Padding inside the slide */
+      padding: 20px 30px;
       height: 100%;
       overflow-y: auto;
-      max-height: 600px; /* Limit height if needed */
+      max-height: 600px;
     }
 
     .caption {
       padding: 10px 20px;
-      font-family: "Montserrat", sans-serif;
-      font-size: 1.1rem;
+      font-family: 'SN Pro', sans-serif;
+      font-size: 1rem;
       letter-spacing: 0.5px;
-      background: rgba(240, 240, 240, 0.9);
-      border-top: 1px solid #ddd;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(5px);
+      border-top: 1px solid var(--border);
       text-align: right;
-      color: #333;
+      color: var(--fg);
     }
 
-    /* navigation */
-    .prev,
-    .next {
+    /* Navigation */
+    .prev, .next {
       cursor: pointer;
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      color: #555;
+      color: var(--fg);
       font-size: 1.5rem;
       padding: 10px;
       border-radius: 50%;
-      background: rgba(0, 0, 0, 0.05);
+      background: rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(4px);
       transition: all 0.3s ease;
       opacity: 0.6;
       z-index: 3;
       user-select: none;
       font-weight: bold;
+      border: 1px solid var(--border);
     }
 
-    .prev:hover,
-    .next:hover {
+    .prev:hover, .next:hover {
       opacity: 1;
-      background: rgba(0, 0, 0, 0.15);
-      color: #000;
+      background: var(--fg-warm);
+      color: var(--bg);
     }
 
     .prev { left: 5px; }
     .next { right: 5px; }
 
-    /* indicator dots */
+    /* Dots */
     .dots-container {
       position: absolute;
       bottom: 10px;
@@ -305,25 +389,43 @@
     }
 
     .dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(255,255,255,0.3);
       cursor: pointer;
       transition: all 0.3s ease;
     }
 
     .dot.active {
-      background: var(--content-color);
+      background: var(--fg-warm);
       transform: scale(1.3);
     }
-
-    .dot:hover {
-      background: rgba(0, 0, 0, 0.5);
-    }
+    
+    /* Custom Scrollbar for Slides */
+    .slide-content::-webkit-scrollbar { width: 4px; }
+    .slide-content::-webkit-scrollbar-track { background: transparent; }
+    .slide-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
   </style>
 </head>
 <body>
+  <!-- Atmospheric Backgrounds -->
+  <div class="grain-layer" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <filter id="grainy">
+        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/>
+      </filter>
+      <rect width="100%" height="100%" filter="url(#grainy)"/>
+    </svg>
+  </div>
+  
+  <div class="floating-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+  
+  <div class="cursor-glow" aria-hidden="true"></div>
+
   <div id="home_wave"></div>
   <div id="preloader"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>
   <div id="db-disconnect-overlay"><div class="loading-wave"><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div></div></div>
@@ -332,12 +434,12 @@
   <div id="login-wrapper">
     <div class="container glass3d">
       <div class="overlay" id="overlay">
-        <div class="sign-in"><h3 style="color: white;">ТОЛЬКО УЗНАЛИ О НАС?</h3><p style="color: #ddd;">Расскажите немного о себе,<br>и совершенствуйте своё дело вместе с нами!</p><button class="button-submit2" id="slide-right-button">Создать учетную запись</button></div>
-        <div class="sign-up" style="text-align:left;"><h3 style="color: white;">МЫ ЗНАКОМЫ?</h3><p style="color: #ddd;">Если вы уже зарегистрированы,<br>перейдите на форму входа</p><button class="button-submit2" id="slide-left-button">Форма входа</button></div>
+        <div class="sign-in"><h3 style="color: white;">ТОЛЬКО УЗНАЛИ О НАС?</h3><p style="color: #aaa;">Расскажите немного о себе,<br>и совершенствуйте своё дело вместе с нами!</p><button class="button-submit2" id="slide-right-button">Создать учетную запись</button></div>
+        <div class="sign-up" style="text-align:left;"><h3 style="color: white;">МЫ ЗНАКОМЫ?</h3><p style="color: #aaa;">Если вы уже зарегистрированы,<br>перейдите на форму входа</p><button class="button-submit2" id="slide-left-button">Форма входа</button></div>
       </div>
       <div class="form">
-        <div class="sign-in" id="sign-in-info" style="margin-left: -255px;"><h2>Relative Parallel</h2><form id="registration-form"><div class="modalFORM"><h3>ФОРМА РЕГИСТРАЦИИ</h3><div class="inputForm"><input class="inputField" placeholder="Фамилия" type="text" name="lastname"/></div><div class="inputForm"><input class="inputField" placeholder="Имя" type="text" name="firstname"/></div><div class="inputForm"><input class="inputField" placeholder="Отчество" type="text" name="middlename"/></div><div class="inputForm"><input class="inputField" placeholder="+7 (999) 999 99 99" type="text" name="phone"/></div><div class="inputForm"><input class="inputField" placeholder="mail@gmail.com" type="email" name="email"/></div><div class="inputForm"><input class="inputField" placeholder="пароль" type="password" name="password"/></div><button class="button-submit" id="regBtn">Отправить заявку</button></div></form></div>
-        <div class="sign-up show" id="sign-up-info" style="margin-left: 130px;"><h2>Relative Parallel</h2><form id="login-form" method="post" autocomplete="on"><div class="modalFORM"><h3>ФОРМА ВХОДА</h3><div class="inputForm"><input class="inputField" type="email" placeholder="email: user@gmail.com" id="loginEmail" name="email" autocomplete="username"/></div><div class="inputForm"><input class="inputField" type="password" placeholder="ваш пароль" id="loginPassword" name="password" autocomplete="current-password"/></div><button class="button-submit" id="loginBtn">Войти</button></div></form></div>
+        <div class="sign-in" id="sign-in-info" style="margin-left: -255px;"><h2 style="color: var(--fg-warm)">AI Equipment Selection</h2><form id="registration-form"><div class="modalFORM"><h3>ФОРМА РЕГИСТРАЦИИ</h3><div class="inputForm"><input class="inputField" placeholder="Фамилия" type="text" name="lastname"/></div><div class="inputForm"><input class="inputField" placeholder="Имя" type="text" name="firstname"/></div><div class="inputForm"><input class="inputField" placeholder="Отчество" type="text" name="middlename"/></div><div class="inputForm"><input class="inputField" placeholder="+7 (999) 999 99 99" type="text" name="phone"/></div><div class="inputForm"><input class="inputField" placeholder="mail@gmail.com" type="email" name="email"/></div><div class="inputForm"><input class="inputField" placeholder="пароль" type="password" name="password"/></div><button class="button-submit" id="regBtn">Отправить заявку</button></div></form></div>
+        <div class="sign-up show" id="sign-up-info" style="margin-left: 130px;"><h2 style="color: var(--fg-warm)">AI Equipment Selection</h2><form id="login-form" method="post" autocomplete="on"><div class="modalFORM"><h3>ФОРМА ВХОДА</h3><div class="inputForm"><input class="inputField" type="email" placeholder="email: user@gmail.com" id="loginEmail" name="email" autocomplete="username"/></div><div class="inputForm"><input class="inputField" type="password" placeholder="ваш пароль" id="loginPassword" name="password" autocomplete="current-password"/></div><button class="button-submit" id="loginBtn">Войти</button></div></form></div>
       </div>
     </div>
   </div>
@@ -347,7 +449,7 @@
     <div class="spec-context-menu" aria-hidden="true"><button type="button" data-action="copy">Скопировать спецификацию</button><button type="button" data-action="excel">Скачать спецификацию Excel</button></div>
     <div id="modal9-ticket-modal" class="tooltip-overlay" style="display:none;"><div class="tooltip-modal"><button class="ans5-close modal9-ticket-close" style="position:absolute; top:4px; right:8px;">×</button><div class="modalRow" style="margin-top:0;"><div class="input-container"><input type="text" id="modal9-ticket-spec-id" class="styled_input_bar" style="width: 90px; text-transform: uppercase; text-align: center;" inputmode="numeric" placeholder=""><label class="input-label">spec #</label></div><div class="input-container"><input type="text" id="modal9-ticket-subject" class="styled_input_bar" style="width: 700px;" maxlength="70" placeholder=""><label class="input-label">тема обращения</label></div></div><div class="modalRow"><div class="input-container" style="width:100%;"><textarea id="modal9-ticket-message" class="styled_input_bar" style="width: 800px; height: 500px;"></textarea><label class="input-label">текст обращения</label></div></div><div class="modalRow"><button type="button" class="darkmatter-btn modal9-submit-ticket-btn" style="height:40px;">отправить обращение</button></div></div></div>
     
-    <!-- Верхнее окно -->
+    <!-- Top Window -->
     <div class="modal9-top-window glass3d">
      <div class="modal9-top-body">
       <div class="file-upload__modal">
@@ -356,14 +458,14 @@
       </div>
       <div class="button-group" style="margin-top: 15px; display:flex; align-items:center; gap:10px;">
         <div class="file-filter-container input-container" style="position: relative; margin-top: -10px; width: 300px;"><input id="file-filter-input" class="styled_input_bar" style="width: 100%;" /><label class="input-label">поиск совпадений</label><button class="group-close ans5-close file-filter-clear" style="display:none;">×</button></div>
-        <label class="switch"><input type="checkbox" id="my-files-toggle"><span class="toggle-slider"></span></label><span class="toggle-text">демонстрация файлов компании</span>
+        <label class="switch"><input type="checkbox" id="my-files-toggle"><span class="toggle-slider"></span></label><span class="toggle-text" style="color: var(--fg-muted); font-size: 13px;">демонстрация файлов компании</span>
       </div>
       <ul class="file-upload__list"></ul>
      </div>
      <section class="modal9-updates" aria-label="Последние обновления"><div class="modal9-updates-header"><h2 class="modal9-updates-title">информация об обновлениях сервиса</h2><button type="button" class="modal9-updates-toggle" aria-expanded="false">развернуть</button></div><div class="modal9-updates-body"><article class="modal9-update-card"><h3 class="modal9-update-title">Обновление</h3><p class="modal9-update-body">Исправления</p></article></div></section>
     </div>
     
-    <!-- Нижнее окно -->
+    <!-- Bottom Window -->
     <div class="modal9-window glass3d">
        <div class="modal9-content">
         <div class="page spec-page active" data-page="1">
@@ -740,11 +842,11 @@
       
       function getStatusIconState(rawValue) {
         const value = String(rawValue ?? '').trim();
-        if (!value || value === '-') return { icon: 'clear_all', color: '#878787', glow: false };
+        if (!value || value === '-') return { icon: 'clear_all', color: 'var(--fg-muted)', glow: false };
         const normalized = value.replace(/\s+/g, ' ');
         const parts = normalized.split('/').map(part => part.trim());
-        if (parts.length === 3 && parts.every(part => part && part === parts[0])) return { icon: 'done_all', color: '#337418', glow: true };
-        return { icon: 'text_fields_alt', color: '#262626', glow: false };
+        if (parts.length === 3 && parts.every(part => part && part === parts[0])) return { icon: 'done_all', color: '#5fd47a', glow: true };
+        return { icon: 'text_fields_alt', color: 'var(--fg)', glow: false };
       }
 
       function applyStatusIcon(scope, field, value) {
@@ -755,7 +857,7 @@
         const state = getStatusIconState(value);
         if (icon.textContent !== state.icon) icon.textContent = state.icon;
         icon.style.color = state.color;
-        icon.style.textShadow = state.glow ? '0 0 8px #5dd62c' : 'none';
+        icon.style.textShadow = state.glow ? '0 0 8px rgba(95, 212, 122, 0.6)' : 'none';
       }
 
       function showCopyTip(el) { const tip = document.createElement('div'); tip.className = 'copy-tooltip'; tip.textContent = 'скопировано'; document.body.appendChild(tip); const r = el.getBoundingClientRect(); tip.style.left = r.left + r.width / 2 - tip.offsetWidth / 2 + 'px'; tip.style.top = r.top - tip.offsetHeight - 6 + 'px'; setTimeout(() => tip.remove(), 1000); }
@@ -906,7 +1008,7 @@
 
        async function loadBlock1(options = {}) {
         const { fromHistory = false } = options;
-        const specIds = Array.from(new Set((history || []).map(h => h?.id).filter(id => id !== null && id !== undefined)));
+        const specIds = Array.from(new Set((history || []).map(h => h?.id).filter(id => id !== null && id !== undefined));
         if (!specIds.length) { block1Rows = []; specGroups = {}; selectionMap = {}; renderBlock1(); return; }
         const { data, error } = await supabase.from(POS_TABLE).select('file_number, user_login, file_name, id, spec_id, pos_number, pos_number_int, name, qty, unit, attrs, attrs_json').in('spec_id', specIds).order('spec_id', { ascending: false }).order('pos_number_int', { ascending: true });
         if (error) { console.error(error); return; }
@@ -1090,9 +1192,9 @@
       function restoreHistoryBlockState(specId, content) { if (!content) return; const saved = historyOpenBlocks[specId]; if (!saved) return; /* Add logic if needed */ }
       function restoreBlock1State(specId, content) { if (!content) return; const saved = block1OpenBlocks[specId]; if (!saved) return; /* Add logic if needed */ }
 
-      function updateSpecProgress(specId, info) { const idStr = String(specId); let statuses = info; if (!statuses || (typeof statuses === 'object' && !('parser' in statuses) && !('selector' in statuses) && !('pricer' in statuses))) { const row = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`); const parser = row?.querySelector('[data-field="status_parser"]')?.value || ''; const selector = row?.querySelector('[data-field="status_selector"]')?.value || ''; const pricer = row?.querySelector('[data-field="status_pricer"]')?.value || ''; statuses = { parser, selector, pricer }; } root.querySelectorAll(`.spec-progress[data-spec-id="${idStr}"]`).forEach(el => setProgress(el, statuses)); }
+      function updateSpecProgress(specId, info) { const idStr = String(specId); let statuses = info; if (!statuses || (typeof statuses === 'object' && !('parser' in statuses) && !('selector' in statuses) && !('pricer' in statuses))) { const row = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`); const parser = row?.querySelector('[data-field="status_parser"]')?.value || row?.querySelector('[data-field="status_parser"]')?.textContent || ''; const selector = row?.querySelector('[data-field="status_selector"]')?.value || row?.querySelector('[data-field="status_selector"]')?.textContent || ''; const pricer = row?.querySelector('[data-field="status_pricer"]')?.value || row?.querySelector('[data-field="status_pricer"]')?.textContent || ''; statuses = { parser, selector, pricer }; } root.querySelectorAll(`.spec-progress[data-spec-id="${idStr}"]`).forEach(el => setProgress(el, statuses)); }
       
-      function setProgress(progressEl, info) { if (!progressEl) return; const specId = progressEl.dataset.specId; const row = historyList.querySelector(`.history-item[data-spec-id="${specId}"]`); let parserStatus = row?.querySelector('[data-field="status_parser"]')?.value || ''; let selectorStatus = row?.querySelector('[data-field="status_selector"]')?.value || ''; let pricerStatus = row?.querySelector('[data-field="status_pricer"]')?.value || ''; if (typeof info === 'object' && info && ('parser' in info || 'selector' in info || 'pricer' in info)) { parserStatus = info.parser ?? parserStatus; selectorStatus = info.selector ?? selectorStatus; pricerStatus = info.pricer ?? pricerStatus; } const steps = progressEl.querySelectorAll('.step'); const pDone = interpretDone(parserStatus); const sDone = interpretDone(selectorStatus); const rDone = interpretDone(pricerStatus); const apply = (stepEl, done) => { const icon = stepEl.querySelector('.status'); if (done) { stepEl.classList.add('active'); if (icon) icon.textContent = 'done_all'; } else { stepEl.classList.remove('active'); if (icon) icon.textContent = 'indeterminate_check_box'; } }; apply(steps[0], pDone); apply(steps[1], sDone); apply(steps[2], rDone); }
+      function setProgress(progressEl, info) { if (!progressEl) return; const specId = progressEl.dataset.specId; const row = historyList.querySelector(`.history-item[data-spec-id="${specId}"]`); let parserStatus = row?.querySelector('[data-field="status_parser"]')?.value || ''; let selectorStatus = row?.querySelector('[data-field="status_selector"]')?.value || row?.querySelector('[data-field="status_selector"]')?.textContent || ''; let pricerStatus = row?.querySelector('[data-field="status_pricer"]')?.value || row?.querySelector('[data-field="status_pricer"]')?.textContent || ''; if (typeof info === 'object' && info && ('parser' in info || 'selector' in info || 'pricer' in info)) { parserStatus = info.parser ?? parserStatus; selectorStatus = info.selector ?? selectorStatus; pricerStatus = info.pricer ?? pricerStatus; } const steps = progressEl.querySelectorAll('.step'); const pDone = interpretDone(parserStatus); const sDone = interpretDone(selectorStatus); const rDone = interpretDone(pricerStatus); const apply = (stepEl, done) => { const icon = stepEl.querySelector('.status'); if (done) { stepEl.classList.add('active'); if (icon) icon.textContent = 'done_all'; } else { stepEl.classList.remove('active'); if (icon) icon.textContent = 'indeterminate_check_box'; } }; apply(steps[0], pDone); apply(steps[1], sDone); apply(steps[2], rDone); }
       function interpretDone(str) { const s = String(str || '').toLowerCase(); const c = parseSelectorCounts(s); return c ? (c.total > 0 && c.received >= c.total) : /(готов|done)/i.test(s); }
       function parseSelectorCounts(str) { const m = String(str || '').match(/(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)/); return m ? { sent: Number(m[1]), received: Number(m[2]), total: Number(m[3]) } : null; }
       
@@ -1125,7 +1227,7 @@
         const row = historyList.querySelector(`.history-item[data-spec-id="${id}"]`);
         if (row) {
           const specCont = row.querySelector('[data-field="id"]').closest('.input-container');
-          if (specCont) { specCont.style.position = 'relative'; if (!specCont.querySelector('.spec-close-btn')) { const extraBtn = document.createElement('button'); extraBtn.textContent = '×'; extraBtn.className = 'group-close ans5-close spec-close-btn'; extraBtn.style.position = 'absolute'; extraBtn.style.right = '-25px'; extraBtn.addEventListener('click', e => { e.stopPropagation(); closeRowGroup(id); }); specCont.appendChild(extraBtn); } }
+          if (specCont) { specCont.style.position = 'relative'; if (!specCont.querySelector('.spec-close-btn')) { const extraBtn = document.createElement('button'); extraBtn.textContent = '×'; extraBtn.className = 'group-close ans5-close spec-close-btn'; extraBtn.style.position = 'absolute'; extraBtn.style.right = '-25px'; extraBtn.style.color = 'var(--fg)'; extraBtn.addEventListener('click', e => { e.stopPropagation(); closeRowGroup(id); }); specCont.appendChild(extraBtn); } }
         }
       }
       
@@ -1208,16 +1310,37 @@
 
     window.logout = function() { location.reload(); };
   </script>
-  <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
+  
+  <!-- Cursor Glow Script -->
   <script>
-    // THREE.JS Logic
-    const SEPARATION = 200, AMOUNTX = 40, AMOUNTY = 60; const AMP_X = 50, AMP_Y = 50; const FREQ_X = 0.3, FREQ_Y = 0.5; const WAVE_SPEED = 0.025; const POINT_SIZE = 10; const POINT_COLOR = 0x2C2C2B; const USE_ROUND_SPRITE = true; let camera, renderer, scene, points, count = 0;
-    function makeCircleSpriteTexture(size = 64, softness = 1.0) { const canvas = document.createElement('canvas'); canvas.width = canvas.height = size; const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, size, size); const r = size * 0.5; const gradient = ctx.createRadialGradient(r, r, r * 0.0, r, r, r); gradient.addColorStop(0, `rgba(255,255,255,1)`); gradient.addColorStop(Math.min(1, 0.7 * softness), `rgba(255,255,255,0.9)`); gradient.addColorStop(1, `rgba(255,255,255,0)`); ctx.fillStyle = gradient; ctx.beginPath(); ctx.arc(r, r, r, 0, Math.PI * 2); ctx.fill(); const tx = new THREE.CanvasTexture(canvas); tx.needsUpdate = true; return tx; }
-    function init(container) { scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 10000); camera.position.set(0, 355, 122); renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight); container.appendChild(renderer.domElement); const positions = []; for (let ix = 0; ix < AMOUNTX; ix++) { for (let iy = 0; iy < AMOUNTY; iy++) { positions.push(ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2), 0, iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2)); } } const geometry = new THREE.BufferGeometry(); geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3)); const materialOptions = { color: POINT_COLOR, size: POINT_SIZE, sizeAttenuation: true }; if (USE_ROUND_SPRITE) { materialOptions.map = makeCircleSpriteTexture(64, 1.0); materialOptions.transparent = true; materialOptions.alphaTest = 0.5; materialOptions.depthWrite = false; } const material = new THREE.PointsMaterial(materialOptions); points = new THREE.Points(geometry, material); scene.add(points); window.addEventListener('resize', onWindowResize); }
-    function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
-    function animate() { requestAnimationFrame(animate); render(); }
-    function render() { const pos = points.geometry.attributes.position.array; let i = 0; for (let ix = 0; ix < AMOUNTX; ix++) { for (let iy = 0; iy < AMOUNTY; iy++) { const waveX = Math.sin((ix + count) * FREQ_X) * AMP_X; const waveY = Math.sin((iy + count) * FREQ_Y) * AMP_Y; pos[i + 1] = waveX + waveY; i += 3; } } points.geometry.attributes.position.needsUpdate = true; renderer.render(scene, camera); count += WAVE_SPEED; }
-    document.addEventListener('DOMContentLoaded', () => { const container = document.getElementById('home_wave'); if (container) { init(container); animate(); } });
+    (function() {
+      var cursorGlow = document.querySelector('.cursor-glow');
+      if (!cursorGlow) return;
+      
+      var currentX = 0, currentY = 0;
+      var targetX = 0, targetY = 0;
+      var initialized = false;
+
+      document.addEventListener('mousemove', function(e) {
+        targetX = e.clientX;
+        targetY = e.clientY;
+        if (!initialized) {
+          currentX = targetX;
+          currentY = targetY;
+          initialized = true;
+        }
+      });
+
+      function animate() {
+        currentX += (targetX - currentX) * 0.08;
+        currentY += (targetY - currentY) * 0.08;
+        cursorGlow.style.left = currentX + 'px';
+        cursorGlow.style.top = currentY + 'px';
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    })();
   </script>
 </body>
 </html>
