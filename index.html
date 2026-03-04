@@ -2,63 +2,61 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Equipment Selection APP</title>
-  <!-- Подключение шрифтов -->
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+  <!-- Подключение новых шрифтов -->
+  <link href="https://fonts.googleapis.com/css2?family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  
   <style>
     :root {
-      --form-width: 900px;
-      --form-height: 900px;
-      --overlay-width: 385px;
+      --form-width: 850px;
+      --form-height: 550px;
+      --overlay-width: 380px;
+      
+      /* Новые переменные стилей */
+      --bg-primary: #f8f9fa;
+      --bg-card: #ffffff;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border-color: #e5e7eb;
+      --accent: #000000;
+      --accent-hover: #333333;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      
       /* Прелоадер */
-      --loader-line-color: #2C2C2B;
+      --loader-line-color: var(--text-primary);
       --loader-line-width: 10px;
-      --loader-line-height: 70px;
-      --fon: #ffffff;
-      --content-color: #2C2C2B;
+      --loader-line-height: 50px;
     }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Comfortaa', sans-serif;
+      font-family: 'SN Pro', sans-serif;
     }
+
     html, body {
       width: 100vw;
       height: 100vh;
-      /* background:  var(--fon)  url('https://images.wallpaperscraft.com/image/single/lines_background_abstraction_1309684_2560x1600.jpg') no-repeat center center fixed;
-      background-size: cover;  */
-      background: none;
-      color: var(--content-color);
+      background: var(--bg-primary);
+      color: var(--text-primary);
       overflow: hidden;
       position: relative;
     }
 
-    .glass3d {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
-      border-radius: 12px;
-      box-shadow:  
-    0 0 0.75px hsl(205 20% 10% / 0.2), 
-    0.7px 0.8px 1.2px -0.4px hsl(205 20% 10% / 0.1), 
-    1.3px 1.5px 2.2px -0.8px hsl(205 20% 10% / 0.1), 
-    2.3px 2.6px 3.9px -1.2px hsl(205 20% 10% / 0.1), 
-    3.9px 4.4px 6.6px -1.7px hsl(205 20% 10% / 0.1), 
-    6.5px 7.2px 10.9px -2.1px hsl(205 20% 10% / 0.1), 
-    8px 9px 14px -2.5px hsl(205 20% 10% / 0.2);
-    }
-
-    /* Прелоадер (основной, при старте страницы) */ 
+    /* --- Прелоадер (стилизован под пример) --- */
     #preloader {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       display: flex;
-      gap: 10px;
+      gap: 8px;
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.5s ease, visibility 0.5s ease;
@@ -69,23 +67,22 @@
     .line {
       width: var(--loader-line-width);
       height: var(--loader-line-height);
-      background-color: var(--content-color);
-      animation: bounce 1.5s infinite ease-in-out;
+      background-color: var(--accent);
+      animation: bounce 1.2s infinite ease-in-out;
       border-radius: 4px;
     }
-    .line:nth-child(2) { animation-delay: 0.3s; }
-    .line:nth-child(3) { animation-delay: 0.6s; }
-    .line:nth-child(5) { animation-delay: 1.2s; }
+    .line:nth-child(2) { animation-delay: 0.1s; }
+    .line:nth-child(3) { animation-delay: 0.2s; }
+    .line:nth-child(4) { animation-delay: 0.3s; }
+    .line:nth-child(5) { animation-delay: 0.4s; }
     @keyframes bounce {
-      0%,20%,50%,80%,100% { transform: translateY(0); }
-      40% { transform: translateY(-30px); }
-      60% { transform: translateY(-15px); }
+      0%, 40%, 100% { transform: scaleY(0.4); }
+      20% { transform: scaleY(1.0); }
     }
 
-    /* Меню */
+    /* --- Меню (Новый стиль) --- */
     #side-menu { display: none; }
 
-    /* Фиксированное меню навигации */
     .navigation {
       position: fixed;
       top: 20px;
@@ -93,9 +90,14 @@
       height: calc(100vh - 40px);
       width: 70px;
       z-index: 1200;
-      border-radius: 12px;
-      border: 1px solid var(--content-color);
+      border-radius: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      transition: width 0.3s ease;
+      overflow: hidden;
     }
+    
     .navigation ul {
       position: absolute;
       top: 0;
@@ -103,146 +105,126 @@
       width: 100%;
       display: flex;
       flex-direction: column;
+      padding: 10px 0;
     }
+    
     .navigation ul li {
       position: relative;
       list-style: none;
-      width: 60px;
+      width: 100%;
       height: 60px;
-      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+      
     .navigation ul li a {
       position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
       width: 100%;
-      text-align: center;
-      color: var(--content-color);
-      font-weight: 500;
+      height: 100%;
       text-decoration: none;
+      color: var(--text-secondary);
+      transition: color 0.2s;
     }
+
+    .navigation ul li.active a {
+      color: var(--text-primary);
+    }
+
     .navigation ul li a .icon {
-      position: relative;
+      font-size: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 60px;
-      height: 60px;
-      transition: 0.5s;
-      left: 9%;
-      top: 7px;
+      z-index: 2;
     }
-    .navigation ul li.active a .icon {
-      color: var(--content-color);
-    }
-    .navigation ul li a .icon i {
-      font-size: 32px;
-    }
-    .navigation ul .indicator,
+
     .navigation ul li a .title {
       position: absolute;
+      left: 80px;
       top: 50%;
-      left: 124px;
-      background: #f5f5f5;
       transform: translateY(-50%);
-      padding: 6px 6px;
-      border-radius: 6px;
-      border: 1px solid var(--content-color);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 600;
       opacity: 0;
-      transition: opacity 0.5s;
+      visibility: hidden;
+      transition: all 0.2s ease;
       pointer-events: none;
+      z-index: 10;
     }
+
     .navigation ul li:hover a .title {
       opacity: 1;
       visibility: visible;
-      transform: translateX(-50px) translateY(-50%);
-      font-size: 16px;
-      width: 210px;
-      height: 30px;
-      font-weight: 700;
-    }
-    .navigation:hover ul .indicator {
-     opacity: 1;
+      left: 70px;
     }
 
-    .navigation:hover ul li:hover a .title {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50px) translateY(-50%);
-    }
-    .navigation ul li a .title::before {
-      content: "";
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #f5f5f5;
-      left: -6px;
-      top: 30%;
-      transition: 0.5s;
-      transform: rotate(45deg) translateY(-50%);
-      border-radius: 8px;
-    }
     .navigation ul .indicator {
-      position: absolute;
-      left: 50%;
-      top: 6%;
-      width: 60px;
-      height: 60px;
-      transform: translateX(-50%);
-      transition: top 0.3s;
-    }
-    .navigation ul .indicator::before {
-      content: "";
       position: absolute;
       width: 50px;
       height: 50px;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #f5f5f5;
-      border-radius: 8px;
-      border: 1px solid var(--content-color);
-      transition: background 0.5s ease;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 12px;
+      top: 17px; /* Начальная позиция, обновляется JS */
+      left: 10px;
+      transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
     }
 
-    /* Логин/регистрация */
+    /* --- Логин/Регистрация (Новый стиль) --- */
     #login-wrapper {
       opacity: 0;
       transition: opacity 0.5s ease;
       width: 100%;
       height: 100%;
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #login-wrapper.show { opacity: 1; }
+    
     .container {
       width: var(--form-width);
       height: var(--form-height);
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border-radius: 10px;
-      border: 1px solid rgba(0,0,0,0.1);
-      overflow: hidden;
       position: relative;
+      background: var(--bg-card);
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
       z-index: 100;
+      border: 1px solid var(--border-color);
     }
+    
     .overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: var(--overlay-width);
       height: 100%;
-      background: #1B1C1D;
-      border-radius: 10px;
-      transition: left 1s ease;
-      z-index: 9999 !important;
-      pointer-events: auto !important;
+      background: var(--accent);
+      border-radius: 20px 0 0 20px; /* Скругление слева */
+      transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.6s ease;
+      z-index: 10;
+      color: white;
     }
-    .overlay.open-sign-up {
+    
+    /* Корректировка скругления при движении */
+    .overlay { border-radius: 20px 0 0 20px; }
+    .overlay.open-sign-up { 
       left: calc(var(--form-width) - var(--overlay-width));
+      border-radius: 0 20px 20px 0;
     }
+    
     .overlay .sign-in,
     .overlay .sign-up {
       position: absolute;
@@ -250,44 +232,46 @@
       left: 0;
       width: 100%;
       height: 100%;
-      padding: 30px;
+      padding: 40px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 15px;
-      transition: opacity 0.5s;
-      pointer-events: auto;
-      z-index: 10000;
-    }
-    .overlay .sign-in {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .overlay .sign-up {
+      gap: 20px;
+      transition: opacity 0.4s ease;
       opacity: 0;
-      pointer-events: none;
     }
-    .overlay.open-sign-up .sign-in {
-      opacity: 0;
-      pointer-events: none;
+    
+    .overlay .sign-in { opacity: 1; }
+    .overlay.open-sign-up .sign-in { opacity: 0; pointer-events: none; }
+    .overlay.open-sign-up .sign-up { opacity: 1; pointer-events: auto; }
+    .overlay .sign-up { opacity: 0; pointer-events: none; }
+    
+    .overlay h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 10px;
     }
-    .overlay.open-sign-up .sign-up {
-      opacity: 1;
-      pointer-events: auto;
+    
+    .overlay p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.5;
     }
-    /* Блок с формами – располагается справа от overlay */
+
+    /* Блок с формами */
     .form {
       position: absolute;
       top: 0;
       left: var(--overlay-width);
       width: calc(var(--form-width) - var(--overlay-width));
       height: 100%;
-      z-index: 500;
       display: flex;
+      background: var(--bg-card);
+      transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .form .sign-in,
-    .form .sign-up {
-      width: 50%;
+    
+    .form .sign-in, .form .sign-up {
+      width: 100%;
       height: 100%;
       display: none;
       flex-direction: column;
@@ -295,197 +279,210 @@
       align-items: center;
       text-align: center;
       opacity: 0;
-      transition: opacity 0.5s;
-      z-index: 500;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      transform: translateX(20px);
+      padding: 40px;
     }
-    .form .sign-in.show { display: flex; opacity: 1; }
-    .form .sign-up.show { display: flex; opacity: 1; }
+    
+    .form .sign-in.show, .form .sign-up.show { 
+      display: flex; 
+      opacity: 1; 
+      transform: translateX(0);
+    }
 
     .modalFORM {
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      background-color: var(--fon);
-      padding: 20px;
-      width: 380px;
-      border-radius: 10px;
-      z-index: 200;
-    }
-    .modalFORM h3 {
-      font-size: 26px;
-      font-weight: 500;
-      text-align: center;
-      text-transform: uppercase;
-      color: var(--content-color);
-      margin: 0;
-    }
-    .inputField {
-      width: 98%;
-      padding: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      border-radius: 10px;
-      outline: 1px solid var(--content-color);
-      border: 0;
-      background-color: var(--fon);
-      outline-offset: 3px;
-      transition: 0.25s;
-    }
-    .inputField:focus { outline-offset: 5px; }
-    .button-submit {
+      gap: 24px;
       width: 100%;
-      padding: 12px;
-      background-color: var(--content-color);
-      border: 1px solid var(--content-color);
-      color: var(--fon);
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 10px;
-      height: 40px;
-      cursor: pointer;
-      transition: all 0.4s;
-    }
-    .button-submit:hover {
-      color: var(--content-color);
-      background-color: var(--fon);
-    }
-    .button-submit2 {
-      padding: 12px;
-      background-color: var(--fon);
-      border: 1px solid var(--fon);
-      color: var(--content-color);
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 10px;
-      height: 40px;
-      width: 100%;
-      cursor: pointer;
-      transition: all 0.4s;
-      margin-top: 26px;
-    }
-    .button-submit2:hover {
-      color: var(--fon);
-      background-color: var(--content-color);
+      max-width: 320px;
     }
 
-    /* Правое модальное окно (контейнер для подгрузки страниц) */
+    .modalFORM h3 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    /* Стилизованные поля ввода */
+    .input-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .styled_input_bar {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 15px;
+      font-family: 'SN Pro', sans-serif;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .styled_input_bar::placeholder { color: transparent; } /* Скрываем стандартный плейсхолдер */
+
+    .styled_input_bar:focus { 
+      border-color: var(--accent); 
+      background-color: var(--bg-card); 
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05); 
+    }
+
+    .input-label {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: all 0.3s ease;
+      background: transparent;
+      padding: 0 4px;
+    }
+
+    .styled_input_bar:focus + .input-label,
+    .styled_input_bar:not(:placeholder-shown) + .input-label {
+      top: 0;
+      left: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      background-color: var(--bg-card); /* Фон для "обрезания" границы */
+      color: var(--accent);
+    }
+
+    /* Кнопки */
+    .button-submit {
+      width: 100%;
+      padding: 14px 24px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .button-submit:hover { 
+      background: var(--accent-hover); 
+      transform: translateY(-1px);
+    }
+
+    .button-submit2 {
+      width: 100%;
+      padding: 12px;
+      background-color: transparent;
+      border: 1.5px solid white;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .button-submit2:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+
+    /* Модальное окно контента */
     .modal-window {
       position: fixed;
-      width: 1278px;
+      width: calc(100vw - 110px); /* Учет ширины меню */
       height: calc(100vh - 40px);
-                              /* ставим «якорь» в центр экрана по Y */
-      top: 50%;                        /* ставим «якорь» в центр экрана по Y */
-      left: 50%;                       /* ставим «якорь» в центр экрана по X */
+      top: 50%;
+      left: calc(50% + 55px); /* Сдвиг на половину меню */
       transform: translate(-50%, -50%);
-      
-      background-color: transparent;
-      border: none;
-      padding: 0;
-      overflow: visible;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 32px;
+      overflow: hidden;
       z-index: 1100;
-      display: none; /* по умолчанию окно скрыто */
+      display: none;
       flex-direction: column;
-      align-items: center;       
-      justify-content: flex-start; 
+      box-shadow: 0 20px 40px rgba(0,0,0,0.05);
     }
-    /* Прелоадер для модального окна */
+
     .lines-loader {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       display: flex;
-      gap: 10px;
+      gap: 8px;
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.5s ease, visibility 0.5s ease;
       z-index: 1200;
     }
-    .lines-loader.visible {
-      opacity: 1;
-      visibility: visible;
-    }
+    .lines-loader.visible { opacity: 1; visibility: visible; }
+    
     .lineLM {
-      width: 10px;
-      height: 70px;
-      background-color: var(--content-color);
-      animation: bounce2 1.5s infinite ease-in-out;
+      width: 8px;
+      height: 40px;
+      background-color: var(--accent);
+      animation: bounce 1.2s infinite ease-in-out;
       border-radius: 4px;
     }
-    .lineLM:nth-child(2) { animation-delay: 0.3s; }
-    .lineLM:nth-child(3) { animation-delay: 0.6s; }
-    .lineLM:nth-child(5) { animation-delay: 1.2s; }
-    @keyframes bounce2 {
-      0%,20%,50%,80%,100% { transform: translateY(0); }
-      40% { transform: translateY(-30px); }
-      60% { transform: translateY(-15px); }
-    }
+    .lineLM:nth-child(2) { animation-delay: 0.1s; }
+    .lineLM:nth-child(3) { animation-delay: 0.2s; }
+    .lineLM:nth-child(4) { animation-delay: 0.3s; }
+    .lineLM:nth-child(5) { animation-delay: 0.4s; }
 
-    /* Контейнер для динамического контента */
     .content-area {
       opacity: 0;
       transition: opacity 0.5s ease;
       width: 100%;
       height: 100%;
-      overflow-y: visible;
+      overflow-y: auto;
       position: relative;
       z-index: 1;
     }
-    .content-area.visible {
-      opacity: 1;
-    }
+    .content-area.visible { opacity: 1; }
 
-      /* Overlay показывающий потерю соединения */
+    /* Оверлей потери соединения */
     #db-disconnect-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.6);
-      backdrop-filter: blur(4px);
+      inset: 0;
+      background: rgba(248, 249, 250, 0.9);
+      backdrop-filter: blur(8px);
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.5s ease;
       z-index: 2000;
-    }
-    #db-disconnect-overlay.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .loading-wave {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      width: 1000px;
-      height: 0;
       display: flex;
+      align-items: center;
       justify-content: center;
-      align-items: flex-end;
-      opacity: 0;
-      transition: opacity 1s ease;
+      flex-direction: column;
     }
-    #db-disconnect-overlay.show .loading-wave {
-      opacity: 1;
+    #db-disconnect-overlay.show { opacity: 1; pointer-events: auto; }
+    
+    .loading-wave {
+      display: flex;
+      gap: 8px;
     }
     .loading-bar {
-      width: 20px;
+      width: 8px;
       height: 40px;
-      margin: 0 5px;
-      background-color: #6b252c;
-      border-radius: 5px;
-      animation: loading-wave-animation 1s ease-in-out infinite;
+      background-color: var(--error);
+      border-radius: 4px;
+      animation: wave 1s ease-in-out infinite;
     }
-    .loading-bar:nth-child(2) { animation-delay: 0.1s; }
-    .loading-bar:nth-child(3) { animation-delay: 0.3s; }
-    .loading-bar:nth-child(4) { animation-delay: 0.5s; }
-    .loading-bar:nth-child(5) { animation-delay: 0.7s; }
-    .loading-bar:nth-child(6) { animation-delay: 0.9s; }
-    .loading-bar:nth-child(7) { animation-delay: 0.11s; }
-    @keyframes loading-wave-animation {
-      0% { height: 10px; }
-      50% { height: 40px; }
-      100% { height: 10px; }
+    .loading-bar:nth-child(2) { animation-delay: 0.1s; height: 60px; }
+    .loading-bar:nth-child(3) { animation-delay: 0.2s; height: 30px; }
+    .loading-bar:nth-child(4) { animation-delay: 0.3s; height: 50px; }
+    
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.5); }
+      50% { transform: scaleY(1.5); }
     }
 
     #home_wave {
@@ -496,102 +493,104 @@
       height: 100%;
       overflow: hidden;
       z-index: -1;
+      opacity: 0.4; /* Легкая прозрачность для фона */
     }
     
+    /* Адаптив для маленьких экранов */
+    @media (max-width: 900px) {
+      .container { width: 95%; height: auto; min-height: 500px; }
+      .form { position: relative; width: 100%; left: 0; top: 0; height: auto; flex-direction: column; }
+      .overlay { position: relative; width: 100%; left: 0 !important; border-radius: 0; height: auto; padding: 20px;}
+      .modal-window { width: 100%; left: 0; transform: none; top: 70px; height: calc(100vh - 90px); border-radius: 20px 20px 0 0;}
+      .navigation { bottom: 0; top: auto; left: 0; width: 100%; height: 70px; border-radius: 20px 20px 0 0; }
+      .navigation ul { flex-direction: row; justify-content: space-around; padding: 0; }
+      .navigation ul li { height: 100%; width: auto; }
+      .navigation ul .indicator { display: none; }
+    }
   </style>
 </head>
 <body>
   <div id="home_wave"></div>
-  <!-- Прелоадер при загрузке index.html -->
+  
   <div id="preloader">
-    <div class="line"></div>
-    <div class="line"></div>
-    <div class="line"></div>
-    <div class="line"></div>
-    <div class="line"></div>
+    <div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
   </div>
 
-    <!-- Оверлей при потере соединения -->
   <div id="db-disconnect-overlay">
     <div class="loading-wave">
-      <div class="loading-bar"></div>
-      <div class="loading-bar"></div>
-      <div class="loading-bar"></div>
-      <div class="loading-bar"></div>
-      <div class="loading-bar"></div>
-      <div class="loading-bar"></div>
-      <div class="loading-bar"></div>
+      <div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div>
     </div>
+    <p style="margin-top: 20px; color: var(--text-secondary);">Потеря соединения с базой данных...</p>
   </div>
 
-   <!-- Меню (скрыто до логина) -->
+  <!-- Меню -->
   <div id="side-menu">
-    <div class="navigation glass3d">
+    <div class="navigation">
       <ul>
         <li class="navbar__item active" data-levels="PAGE1" data-modal="modal1">
           <a href="#">
-            <span class="icon"><i class="material-symbols-outlined">view_kanban</i></span>
+            <span class="icon material-symbols-outlined">view_kanban</span>
             <span class="title">TASKS</span>
           </a>
         </li>
         <li class="navbar__item" data-levels="PAGE2" data-modal="modal2">
           <a href="#">
-            <span class="icon"><i class="material-symbols-outlined">price_check</i></span>
+            <span class="icon material-symbols-outlined">price_check</span>
             <span class="title">COST coordination</span>
           </a>
         </li>       
         <li class="navbar__item" data-levels="PAGE3" data-modal="modal3">
           <a href="#">
-            <span class="icon"><i class="material-symbols-outlined">full_stacked_bar_chart</i></span>
+            <span class="icon material-symbols-outlined">full_stacked_bar_chart</span>
             <span class="title">Deal Desk</span>
           </a>
         </li>
         <li class="navbar__item" data-levels="PAGE4" data-modal="modal4">
           <a href="#">
-            <span class="icon"><i class="material-symbols-outlined">shelves</i></span>
+            <span class="icon material-symbols-outlined">shelves</span>
             <span class="title">Warehouse</span>
           </a>
         </li>
         <li class="navbar__item" data-levels="PAGE5" data-modal="modal5">
           <a href="#">
-            <span class="icon"><i class="material-symbols-outlined">receipt_long</i></span>
+            <span class="icon material-symbols-outlined">receipt_long</span>
             <span class="title">My recipes</span>
           </a>
         </li>
         <li class="navbar__item" data-levels="PAGE6" data-modal="modal6">
           <a href="#">
-            <span class="icon"><i class="material-symbols-outlined">credit_score</i></span>
+            <span class="icon material-symbols-outlined">credit_score</span>
             <span class="title">MY Income</span>
           </a>
         </li>
         <li class="navbar__item" data-levels="PAGE7" data-modal="modal7">
           <a href="#">
-            <span class="icon"><i class="material-symbols-outlined">construction</i></span>
+            <span class="icon material-symbols-outlined">construction</span>
             <span class="title">PAGE 7</span>
           </a>
         </li>
         <li class="navbar__item" data-levels="PAGE8" data-modal="modal8">
           <a href="#">
-            <span class="icon"><i class="material-symbols-outlined">construction</i></span>
+            <span class="icon material-symbols-outlined">construction</span>
             <span class="title">PAGE 8</span>
           </a>
         </li>
         <li class="navbar__item" data-levels="PAGE9" data-modal="modal9">
           <a href="#">
-            <span class="icon"><i class="material-symbols-outlined">blur_on</i></span>
+            <span class="icon material-symbols-outlined">blur_on</span>
             <span class="title">PAGE 9</span>
           </a>
         </li>
         <li class="navbar__item" data-levels="PAGE10" data-modal="modal10">
           <a href="#">
-            <span class="icon"><i class="material-symbols-outlined">forum</i></span>
-            <span class="title">technical support</span>
+            <span class="icon material-symbols-outlined">forum</span>
+            <span class="title">Technical support</span>
           </a>
         </li>
         <li class="navbar__item" id="settingsMenuItem" data-modal="modal0" style="display:none;">
           <a href="#">
-            <span class="icon"><i class="material-symbols-outlined">settings</i></span>
-            <span class="title">настройки</span>
+            <span class="icon material-symbols-outlined">settings</span>
+            <span class="title">Настройки</span>
           </a>
         </li>
         <div class="indicator"></div>
@@ -599,106 +598,98 @@
     </div>
   </div>
 
-  <!-- Правое "модальное" окно (но по сути — блок) для загрузки страниц -->
-  <div id="right-modal" class="modal-window" style="margin-left: 44px;">
-    <!-- Прелоадер для динамически загружаемых страниц -->
+  <!-- Модальное окно контента -->
+  <div id="right-modal" class="modal-window">
     <div class="lines-loader" id="linesLoader">
-      <div class="lineLM"></div>
-      <div class="lineLM"></div>
-      <div class="lineLM"></div>
-      <div class="lineLM"></div>
-      <div class="lineLM"></div>
+      <div class="lineLM"></div><div class="lineLM"></div><div class="lineLM"></div><div class="lineLM"></div><div class="lineLM"></div>
     </div>
-    <!-- Основной контейнер для подгруженного контента -->
     <div class="content-area" id="modalContentArea"></div>
   </div>
 
-  <!-- Контейнер логин/регистрации -->
+  <!-- Форма авторизации -->
   <div id="login-wrapper">
-    <div class="container glass3d">
-      <!-- Overlay -->
+    <div class="container">
       <div class="overlay" id="overlay">
-        <!-- "ТОЛЬКО УЗНАЛИ?" (по умолчанию) -->
         <div class="sign-in">
-          <h3 style="color: white;">ТОЛЬКО УЗНАЛИ О НАС?</h3>
-          <p style="color: #ddd;">
-            Расскажите немного о себе,<br>
-            и совершенствуйте своё дело вместе с нами!
-          </p>
-          <button class="button-submit2" id="slide-right-button">Создать учетную запись</button>
+          <h3>Новый пользователь?</h3>
+          <p>Создайте учетную запись, чтобы получить доступ ко всем функциям платформы.</p>
+          <button class="button-submit2" id="slide-right-button">Создать аккаунт</button>
         </div>
-        <!-- "МЫ ЗНАКОМЫ?" (при open-sign-up) -->
-        <div class="sign-up" style="text-align:left;">
-          <h3 style="color: white;">МЫ ЗНАКОМЫ?</h3>
-          <p style="color: #ddd;">
-            Если вы уже зарегистрированы,<br>
-            перейдите на форму входа
-          </p>
-          <button class="button-submit2" id="slide-left-button">Форма входа</button>
+        <div class="sign-up">
+          <h3>Уже с нами?</h3>
+          <p>Если у вас уже есть аккаунт, выполните вход, используя ваши данные.</p>
+          <button class="button-submit2" id="slide-left-button">Войти</button>
         </div>
       </div>
-      <!-- Блок с формами -->
+      
       <div class="form">
-        <!-- Левая половина: Регистрация (по умолчанию скрыта) -->
-        <div class="sign-in" id="sign-in-info" style="margin-left: -255px;">
-          <h2>AI Equipment Selection APP</h2>
+        <!-- Левая часть: Регистрация -->
+        <div class="sign-in" id="sign-in-info">
+           <h2 style="font-size: 20px; color: var(--text-secondary); margin-bottom: 20px;">AI Equipment Selection</h2>
           <form id="registration-form">
             <div class="modalFORM">
-              <h3>ФОРМА РЕГИСТРАЦИИ</h3>
-              <div class="inputForm">
-                <input class="inputField" placeholder="Фамилия" type="text" name="lastname"/>
+              <h3>Регистрация</h3>
+              <div class="input-container">
+                <input class="styled_input_bar" type="text" name="lastname" id="regLastname" placeholder=" " />
+                <label class="input-label" for="regLastname">Фамилия</label>
               </div>
-              <div class="inputForm">
-                <input class="inputField" placeholder="Имя" type="text" name="firstname"/>
+              <div class="input-container">
+                <input class="styled_input_bar" type="text" name="firstname" id="regFirstname" placeholder=" " />
+                <label class="input-label" for="regFirstname">Имя</label>
               </div>
-              <div class="inputForm">
-                <input class="inputField" placeholder="Отчество" type="text" name="middlename"/>
+              <div class="input-container">
+                <input class="styled_input_bar" type="text" name="middlename" id="regMiddlename" placeholder=" " />
+                <label class="input-label" for="regMiddlename">Отчество</label>
               </div>
-              <div class="inputForm">
-                <input class="inputField" placeholder="+7 (999) 999 99 99" type="text" name="phone"/>
+              <div class="input-container">
+                <input class="styled_input_bar" type="text" name="phone" id="regPhone" placeholder=" " />
+                <label class="input-label" for="regPhone">Телефон</label>
               </div>
-              <div class="inputForm">
-                <input class="inputField" placeholder="mail@gmail.com" type="email" name="email"/>
+              <div class="input-container">
+                <input class="styled_input_bar" type="email" name="email" id="regEmail" placeholder=" " />
+                <label class="input-label" for="regEmail">Email</label>
               </div>
-              <div class="inputForm">
-                <input class="inputField" placeholder="пароль" type="password" name="password"/>
+              <div class="input-container">
+                <input class="styled_input_bar" type="password" name="password" id="regPassword" placeholder=" " />
+                <label class="input-label" for="regPassword">Пароль</label>
               </div>
-              <button class="button-submit" id="regBtn">Отправить заявку</button>
+              <button class="button-submit" id="regBtn">Зарегистрироваться</button>
             </div>
           </form>
         </div>
-        <!-- Правая половина: Вход (по умолчанию видна) -->
-        <div class="sign-up show" id="sign-up-info" style="margin-left: 130px;">
-          <h2>AI Equipment Selection APP</h2>
+        
+        <!-- Правая часть: Вход -->
+        <div class="sign-up show" id="sign-up-info">
+          <h2 style="font-size: 20px; color: var(--text-secondary); margin-bottom: 20px;">AI Equipment Selection</h2>
           <form id="login-form" method="post" autocomplete="on">
             <div class="modalFORM">
-              <h3>ФОРМА ВХОДА</h3>
-              <div class="inputForm">
-                <input class="inputField" type="email" placeholder="email: user@gmail.com" id="loginEmail" name="email" autocomplete="username"/>
+              <h3>Вход в систему</h3>
+              <div class="input-container">
+                <input class="styled_input_bar" type="email" id="loginEmail" name="email" autocomplete="username" placeholder=" " />
+                <label class="input-label" for="loginEmail">Email</label>
               </div>
-              <div class="inputForm">
-                <input class="inputField" type="password" placeholder="ваш пароль" id="loginPassword" name="password" autocomplete="current-password"/>
+              <div class="input-container">
+                <input class="styled_input_bar" type="password" id="loginPassword" name="password" autocomplete="current-password" placeholder=" " />
+                <label class="input-label" for="loginPassword">Пароль</label>
               </div>
               <button class="button-submit" id="loginBtn">Войти</button>
             </div>
           </form>
         </div>
-      </div> <!-- .form -->
-    </div> <!-- .container -->
-  </div> <!-- #login-wrapper -->
+      </div>
+    </div>
+  </div>
 
-  <!-- Основной сценарий проекта (type="module") -->
+  <!-- Скрипты -->
   <script type="module">
     import { createClient } from "./vendor/supabase-client.js";
     window.SUPABASE_URL = 'https://jviswahajwmwibedxcll.supabase.co';
     window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2aXN3YWhhandtd2liZWR4Y2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMzU5NDcsImV4cCI6MjA2NDkxMTk0N30.Bkgknn8BAhlUp429fhyOErV-afbPkfcneTdVhKwgn7c';
 
     const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-  
-  // Сделать supabase доступным глобально
-  window.supabase = supabase;
+    window.supabase = supabase;
 
-    // DOM-элементы
+    // DOM Elements
     const preloader         = document.getElementById('preloader');
     const loginWrapper      = document.getElementById('login-wrapper');
     const sideMenu          = document.getElementById('side-menu');
@@ -710,7 +701,7 @@
     const loginEmail        = document.getElementById('loginEmail');
     const loginPassword     = document.getElementById('loginPassword');
     const loginBtn          = document.getElementById('loginBtn');
-     const regBtn            = document.getElementById('regBtn');
+    const regBtn            = document.getElementById('regBtn');
 
     async function hashPassword(str) {
       const enc = new TextEncoder().encode(str);
@@ -721,7 +712,7 @@
     }
     window.hashPassword = hashPassword;
 
-    // Прелоадер при загрузке index.html
+    // Logic
     document.addEventListener('DOMContentLoaded', () => {
       preloader.classList.add('visible');
       setTimeout(() => {
@@ -731,123 +722,81 @@
           preloader.style.display = 'none';
           loginWrapper.classList.add('show');
           document.body.style.overflow = 'auto';
-          // По умолчанию показываем форму ВХОДА (правую)
-          registrationForm.style.opacity = '0';
-          registrationForm.style.display = 'none';
-          loginForm.style.opacity = '1';
-          loginForm.style.display = 'flex';
+          // Default state
+          registrationForm.classList.remove('show');
+          loginForm.classList.add('show');
         }, 500);
       }, 2000);
     });
 
-    // Переключение overlay + форм регистрации/входа
     function toggleOverlay(toSignUp) {
       if (toSignUp) {
         overlay.classList.add('open-sign-up');
-        loginForm.style.opacity = '0';
-        setTimeout(() => { loginForm.style.display = 'none'; }, 500);
+        loginForm.classList.remove('show');
         setTimeout(() => {
-          registrationForm.style.display = 'flex';
-          registrationForm.style.opacity = '1';
-        }, 600);
+          registrationForm.classList.add('show');
+        }, 300);
       } else {
         overlay.classList.remove('open-sign-up');
-        registrationForm.style.opacity = '0';
-        setTimeout(() => { registrationForm.style.display = 'none'; }, 500);
+        registrationForm.classList.remove('show');
         setTimeout(() => {
-          loginForm.style.display = 'flex';
-          loginForm.style.opacity = '1';
-        }, 600);
+          loginForm.classList.add('show');
+        }, 300);
       }
     }
     slideRightBtn.addEventListener('click', () => toggleOverlay(true));
     slideLeftBtn.addEventListener('click', () => toggleOverlay(false));
 
-    // Кнопка "Войти"
     loginBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       const email = loginEmail.value.trim();
       const pass = loginPassword.value.trim();
-      if (!email || !pass) {
-        alert('Пожалуйста, введите логин и пароль');
-        return;
-      }
+      if (!email || !pass) { alert('Введите логин и пароль'); return; }
+      
       loginBtn.disabled = true;
       const originalLoginText = loginBtn.innerHTML;
-      loginBtn.innerHTML = 'Загрузка...';
-
+      loginBtn.innerHTML = '<span style="display:inline-block; animation: spin 1s linear infinite; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; width: 20px; height: 20px;"></span>';
+      
       let user = null;
       let loginData = null;
       try {
         user = await checkLoginCustom(email, pass);
-        if (!user) {
-          alert('Неверный логин или пароль');
-          loginBtn.disabled = false;
-          loginBtn.innerHTML = originalLoginText;
-          return;
-        }
-        const { data: ld, error: loginErr } =
-          await supabase.auth.signInWithPassword({ email, password: pass });
-        if (loginErr) {
-          throw loginErr;
-        }
+        if (!user) { alert('Неверный логин или пароль'); loginBtn.disabled = false; loginBtn.innerHTML = originalLoginText; return; }
+        const { data: ld, error: loginErr } = await supabase.auth.signInWithPassword({ email, password: pass });
+        if (loginErr) throw loginErr;
         loginData = ld;
       } catch (e) {
-        console.error('Custom auth exception', e);
-        alert('Ошибка авторизации: ' + (e.message || e.description || e));
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = originalLoginText;
+        console.error('Auth exception', e);
+        alert('Ошибка: ' + e.message);
+        loginBtn.disabled = false; loginBtn.innerHTML = originalLoginText;
         return;
       }
-      // Сохраняем данные компании глобально
+
       window.companyId = user.company_id;
       window.companyName = user.company_name;
       window.LOCAL_USER_ID = user.id;
       window.AUTH_ID = loginData?.user?.id || user.id;
-      // ▼ 1. Сохраняем уникальный ключ пользователя глобально
       window.USER_KEY = user.user_key || window.AUTH_ID || user.id || '';
       window.IS_ADMIN = user.is_admin;
       window.USER_LEVELS = user.menu_levels || '';
-      window.USER_LOGIN  = user.login || user.email || user.last_name || '';
-      // Попытка сохранить логин/пароль в менеджере паролей браузера
+      window.USER_LOGIN = user.login || user.email || user.last_name || '';
+
       if (navigator.credentials && typeof navigator.credentials.store === 'function') {
-        try {
-          const displayName = window.USER_LOGIN || user.email || email;
-          let credential = null;
-          if (typeof PasswordCredential !== 'undefined') {
-            credential = new PasswordCredential({
-              id: email,
-              name: displayName,
-              password: pass
-            });
-          } else if (typeof navigator.credentials.create === 'function') {
-            credential = await navigator.credentials.create({
-              password: {
-                id: email,
-                name: displayName,
-                password: pass
-              }
-            });
-          }
-          if (credential) {
-            await navigator.credentials.store(credential);
-          }
-        } catch (credErr) {
-          console.warn('Не удалось сохранить пароль через Credential Management API', credErr);
-        }
+         try {
+          const credential = new PasswordCredential({ id: email, password: pass });
+          await navigator.credentials.store(credential);
+        } catch (e) {}
       }
-      // ▼ 2. Ограничиваем меню доступными уровнями
-     // Вызываем фильтр меню даже при пустых правах
+
       filterMenuByUserLevels(user.menu_levels || '');
       const settingsItem = document.getElementById('settingsMenuItem');
-      if (settingsItem) {
-        settingsItem.style.display = user.is_admin ? '' : 'none';
-      }
-      // ▼ 3. Переходим из формы логина в основное приложение
+      if (settingsItem) settingsItem.style.display = user.is_admin ? '' : 'none';
+
       loginWrapper.classList.remove('show');
       preloader.style.display = 'flex';
       preloader.classList.remove('fade-out');
       preloader.classList.add('visible');
+      
       setTimeout(() => {
         preloader.classList.remove('visible');
         preloader.classList.add('fade-out');
@@ -873,23 +822,19 @@
       initIndicator();
     }
 
-    // Кнопка регистрации "Отправить заявку"
     if (regBtn) {
       regBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         regBtn.disabled = true;
         const originalRegText = regBtn.innerHTML;
-        regBtn.innerHTML = 'Загрузка...';
-
-        const regForm = document.getElementById('registration-form');
-        const formData = new FormData(regForm);
+        regBtn.innerHTML = 'Отправка...';
+        
+        const regFormEl = document.getElementById('registration-form');
+        const formData = new FormData(regFormEl);
         const data = {
-          lastname:   formData.get('lastname'),
-          firstname:  formData.get('firstname'),
-          middlename: formData.get('middlename'),
-          phone:      formData.get('phone'),
-          email:      formData.get('email'),
-          password:   formData.get('password')
+          lastname: formData.get('lastname'), firstname: formData.get('firstname'),
+          middlename: formData.get('middlename'), phone: formData.get('phone'),
+          email: formData.get('email'), password: formData.get('password')
         };
 
         try {
@@ -901,193 +846,107 @@
           window.registeredCompany = companyInfo;
 
           const user = await checkLoginCustom(data.email, data.password);
-          if (user) {
-            window.companyId = user.company_id;
-            window.companyName = user.company_name;
-            window.AUTH_ID = user.id;
-            window.USER_KEY = user.user_key || window.AUTH_ID || user.id || '';
-            window.IS_ADMIN = user.is_admin;
-            window.USER_LEVELS = user.menu_levels || '';
+           if (user) {
+            window.companyId = user.company_id; window.companyName = user.company_name;
+            window.AUTH_ID = user.id; window.USER_KEY = user.user_key || window.AUTH_ID || user.id || '';
+            window.IS_ADMIN = user.is_admin; window.USER_LEVELS = user.menu_levels || '';
             window.USER_LOGIN = user.login || user.email || user.last_name || '';
             filterMenuByUserLevels(user.menu_levels || '');
             const settingsItem = document.getElementById('settingsMenuItem');
             if (settingsItem) settingsItem.style.display = user.is_admin ? '' : 'none';
           }
 
-          alert('Регистрация успешна! Подтвердите email перед входом.');
+          alert('Регистрация успешна! Подтвердите email.');
           toggleOverlay(false);
           showRightModal('modal0');
         } catch (error) {
-          alert('Ошибка регистрации: ' + (error.message || error.description || error));
+          alert('Ошибка регистрации: ' + (error.message || error));
         } finally {
-          regBtn.disabled = false;
-          regBtn.innerHTML = originalRegText;
+          regBtn.disabled = false; regBtn.innerHTML = originalRegText;
         }
       });
     }
 
     async function registerUser(userData, companyId, companyName) {
       const pass_hash = await hashPassword(userData.password || '');
-      const { data, error } = await supabase
-        .from('administrators')
-        .insert([
-          {
-            last_name:   userData.lastname,
-            first_name:  userData.firstname,
-            middle_name: userData.middlename,
-            phone:       userData.phone,
-            email:       userData.email,
-            pass: pass_hash,
-            company_id:  companyId,
-            company_name: companyName,
-            menu_levels: 'PAGE1,PAGE2,PAGE3'
-          }
-        ])
-        .select('*')
-        .single();
-      if (error) {
-        throw error;
-      }
-      await supabase.auth.signUp({
-        email: userData.email,
-        password: userData.password
-      });
+      const { data, error } = await supabase.from('administrators').insert([
+        { last_name: userData.lastname, first_name: userData.firstname, middle_name: userData.middlename,
+          phone: userData.phone, email: userData.email, pass: pass_hash,
+          company_id: companyId, company_name: companyName, menu_levels: 'PAGE1,PAGE2,PAGE3' }
+      ]).select('*').single();
+      if (error) throw error;
+      await supabase.auth.signUp({ email: userData.email, password: userData.password });
       return data;
     }
 
-    // Проверка логина
     async function checkLoginCustom(email, password) {
       const pass_hash = await hashPassword(password);
       try {
-        let { data: adminData } = await supabase
-          .from('administrators')
-          .select('*')
-          .eq('email', email)
-          .single();
-        if (adminData && adminData.pass === pass_hash) {
-          return { ...adminData, is_admin: true };
-        }
-        let { data: empData } = await supabase
-          .from('employees')
-          .select('*')
-          .eq('email', email)
-          .single();
-        if (empData && empData.pass === pass_hash) {
-          return { ...empData, is_admin: false };
-        }
+        let { data: adminData } = await supabase.from('administrators').select('*').eq('email', email).single();
+        if (adminData && adminData.pass === pass_hash) return { ...adminData, is_admin: true };
+        let { data: empData } = await supabase.from('employees').select('*').eq('email', email).single();
+        if (empData && empData.pass === pass_hash) return { ...empData, is_admin: false };
         return null;
-      } catch (err) {
-        console.error(err);
-        return null;
-      }
+      } catch (err) { return null; }
     }
 
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    // Динамическая подгрузка страниц, аналогично проекту 1
-    const rightModal       = document.getElementById('right-modal');
-    const linesLoader      = document.getElementById('linesLoader');
+    const rightModal = document.getElementById('right-modal');
+    const linesLoader = document.getElementById('linesLoader');
     const modalContentArea = document.getElementById('modalContentArea');
-    const dbOverlay        = document.getElementById('db-disconnect-overlay');
+    const dbOverlay = document.getElementById('db-disconnect-overlay');
 
     async function pingDatabase() {
-      try {
-        const { error } = await supabase
-          .from('administrators')
-          .select('id')
-          .limit(1);
-        return !error;
-      } catch (e) {
-        return false;
-      }
+      try { const { error } = await supabase.from('administrators').select('id').limit(1); return !error; }
+      catch (e) { return false; }
     }
-
     async function checkDbConnection() {
       const isOk = await pingDatabase();
-      if (isOk) {
-        dbOverlay.classList.remove('show');
-      } else {
-        dbOverlay.classList.add('show');
-      }
+      if (isOk) dbOverlay.classList.remove('show'); else dbOverlay.classList.add('show');
     }
-
     setInterval(checkDbConnection, 10000);
     checkDbConnection();
 
-    // Функция, которая находит все <script> в загруженном контенте и выполняет их
     function executeScriptsFromHTML(parentElem) {
       const scripts = parentElem.querySelectorAll('script');
       scripts.forEach(oldScript => {
         const newScript = document.createElement('script');
-        // Копируем все атрибуты (например, type="module" или что-то ещё)
-        Array.from(oldScript.attributes).forEach(attr => {
-          newScript.setAttribute(attr.name, attr.value);
-        });
-        // Если <script src="...">, то подгружаем. Иначе переносим текстовый контент
-        if (oldScript.src) {
-          newScript.src = oldScript.src;
-        } else {
-          newScript.textContent = oldScript.textContent;
-        }
-        // Вставляем <script> в документ, чтобы он выполнился
+        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        if (oldScript.src) newScript.src = oldScript.src; else newScript.textContent = oldScript.textContent;
         document.body.appendChild(newScript);
       });
     }
 
-    // Функция showRightModal, которая показывает правое окно
     window.showRightModal = async function(pageId) {
-      // Страница настроек доступна только администраторам
-      if (pageId === 'modal0' && !window.IS_ADMIN) {
-        alert('Доступ разрешен только администраторам');
-        return;
-      }
-      // Проверяем уровни доступа для остальных страниц
+      if (pageId === 'modal0' && !window.IS_ADMIN) { alert('Доступ запрещен'); return; }
       const navItem = document.querySelector(`.navbar__item[data-modal="${pageId}"]`);
       if (navItem && navItem.dataset.levels) {
         const userLevels = (window.USER_LEVELS || '').split(',').map(l => l.trim().toUpperCase());
         const required = navItem.dataset.levels.split(',').map(l => l.trim().toUpperCase());
         const hasAccess = required.every(l => userLevels.includes(l));
-        if (!hasAccess) {
-          alert('Недостаточно прав для доступа');
-          return;
-        }
+        if (!hasAccess) { alert('Недостаточно прав'); return; }
       }
-      rightModal.style.display = 'flex'; // или 'block'
-
-      // Сбрасываем контейнер и показываем прелоадер
+      
+      rightModal.style.display = 'flex';
       modalContentArea.innerHTML = '';
-      linesLoader.classList.add('visible'); // показываем лоадер
+      linesLoader.classList.add('visible');
 
-      // Грузим контент
       try {
-        // Предотвращаем кэширование
         const url = `${pageId}.html?t=${Date.now()}`;
         const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Ошибка загрузки страницы');
-        }
+        if (!response.ok) throw new Error('Ошибка загрузки');
         const html = await response.text();
-
-        // Вставляем загруженный HTML в .content-area
         modalContentArea.innerHTML = html;
-        // Теперь ищем и исполняем <script>
         executeScriptsFromHTML(modalContentArea);
-
-        // Плавно показываем контент
         modalContentArea.classList.add('visible');
-
       } catch (error) {
-        modalContentArea.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
+        modalContentArea.innerHTML = `<p style="color: red; padding: 20px;">Ошибка: ${error.message}</p>`;
       } finally {
-        // Скрываем лоадер
         linesLoader.classList.remove('visible');
       }
     };
 
-    // Пример функции закрытия правого окна
     window.closeRightModal = function() {
-      if (window.cleanupRealtime) {
-        window.cleanupRealtime();
-      }
+      if (window.cleanupRealtime) window.cleanupRealtime();
       modalContentArea.innerHTML = '';
       modalContentArea.classList.remove('visible');
       rightModal.style.display = 'none';
@@ -1096,7 +955,10 @@
     const indicator = document.querySelector('.indicator');
 
     function moveIndicatorTo(item) {
-      indicator.style.top = (item.offsetTop + 6) + 'px';
+      // Для вертикального меню
+      indicator.style.top = (item.offsetTop + 5) + 'px';
+      indicator.style.left = '10px'; // Фиксируем слева
+      indicator.style.width = '50px'; // Фиксированная ширина индикатора
     }
 
     function setActive(item) {
@@ -1110,12 +972,9 @@
       if (first) setActive(first);
     }
 
-    // Вешаем обработчик на пункты меню
     const navItems = document.querySelectorAll('.navbar__item');
     navItems.forEach(item => {
-      item.addEventListener('mouseenter', function() {
-        moveIndicatorTo(this);
-      });
+      item.addEventListener('mouseenter', function() { moveIndicatorTo(this); });
       item.addEventListener('click', function(e) {
         e.preventDefault();
         setActive(this);
@@ -1124,162 +983,97 @@
       });
     });
 
-    // После загрузки меню формируем массив доступных страниц
     window.ADMIN_PAGES = Array.from(document.querySelectorAll('.navbar__item'))
       .filter(item => item.id !== 'settingsMenuItem')
-      .map(item => ({
-        code: item.dataset.levels,
-        title: item.querySelector('.title')?.textContent.trim() || item.dataset.levels
-      }));
+      .map(item => ({ code: item.dataset.levels, title: item.querySelector('.title')?.textContent.trim() || item.dataset.levels }));
 
-    window.logout = function() {
-      location.reload();
-    };
+    window.logout = function() { location.reload(); };
   </script>
+  
   <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
-<script>
-  // ========================= НАСТРОЙКИ (меняйте здесь) =========================
-  const SEPARATION = 200;          // расстояние между точками сетки
-  const AMOUNTX = 40;              // количество точек по X
-  const AMOUNTY = 60;              // количество точек по Y
+  <script>
+    // Three.js Background (Preserved)
+    const SEPARATION = 200, AMOUNTX = 40, AMOUNTY = 60;
+    const AMP_X = 50, AMP_Y = 50, FREQ_X = 0.3, FREQ_Y = 0.5, WAVE_SPEED = 0.025;
+    const POINT_SIZE = 10;
+    const POINT_COLOR = 0x000000; // Changed to black to match new theme
+    const USE_ROUND_SPRITE = true;
+    let camera, renderer, scene, points, count = 0;
 
-  const AMP_X = 50;                // амплитуда колебаний по X (высота волны от sin(ix))
-  const AMP_Y = 50;                // амплитуда колебаний по Y (высота волны от sin(iy))
-  const FREQ_X = 0.3;              // «частота» по X (чем меньше, тем более растянута волна)
-  const FREQ_Y = 0.5;              // «частота» по Y
-  const WAVE_SPEED = 0.025;         // скорость течения времени волны (меньше — медленнее)
+    function makeCircleSpriteTexture(size = 64, softness = 1.0) {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, size, size);
+      const r = size * 0.5;
+      const gradient = ctx.createRadialGradient(r, r, r * 0.0, r, r, r);
+      gradient.addColorStop(0, `rgba(0,0,0,0.5)`); // Subtle black
+      gradient.addColorStop(1, `rgba(0,0,0,0)`);
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(r, r, r, 0, Math.PI * 2);
+      ctx.fill();
+      const tx = new THREE.CanvasTexture(canvas);
+      tx.needsUpdate = true;
+      return tx;
+    }
 
-  const POINT_SIZE = 10;           // размер точки
-  const POINT_COLOR = 0x2C2C2B;    // цвет точек
-  const USE_ROUND_SPRITE = true;   // true — круглые точки (спрайт), false — квадратные
+    function init(container) {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 10000);
+      camera.position.set(0, 355, 122);
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
 
-  // =============== ВНУТРЕННИЕ ПЕРЕМЕННЫЕ СЦЕНЫ (лучше не трогать) ===============
-  let camera, renderer, scene, points, count = 0;
-
-  // //функция: создать круглый спрайт для точек (если включено)
-  function makeCircleSpriteTexture(size = 64, softness = 1.0) {
-    const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = size;
-    const ctx = canvas.getContext('2d');
-
-    // фон прозрачный
-    ctx.clearRect(0, 0, size, size);
-
-    // //отрисовка мягкого круга
-    const r = size * 0.5;
-    const gradient = ctx.createRadialGradient(r, r, r * 0.0, r, r, r);
-    // центр — непрозрачный, к краям — к прозрачному
-    gradient.addColorStop(0, `rgba(255,255,255,1)`);
-    gradient.addColorStop(Math.min(1, 0.7 * softness), `rgba(255,255,255,0.9)`);
-    gradient.addColorStop(1, `rgba(255,255,255,0)`);
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(r, r, r, 0, Math.PI * 2);
-    ctx.fill();
-
-    const tx = new THREE.CanvasTexture(canvas);
-    tx.needsUpdate = true;
-    return tx;
-  }
-
-  // //функция: инициализация сцены/камеры/рендера/геометрии
-  function init(container) {
-    // //сцена
-    scene = new THREE.Scene();
-
-    // //камера
-    camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 10000);
-    camera.position.set(0, 355, 122);
-
-    // //рендерер
-    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    container.appendChild(renderer.domElement);
-
-    // //подготовка позиций точек сетки
-    const positions = [];
-    for (let ix = 0; ix < AMOUNTX; ix++) {
-      for (let iy = 0; iy < AMOUNTY; iy++) {
-        positions.push(
-          ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2),
-          0,
-          iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2)
-        );
+      const positions = [];
+      for (let ix = 0; ix < AMOUNTX; ix++) {
+        for (let iy = 0; iy < AMOUNTY; iy++) {
+          positions.push(ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2), 0, iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2));
+        }
       }
-    }
-
-    // //геометрия точек
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-
-    // //материал точек (форма/цвет/размер)
-    const materialOptions = {
-      color: POINT_COLOR,         // цвет точек
-      size: POINT_SIZE,           // размер точек
-      sizeAttenuation: true       // затухание размера с расстоянием (оставьте true)
-    };
-
-    if (USE_ROUND_SPRITE) {
-      // //включаем спрайт для круглой формы
-      materialOptions.map = makeCircleSpriteTexture(64, 1.0);  // круглый спрайт
-      materialOptions.transparent = true;
-      materialOptions.alphaTest = 0.5; // отсечь края
-      materialOptions.depthWrite = false; // красивее блендится
-    }
-
-    const material = new THREE.PointsMaterial(materialOptions);
-
-    // //объект из точек
-    points = new THREE.Points(geometry, material);
-    scene.add(points);
-
-    // //адаптация к ресайзу
-    window.addEventListener('resize', onWindowResize);
-  }
-
-  // //функция: обработка ресайза окна
-  function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  }
-
-  // //функция: запуск цикла анимации
-  function animate() {
-    requestAnimationFrame(animate);
-    render();
-  }
-
-  // //функция: один кадр отрисовки (волны + рендер)
-  function render() {
-    const pos = points.geometry.attributes.position.array;
-    let i = 0;
-
-    // //обновляем Y-координату каждой точки сетки как сумму двух синусоид
-    for (let ix = 0; ix < AMOUNTX; ix++) {
-      for (let iy = 0; iy < AMOUNTY; iy++) {
-        const waveX = Math.sin((ix + count) * FREQ_X) * AMP_X;
-        const waveY = Math.sin((iy + count) * FREQ_Y) * AMP_Y;
-        pos[i + 1] = waveX + waveY; // Y
-        i += 3; // переходим к следующей вершине (x,y,z)
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      const materialOptions = { color: POINT_COLOR, size: POINT_SIZE, sizeAttenuation: true };
+      if (USE_ROUND_SPRITE) {
+        materialOptions.map = makeCircleSpriteTexture(64, 1.0);
+        materialOptions.transparent = true;
+        materialOptions.depthWrite = false;
       }
+      const material = new THREE.PointsMaterial(materialOptions);
+      points = new THREE.Points(geometry, material);
+      scene.add(points);
+      window.addEventListener('resize', onWindowResize);
     }
 
-    points.geometry.attributes.position.needsUpdate = true;
-    renderer.render(scene, camera);
-
-    // //скорость волны (уменьшите WAVE_SPEED — волны замедлятся)
-    count += WAVE_SPEED;
-  }
-
-  // //точка входа
-  document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('home_wave');
-    if (container) {
-      init(container);
-      animate();
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
     }
-  });
-</script>
+
+    function animate() { requestAnimationFrame(animate); render(); }
+
+    function render() {
+      const pos = points.geometry.attributes.position.array;
+      let i = 0;
+      for (let ix = 0; ix < AMOUNTX; ix++) {
+        for (let iy = 0; iy < AMOUNTY; iy++) {
+          const waveX = Math.sin((ix + count) * FREQ_X) * AMP_X;
+          const waveY = Math.sin((iy + count) * FREQ_Y) * AMP_Y;
+          pos[i + 1] = waveX + waveY;
+          i += 3;
+        }
+      }
+      points.geometry.attributes.position.needsUpdate = true;
+      renderer.render(scene, camera);
+      count += WAVE_SPEED;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('home_wave');
+      if (container) { init(container); animate(); }
+    });
+  </script>
 </body>
 </html>
