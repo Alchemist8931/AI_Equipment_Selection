@@ -801,13 +801,39 @@
          xhr.setRequestHeader('x-upsert', 'true');
          xhr.upload.onprogress = e => { if (e.lengthComputable) { const percent = Math.round((e.loaded / e.total) * 100); uploadProgress.value = percent; uploadStatus.textContent = percent + '%'; } };
          xhr.onload = async () => {
-             mainUploadBtn.classList.remove('loading'); mainUploadBtn.disabled = false; selectedFile = null; fileInput.value = '';
-             if (xhr.status >= 200 && xhr.status < 300) {
-                 uploadStatus.textContent = 'Загрузка завершена...';
-                 try { const {  insertedRow, error: regErr } = await supabase.from(TABLE).insert({ user_login: window.USER_LOGIN || '', file_path: filePath, file_name: fileNameForDB, file_ext: ext }).select('*').single(); if (regErr) throw regErr; uploadStatus.textContent = `Файл поставлен в очередь: ${insertedRow.file_number}`; loadHistory(); }
-                 catch (err) { uploadStatus.textContent = 'Ошибка записи в БД'; console.error(err); }
-             } else { uploadStatus.textContent = 'Ошибка загрузки файла'; }
-         };
+    mainUploadBtn.classList.remove('loading'); 
+    mainUploadBtn.disabled = false; 
+    selectedFile = null; 
+    fileInput.value = '';
+    
+    if (xhr.status >= 200 && xhr.status < 300) {
+        uploadStatus.textContent = 'Загрузка завершена...';
+        try { 
+            // ИСПРАВЛЕНО: деструктуризация { data, error }
+            const { data, error: regErr } = await supabase.from(TABLE).insert({ 
+                user_login: window.USER_LOGIN || '', 
+                file_path: filePath, 
+                file_name: fileNameForDB, 
+                file_ext: ext 
+            }).select('*').single(); 
+            
+            if (regErr) throw regErr; 
+            
+            if (data) {
+                uploadStatus.textContent = `Файл поставлен в очередь: ${data.file_number}`; 
+                loadHistory();
+            } else {
+                uploadStatus.textContent = 'Ошибка: пустой ответ от БД';
+            }
+        } 
+        catch (err) { 
+            uploadStatus.textContent = 'Ошибка записи в БД'; 
+            console.error(err); 
+        } 
+    } else { 
+        uploadStatus.textContent = 'Ошибка загрузки файла'; 
+    } 
+};
          xhr.send(selectedFile);
       });
 
