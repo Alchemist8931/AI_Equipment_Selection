@@ -85,20 +85,6 @@
     @keyframes orbFloat1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-40px, 40px); } }
     @keyframes orbFloat2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, -30px); } }
 
-    .cursor-glow {
-      position: fixed;
-      width: 400px; height: 400px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(240, 235, 228, 0.04) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 1;
-      transform: translate(-50%, -50%);
-      opacity: 0;
-      transition: opacity 0.4s;
-      will-change: transform, left, top;
-    }
-    body:hover .cursor-glow { opacity: 1; }
-
     /* === Main App Styles === */
     .glass3d {
       background: var(--bg-card);
@@ -423,8 +409,6 @@
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
   </div>
-  
-  <div class="cursor-glow" aria-hidden="true"></div>
 
   <div id="home_wave"></div>
   <div id="preloader"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>
@@ -1008,7 +992,7 @@
 
        async function loadBlock1(options = {}) {
         const { fromHistory = false } = options;
-        const specIds = Array.from(new Set((history || []).map(h => h?.id).filter(id => id !== null && id !== undefined));
+        const specIds = Array.from(new Set((history || []).map(h => h?.id).filter(id => id !== null && id !== undefined)));
         if (!specIds.length) { block1Rows = []; specGroups = {}; selectionMap = {}; renderBlock1(); return; }
         const { data, error } = await supabase.from(POS_TABLE).select('file_number, user_login, file_name, id, spec_id, pos_number, pos_number_int, name, qty, unit, attrs, attrs_json').in('spec_id', specIds).order('spec_id', { ascending: false }).order('pos_number_int', { ascending: true });
         if (error) { console.error(error); return; }
@@ -1309,38 +1293,6 @@
     }
 
     window.logout = function() { location.reload(); };
-  </script>
-  
-  <!-- Cursor Glow Script -->
-  <script>
-    (function() {
-      var cursorGlow = document.querySelector('.cursor-glow');
-      if (!cursorGlow) return;
-      
-      var currentX = 0, currentY = 0;
-      var targetX = 0, targetY = 0;
-      var initialized = false;
-
-      document.addEventListener('mousemove', function(e) {
-        targetX = e.clientX;
-        targetY = e.clientY;
-        if (!initialized) {
-          currentX = targetX;
-          currentY = targetY;
-          initialized = true;
-        }
-      });
-
-      function animate() {
-        currentX += (targetX - currentX) * 0.08;
-        currentY += (targetY - currentY) * 0.08;
-        cursorGlow.style.left = currentX + 'px';
-        cursorGlow.style.top = currentY + 'px';
-        requestAnimationFrame(animate);
-      }
-
-      animate();
-    })();
   </script>
 </body>
 </html>
