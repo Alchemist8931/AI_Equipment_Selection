@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Relative Parallel</title>
+  <!-- Подключение шрифтов -->
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  <style>
+    :root {
+      --form-width: 900px;
+      --form-height: 900px;
+      --overlay-width: 385px;
+      /* Прелоадер */
+      --loader-line-color: #2C2C2B;
+      --loader-line-width: 10px;
+      --loader-line-height: 70px;
+      --fon: #ffffff;
+      --content-color: #2C2C2B;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Comfortaa', sans-serif;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      /* background:  var(--fon)  url('https://images.wallpaperscraft.com/image/single/lines_background_abstraction_1309684_2560x1600.jpg') no-repeat center center fixed;
+      background-size: cover;  */
+      background: none;
+      color: var(--content-color);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .glass3d {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      border-radius: 12px;
+      box-shadow:  
+    0 0 0.75px hsl(205 20% 10% / 0.2), 
+    0.7px 0.8px 1.2px -0.4px hsl(205 20% 10% / 0.1), 
+    1.3px 1.5px 2.2px -0.8px hsl(205 20% 10% / 0.1), 
+    2.3px 2.6px 3.9px -1.2px hsl(205 20% 10% / 0.1), 
+    3.9px 4.4px 6.6px -1.7px hsl(205 20% 10% / 0.1), 
+    6.5px 7.2px 10.9px -2.1px hsl(205 20% 10% / 0.1), 
+    8px 9px 14px -2.5px hsl(205 20% 10% / 0.2);
+    }
+
+    /* Прелоадер (основной, при старте страницы) */ 
+    #preloader {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      gap: 10px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+      z-index: 9999;
+    }
+    #preloader.visible { opacity: 1; visibility: visible; }
+    #preloader.fade-out { opacity: 0; visibility: hidden; }
+    .line {
+      width: var(--loader-line-width);
+      height: var(--loader-line-height);
+      background-color: var(--content-color);
+      animation: bounce 1.5s infinite ease-in-out;
+      border-radius: 4px;
+    }
+    .line:nth-child(2) { animation-delay: 0.3s; }
+    .line:nth-child(3) { animation-delay: 0.6s; }
+    .line:nth-child(5) { animation-delay: 1.2s; }
+    @keyframes bounce {
+      0%,20%,50%,80%,100% { transform: translateY(0); }
+      40% { transform: translateY(-30px); }
+      60% { transform: translateY(-15px); }
+    }
+
+    /* Меню */
+    #side-menu { display: none; }
+
+    /* Фиксированное меню навигации */
+    .navigation {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      height: calc(100vh - 40px);
+      width: 70px;
+      z-index: 1200;
+      border-radius: 12px;
+      border: 1px solid var(--content-color);
+    }
+    .navigation ul {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .navigation ul li {
+      position: relative;
+      list-style: none;
+      width: 60px;
+      height: 60px;
+      z-index: 1;
+    }
+    .navigation ul li a {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      text-align: center;
+      color: var(--content-color);
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .navigation ul li a .icon {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      transition: 0.5s;
+      left: 9%;
+      top: 7px;
+    }
+    .navigation ul li.active a .icon {
+      color: var(--content-color);
+    }
+    .navigation ul li a .icon i {
+      font-size: 32px;
+    }
+    .navigation ul .indicator,
+    .navigation ul li a .title {
+      position: absolute;
+      top: 50%;
+      left: 124px;
+      background: #f5f5f5;
+      transform: translateY(-50%);
+      padding: 6px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--content-color);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    .navigation ul li:hover a .title {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50px) translateY(-50%);
+      font-size: 16px;
+      width: 210px;
+      height: 30px;
+      font-weight: 700;
+    }
+    .navigation:hover ul .indicator {
+     opacity: 1;
+    }
+
+    .navigation:hover ul li:hover a .title {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50px) translateY(-50%);
+    }
+    .navigation ul li a .title::before {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #f5f5f5;
+      left: -6px;
+      top: 30%;
+      transition: 0.5s;
+      transform: rotate(45deg) translateY(-50%);
+      border-radius: 8px;
+    }
+    .navigation ul .indicator {
+      position: absolute;
+      left: 50%;
+      top: 6%;
+      width: 60px;
+      height: 60px;
+      transform: translateX(-50%);
+      transition: top 0.3s;
+    }
+    .navigation ul .indicator::before {
+      content: "";
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #f5f5f5;
+      border-radius: 8px;
+      border: 1px solid var(--content-color);
+      transition: background 0.5s ease;
+    }
+
+    /* Логин/регистрация */
+    #login-wrapper {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    #login-wrapper.show { opacity: 1; }
+    .container {
+      width: var(--form-width);
+      height: var(--form-height);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.1);
+      overflow: hidden;
+      position: relative;
+      z-index: 100;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: var(--overlay-width);
+      height: 100%;
+      background: #1B1C1D;
+      border-radius: 10px;
+      transition: left 1s ease;
+      z-index: 9999 !important;
+      pointer-events: auto !important;
+    }
+    .overlay.open-sign-up {
+      left: calc(var(--form-width) - var(--overlay-width));
+    }
+    .overlay .sign-in,
+    .overlay .sign-up {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 15px;
+      transition: opacity 0.5s;
+      pointer-events: auto;
+      z-index: 10000;
+    }
+    .overlay .sign-in {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .overlay .sign-up {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .overlay.open-sign-up .sign-in {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .overlay.open-sign-up .sign-up {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* Блок с формами – располагается справа от overlay */
+    .form {
+      position: absolute;
+      top: 0;
+      left: var(--overlay-width);
+      width: calc(var(--form-width) - var(--overlay-width));
+      height: 100%;
+      z-index: 500;
+      display: flex;
+    }
+    .form .sign-in,
+    .form .sign-up {
+      width: 50%;
+      height: 100%;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.5s;
+      z-index: 500;
+    }
+    .form .sign-in.show { display: flex; opacity: 1; }
+    .form .sign-up.show { display: flex; opacity: 1; }
+
+    .modalFORM {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background-color: var(--fon);
+      padding: 20px;
+      width: 380px;
+      border-radius: 10px;
+      z-index: 200;
+    }
+    .modalFORM h3 {
+      font-size: 26px;
+      font-weight: 500;
+      text-align: center;
+      text-transform: uppercase;
+      color: var(--content-color);
+      margin: 0;
+    }
+    .inputField {
+      width: 98%;
+      padding: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 10px;
+      outline: 1px solid var(--content-color);
+      border: 0;
+      background-color: var(--fon);
+      outline-offset: 3px;
+      transition: 0.25s;
+    }
+    .inputField:focus { outline-offset: 5px; }
+    .button-submit {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--content-color);
+      border: 1px solid var(--content-color);
+      color: var(--fon);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
+      height: 40px;
+      cursor: pointer;
+      transition: all 0.4s;
+    }
+    .button-submit:hover {
+      color: var(--content-color);
+      background-color: var(--fon);
+    }
+    .button-submit2 {
+      padding: 12px;
+      background-color: var(--fon);
+      border: 1px solid var(--fon);
+      color: var(--content-color);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
+      height: 40px;
+      width: 100%;
+      cursor: pointer;
+      transition: all 0.4s;
+      margin-top: 26px;
+    }
+    .button-submit2:hover {
+      color: var(--fon);
+      background-color: var(--content-color);
+    }
+
+    /* Правое модальное окно (контейнер для подгрузки страниц) */
+    .modal-window {
+      position: fixed;
+      width: 1278px;
+      height: calc(100vh - 40px);
+                              /* ставим «якорь» в центр экрана по Y */
+      top: 50%;                        /* ставим «якорь» в центр экрана по Y */
+      left: 50%;                       /* ставим «якорь» в центр экрана по X */
+      transform: translate(-50%, -50%);
+      
+      background-color: transparent;
+      border: none;
+      padding: 0;
+      overflow: visible;
+      z-index: 1100;
+      display: none; /* по умолчанию окно скрыто */
+      flex-direction: column;
+      align-items: center;       
+      justify-content: flex-start; 
+    }
+    /* Прелоадер для модального окна */
+    .lines-loader {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      gap: 10px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+      z-index: 1200;
+    }
+    .lines-loader.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    .lineLM {
+      width: 10px;
+      height: 70px;
+      background-color: var(--content-color);
+      animation: bounce2 1.5s infinite ease-in-out;
+      border-radius: 4px;
+    }
+    .lineLM:nth-child(2) { animation-delay: 0.3s; }
+    .lineLM:nth-child(3) { animation-delay: 0.6s; }
+    .lineLM:nth-child(5) { animation-delay: 1.2s; }
+    @keyframes bounce2 {
+      0%,20%,50%,80%,100% { transform: translateY(0); }
+      40% { transform: translateY(-30px); }
+      60% { transform: translateY(-15px); }
+    }
+
+    /* Контейнер для динамического контента */
+    .content-area {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      width: 100%;
+      height: 100%;
+      overflow-y: visible;
+      position: relative;
+      z-index: 1;
+    }
+    .content-area.visible {
+      opacity: 1;
+    }
+
+      /* Overlay показывающий потерю соединения */
+    #db-disconnect-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      z-index: 2000;
+    }
+    #db-disconnect-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .loading-wave {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 1000px;
+      height: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    #db-disconnect-overlay.show .loading-wave {
+      opacity: 1;
+    }
+    .loading-bar {
+      width: 20px;
+      height: 40px;
+      margin: 0 5px;
+      background-color: #6b252c;
+      border-radius: 5px;
+      animation: loading-wave-animation 1s ease-in-out infinite;
+    }
+    .loading-bar:nth-child(2) { animation-delay: 0.1s; }
+    .loading-bar:nth-child(3) { animation-delay: 0.3s; }
+    .loading-bar:nth-child(4) { animation-delay: 0.5s; }
+    .loading-bar:nth-child(5) { animation-delay: 0.7s; }
+    .loading-bar:nth-child(6) { animation-delay: 0.9s; }
+    .loading-bar:nth-child(7) { animation-delay: 0.11s; }
+    @keyframes loading-wave-animation {
+      0% { height: 10px; }
+      50% { height: 40px; }
+      100% { height: 10px; }
+    }
+
+    #home_wave {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+    
+  </style>
+</head>
+<body>
+  <div id="home_wave"></div>
+  <!-- Прелоадер при загрузке index.html -->
+  <div id="preloader">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+
+    <!-- Оверлей при потере соединения -->
+  <div id="db-disconnect-overlay">
+    <div class="loading-wave">
+      <div class="loading-bar"></div>
+      <div class="loading-bar"></div>
+      <div class="loading-bar"></div>
+      <div class="loading-bar"></div>
+      <div class="loading-bar"></div>
+      <div class="loading-bar"></div>
+      <div class="loading-bar"></div>
+    </div>
+  </div>
+
+   <!-- Меню (скрыто до логина) -->
+  <div id="side-menu">
+    <div class="navigation glass3d">
+      <ul>
+        <li class="navbar__item active" data-levels="PAGE1" data-modal="modal1">
+          <a href="#">
+            <span class="icon"><i class="material-symbols-outlined">view_kanban</i></span>
+            <span class="title">TASKS</span>
+          </a>
+        </li>
+        <li class="navbar__item" data-levels="PAGE2" data-modal="modal2">
+          <a href="#">
+            <span class="icon"><i class="material-symbols-outlined">price_check</i></span>
+            <span class="title">COST coordination</span>
+          </a>
+        </li>       
+        <li class="navbar__item" data-levels="PAGE3" data-modal="modal3">
+          <a href="#">
+            <span class="icon"><i class="material-symbols-outlined">full_stacked_bar_chart</i></span>
+            <span class="title">Deal Desk</span>
+          </a>
+        </li>
+        <li class="navbar__item" data-levels="PAGE4" data-modal="modal4">
+          <a href="#">
+            <span class="icon"><i class="material-symbols-outlined">shelves</i></span>
+            <span class="title">Warehouse</span>
+          </a>
+        </li>
+        <li class="navbar__item" data-levels="PAGE5" data-modal="modal5">
+          <a href="#">
+            <span class="icon"><i class="material-symbols-outlined">receipt_long</i></span>
+            <span class="title">My recipes</span>
+          </a>
+        </li>
+        <li class="navbar__item" data-levels="PAGE6" data-modal="modal6">
+          <a href="#">
+            <span class="icon"><i class="material-symbols-outlined">credit_score</i></span>
+            <span class="title">MY Income</span>
+          </a>
+        </li>
+        <li class="navbar__item" data-levels="PAGE7" data-modal="modal7">
+          <a href="#">
+            <span class="icon"><i class="material-symbols-outlined">construction</i></span>
+            <span class="title">PAGE 7</span>
+          </a>
+        </li>
+        <li class="navbar__item" data-levels="PAGE8" data-modal="modal8">
+          <a href="#">
+            <span class="icon"><i class="material-symbols-outlined">construction</i></span>
+            <span class="title">PAGE 8</span>
+          </a>
+        </li>
+        <li class="navbar__item" data-levels="PAGE9" data-modal="modal9">
+          <a href="#">
+            <span class="icon"><i class="material-symbols-outlined">blur_on</i></span>
+            <span class="title">PAGE 9</span>
+          </a>
+        </li>
+        <li class="navbar__item" data-levels="PAGE10" data-modal="modal10">
+          <a href="#">
+            <span class="icon"><i class="material-symbols-outlined">forum</i></span>
+            <span class="title">technical support</span>
+          </a>
+        </li>
+        <li class="navbar__item" id="settingsMenuItem" data-modal="modal0" style="display:none;">
+          <a href="#">
+            <span class="icon"><i class="material-symbols-outlined">settings</i></span>
+            <span class="title">настройки</span>
+          </a>
+        </li>
+        <div class="indicator"></div>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Правое "модальное" окно (но по сути — блок) для загрузки страниц -->
+  <div id="right-modal" class="modal-window" style="margin-left: 44px;">
+    <!-- Прелоадер для динамически загружаемых страниц -->
+    <div class="lines-loader" id="linesLoader">
+      <div class="lineLM"></div>
+      <div class="lineLM"></div>
+      <div class="lineLM"></div>
+      <div class="lineLM"></div>
+      <div class="lineLM"></div>
+    </div>
+    <!-- Основной контейнер для подгруженного контента -->
+    <div class="content-area" id="modalContentArea"></div>
+  </div>
+
+  <!-- Контейнер логин/регистрации -->
+  <div id="login-wrapper">
+    <div class="container glass3d">
+      <!-- Overlay -->
+      <div class="overlay" id="overlay">
+        <!-- "ТОЛЬКО УЗНАЛИ?" (по умолчанию) -->
+        <div class="sign-in">
+          <h3 style="color: white;">ТОЛЬКО УЗНАЛИ О НАС?</h3>
+          <p style="color: #ddd;">
+            Расскажите немного о себе,<br>
+            и совершенствуйте своё дело вместе с нами!
+          </p>
+          <button class="button-submit2" id="slide-right-button">Создать учетную запись</button>
+        </div>
+        <!-- "МЫ ЗНАКОМЫ?" (при open-sign-up) -->
+        <div class="sign-up" style="text-align:left;">
+          <h3 style="color: white;">МЫ ЗНАКОМЫ?</h3>
+          <p style="color: #ddd;">
+            Если вы уже зарегистрированы,<br>
+            перейдите на форму входа
+          </p>
+          <button class="button-submit2" id="slide-left-button">Форма входа</button>
+        </div>
+      </div>
+      <!-- Блок с формами -->
+      <div class="form">
+        <!-- Левая половина: Регистрация (по умолчанию скрыта) -->
+        <div class="sign-in" id="sign-in-info" style="margin-left: -255px;">
+          <h2>Relative Parallel</h2>
+          <form id="registration-form">
+            <div class="modalFORM">
+              <h3>ФОРМА РЕГИСТРАЦИИ</h3>
+              <div class="inputForm">
+                <input class="inputField" placeholder="Фамилия" type="text" name="lastname"/>
+              </div>
+              <div class="inputForm">
+                <input class="inputField" placeholder="Имя" type="text" name="firstname"/>
+              </div>
+              <div class="inputForm">
+                <input class="inputField" placeholder="Отчество" type="text" name="middlename"/>
+              </div>
+              <div class="inputForm">
+                <input class="inputField" placeholder="+7 (999) 999 99 99" type="text" name="phone"/>
+              </div>
+              <div class="inputForm">
+                <input class="inputField" placeholder="mail@gmail.com" type="email" name="email"/>
+              </div>
+              <div class="inputForm">
+                <input class="inputField" placeholder="пароль" type="password" name="password"/>
+              </div>
+              <button class="button-submit" id="regBtn">Отправить заявку</button>
+            </div>
+          </form>
+        </div>
+        <!-- Правая половина: Вход (по умолчанию видна) -->
+        <div class="sign-up show" id="sign-up-info" style="margin-left: 130px;">
+          <h2>Relative Parallel</h2>
+          <form id="login-form" method="post" autocomplete="on">
+            <div class="modalFORM">
+              <h3>ФОРМА ВХОДА</h3>
+              <div class="inputForm">
+                <input class="inputField" type="email" placeholder="email: user@gmail.com" id="loginEmail" name="email" autocomplete="username"/>
+              </div>
+              <div class="inputForm">
+                <input class="inputField" type="password" placeholder="ваш пароль" id="loginPassword" name="password" autocomplete="current-password"/>
+              </div>
+              <button class="button-submit" id="loginBtn">Войти</button>
+            </div>
+          </form>
+        </div>
+      </div> <!-- .form -->
+    </div> <!-- .container -->
+  </div> <!-- #login-wrapper -->
+
+  <!-- Основной сценарий проекта (type="module") -->
+  <script type="module">
+    import { createClient } from "./vendor/supabase-client.js";
+    window.SUPABASE_URL = 'https://jviswahajwmwibedxcll.supabase.co';
+    window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2aXN3YWhhandtd2liZWR4Y2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMzU5NDcsImV4cCI6MjA2NDkxMTk0N30.Bkgknn8BAhlUp429fhyOErV-afbPkfcneTdVhKwgn7c';
+
+    const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+  
+  // Сделать supabase доступным глобально
+  window.supabase = supabase;
+
+    // DOM-элементы
+    const preloader         = document.getElementById('preloader');
+    const loginWrapper      = document.getElementById('login-wrapper');
+    const sideMenu          = document.getElementById('side-menu');
+    const overlay           = document.getElementById('overlay');
+    const registrationForm  = document.getElementById("sign-in-info");
+    const loginForm         = document.getElementById("sign-up-info");
+    const slideRightBtn     = document.getElementById("slide-right-button");
+    const slideLeftBtn      = document.getElementById("slide-left-button");
+    const loginEmail        = document.getElementById('loginEmail');
+    const loginPassword     = document.getElementById('loginPassword');
+    const loginBtn          = document.getElementById('loginBtn');
+     const regBtn            = document.getElementById('regBtn');
+
+    async function hashPassword(str) {
+      const enc = new TextEncoder().encode(str);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(buf))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+    window.hashPassword = hashPassword;
+
+    // Прелоадер при загрузке index.html
+    document.addEventListener('DOMContentLoaded', () => {
+      preloader.classList.add('visible');
+      setTimeout(() => {
+        preloader.classList.remove('visible');
+        preloader.classList.add('fade-out');
+        setTimeout(() => {
+          preloader.style.display = 'none';
+          loginWrapper.classList.add('show');
+          document.body.style.overflow = 'auto';
+          // По умолчанию показываем форму ВХОДА (правую)
+          registrationForm.style.opacity = '0';
+          registrationForm.style.display = 'none';
+          loginForm.style.opacity = '1';
+          loginForm.style.display = 'flex';
+        }, 500);
+      }, 2000);
+    });
+
+    // Переключение overlay + форм регистрации/входа
+    function toggleOverlay(toSignUp) {
+      if (toSignUp) {
+        overlay.classList.add('open-sign-up');
+        loginForm.style.opacity = '0';
+        setTimeout(() => { loginForm.style.display = 'none'; }, 500);
+        setTimeout(() => {
+          registrationForm.style.display = 'flex';
+          registrationForm.style.opacity = '1';
+        }, 600);
+      } else {
+        overlay.classList.remove('open-sign-up');
+        registrationForm.style.opacity = '0';
+        setTimeout(() => { registrationForm.style.display = 'none'; }, 500);
+        setTimeout(() => {
+          loginForm.style.display = 'flex';
+          loginForm.style.opacity = '1';
+        }, 600);
+      }
+    }
+    slideRightBtn.addEventListener('click', () => toggleOverlay(true));
+    slideLeftBtn.addEventListener('click', () => toggleOverlay(false));
+
+    // Кнопка "Войти"
+    loginBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = loginEmail.value.trim();
+      const pass = loginPassword.value.trim();
+      if (!email || !pass) {
+        alert('Пожалуйста, введите логин и пароль');
+        return;
+      }
+      loginBtn.disabled = true;
+      const originalLoginText = loginBtn.innerHTML;
+      loginBtn.innerHTML = 'Загрузка...';
+
+      let user = null;
+      let loginData = null;
+      try {
+        user = await checkLoginCustom(email, pass);
+        if (!user) {
+          alert('Неверный логин или пароль');
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = originalLoginText;
+          return;
+        }
+        const { data: ld, error: loginErr } =
+          await supabase.auth.signInWithPassword({ email, password: pass });
+        if (loginErr) {
+          throw loginErr;
+        }
+        loginData = ld;
+      } catch (e) {
+        console.error('Custom auth exception', e);
+        alert('Ошибка авторизации: ' + (e.message || e.description || e));
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = originalLoginText;
+        return;
+      }
+      // Сохраняем данные компании глобально
+      window.companyId = user.company_id;
+      window.companyName = user.company_name;
+      window.LOCAL_USER_ID = user.id;
+      window.AUTH_ID = loginData?.user?.id || user.id;
+      // ▼ 1. Сохраняем уникальный ключ пользователя глобально
+      window.USER_KEY = user.user_key || window.AUTH_ID || user.id || '';
+      window.IS_ADMIN = user.is_admin;
+      window.USER_LEVELS = user.menu_levels || '';
+      window.USER_LOGIN  = user.login || user.email || user.last_name || '';
+      // Попытка сохранить логин/пароль в менеджере паролей браузера
+      if (navigator.credentials && typeof navigator.credentials.store === 'function') {
+        try {
+          const displayName = window.USER_LOGIN || user.email || email;
+          let credential = null;
+          if (typeof PasswordCredential !== 'undefined') {
+            credential = new PasswordCredential({
+              id: email,
+              name: displayName,
+              password: pass
+            });
+          } else if (typeof navigator.credentials.create === 'function') {
+            credential = await navigator.credentials.create({
+              password: {
+                id: email,
+                name: displayName,
+                password: pass
+              }
+            });
+          }
+          if (credential) {
+            await navigator.credentials.store(credential);
+          }
+        } catch (credErr) {
+          console.warn('Не удалось сохранить пароль через Credential Management API', credErr);
+        }
+      }
+      // ▼ 2. Ограничиваем меню доступными уровнями
+     // Вызываем фильтр меню даже при пустых правах
+      filterMenuByUserLevels(user.menu_levels || '');
+      const settingsItem = document.getElementById('settingsMenuItem');
+      if (settingsItem) {
+        settingsItem.style.display = user.is_admin ? '' : 'none';
+      }
+      // ▼ 3. Переходим из формы логина в основное приложение
+      loginWrapper.classList.remove('show');
+      preloader.style.display = 'flex';
+      preloader.classList.remove('fade-out');
+      preloader.classList.add('visible');
+      setTimeout(() => {
+        preloader.classList.remove('visible');
+        preloader.classList.add('fade-out');
+        setTimeout(() => {
+          preloader.style.display = 'none';
+          sideMenu.style.display = 'block';
+          initIndicator();
+        }, 500);
+      }, 1500);
+    });
+
+    function filterMenuByUserLevels(userLevels) {
+      const userKeys = userLevels.split(',').map(key => key.trim().toUpperCase());
+      const menuItems = document.querySelectorAll('.navbar__item');
+      menuItems.forEach(item => {
+        const levelsAttr = item.getAttribute('data-levels');
+        if (levelsAttr) {
+          const itemLevels = levelsAttr.split(',').map(key => key.trim().toUpperCase());
+          const hasAccess = itemLevels.every(level => userKeys.includes(level));
+          item.style.display = hasAccess ? '' : 'none';
+        }
+      });
+      initIndicator();
+    }
+
+    // Кнопка регистрации "Отправить заявку"
+    if (regBtn) {
+      regBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        regBtn.disabled = true;
+        const originalRegText = regBtn.innerHTML;
+        regBtn.innerHTML = 'Загрузка...';
+
+        const regForm = document.getElementById('registration-form');
+        const formData = new FormData(regForm);
+        const data = {
+          lastname:   formData.get('lastname'),
+          firstname:  formData.get('firstname'),
+          middlename: formData.get('middlename'),
+          phone:      formData.get('phone'),
+          email:      formData.get('email'),
+          password:   formData.get('password')
+        };
+
+        try {
+          const companyId = crypto.randomUUID();
+          const companyName = 'Company NAME';
+          const companyInfo = await registerUser(data, companyId, companyName);
+          window.companyId = companyId;
+          window.companyName = companyName;
+          window.registeredCompany = companyInfo;
+
+          const user = await checkLoginCustom(data.email, data.password);
+          if (user) {
+            window.companyId = user.company_id;
+            window.companyName = user.company_name;
+            window.AUTH_ID = user.id;
+            window.USER_KEY = user.user_key || window.AUTH_ID || user.id || '';
+            window.IS_ADMIN = user.is_admin;
+            window.USER_LEVELS = user.menu_levels || '';
+            window.USER_LOGIN = user.login || user.email || user.last_name || '';
+            filterMenuByUserLevels(user.menu_levels || '');
+            const settingsItem = document.getElementById('settingsMenuItem');
+            if (settingsItem) settingsItem.style.display = user.is_admin ? '' : 'none';
+          }
+
+          alert('Регистрация успешна! Подтвердите email перед входом.');
+          toggleOverlay(false);
+          showRightModal('modal0');
+        } catch (error) {
+          alert('Ошибка регистрации: ' + (error.message || error.description || error));
+        } finally {
+          regBtn.disabled = false;
+          regBtn.innerHTML = originalRegText;
+        }
+      });
+    }
+
+    async function registerUser(userData, companyId, companyName) {
+      const pass_hash = await hashPassword(userData.password || '');
+      const { data, error } = await supabase
+        .from('administrators')
+        .insert([
+          {
+            last_name:   userData.lastname,
+            first_name:  userData.firstname,
+            middle_name: userData.middlename,
+            phone:       userData.phone,
+            email:       userData.email,
+            pass: pass_hash,
+            company_id:  companyId,
+            company_name: companyName,
+            menu_levels: 'PAGE1,PAGE2,PAGE3'
+          }
+        ])
+        .select('*')
+        .single();
+      if (error) {
+        throw error;
+      }
+      await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.password
+      });
+      return data;
+    }
+
+    // Проверка логина
+    async function checkLoginCustom(email, password) {
+      const pass_hash = await hashPassword(password);
+      try {
+        let { data: adminData } = await supabase
+          .from('administrators')
+          .select('*')
+          .eq('email', email)
+          .single();
+        if (adminData && adminData.pass === pass_hash) {
+          return { ...adminData, is_admin: true };
+        }
+        let { data: empData } = await supabase
+          .from('employees')
+          .select('*')
+          .eq('email', email)
+          .single();
+        if (empData && empData.pass === pass_hash) {
+          return { ...empData, is_admin: false };
+        }
+        return null;
+      } catch (err) {
+        console.error(err);
+        return null;
+      }
+    }
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // Динамическая подгрузка страниц, аналогично проекту 1
+    const rightModal       = document.getElementById('right-modal');
+    const linesLoader      = document.getElementById('linesLoader');
+    const modalContentArea = document.getElementById('modalContentArea');
+    const dbOverlay        = document.getElementById('db-disconnect-overlay');
+
+    async function pingDatabase() {
+      try {
+        const { error } = await supabase
+          .from('administrators')
+          .select('id')
+          .limit(1);
+        return !error;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function checkDbConnection() {
+      const isOk = await pingDatabase();
+      if (isOk) {
+        dbOverlay.classList.remove('show');
+      } else {
+        dbOverlay.classList.add('show');
+      }
+    }
+
+    setInterval(checkDbConnection, 10000);
+    checkDbConnection();
+
+    // Функция, которая находит все <script> в загруженном контенте и выполняет их
+    function executeScriptsFromHTML(parentElem) {
+      const scripts = parentElem.querySelectorAll('script');
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        // Копируем все атрибуты (например, type="module" или что-то ещё)
+        Array.from(oldScript.attributes).forEach(attr => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+        // Если <script src="...">, то подгружаем. Иначе переносим текстовый контент
+        if (oldScript.src) {
+          newScript.src = oldScript.src;
+        } else {
+          newScript.textContent = oldScript.textContent;
+        }
+        // Вставляем <script> в документ, чтобы он выполнился
+        document.body.appendChild(newScript);
+      });
+    }
+
+    // Функция showRightModal, которая показывает правое окно
+    window.showRightModal = async function(pageId) {
+      // Страница настроек доступна только администраторам
+      if (pageId === 'modal0' && !window.IS_ADMIN) {
+        alert('Доступ разрешен только администраторам');
+        return;
+      }
+      // Проверяем уровни доступа для остальных страниц
+      const navItem = document.querySelector(`.navbar__item[data-modal="${pageId}"]`);
+      if (navItem && navItem.dataset.levels) {
+        const userLevels = (window.USER_LEVELS || '').split(',').map(l => l.trim().toUpperCase());
+        const required = navItem.dataset.levels.split(',').map(l => l.trim().toUpperCase());
+        const hasAccess = required.every(l => userLevels.includes(l));
+        if (!hasAccess) {
+          alert('Недостаточно прав для доступа');
+          return;
+        }
+      }
+      rightModal.style.display = 'flex'; // или 'block'
+
+      // Сбрасываем контейнер и показываем прелоадер
+      modalContentArea.innerHTML = '';
+      linesLoader.classList.add('visible'); // показываем лоадер
+
+      // Грузим контент
+      try {
+        // Предотвращаем кэширование
+        const url = `${pageId}.html?t=${Date.now()}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Ошибка загрузки страницы');
+        }
+        const html = await response.text();
+
+        // Вставляем загруженный HTML в .content-area
+        modalContentArea.innerHTML = html;
+        // Теперь ищем и исполняем <script>
+        executeScriptsFromHTML(modalContentArea);
+
+        // Плавно показываем контент
+        modalContentArea.classList.add('visible');
+
+      } catch (error) {
+        modalContentArea.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
+      } finally {
+        // Скрываем лоадер
+        linesLoader.classList.remove('visible');
+      }
+    };
+
+    // Пример функции закрытия правого окна
+    window.closeRightModal = function() {
+      if (window.cleanupRealtime) {
+        window.cleanupRealtime();
+      }
+      modalContentArea.innerHTML = '';
+      modalContentArea.classList.remove('visible');
+      rightModal.style.display = 'none';
+    };
+
+    const indicator = document.querySelector('.indicator');
+
+    function moveIndicatorTo(item) {
+      indicator.style.top = (item.offsetTop + 6) + 'px';
+    }
+
+    function setActive(item) {
+      document.querySelectorAll('.navbar__item').forEach(el => el.classList.remove('active'));
+      item.classList.add('active');
+      moveIndicatorTo(item);
+    }
+
+    function initIndicator() {
+      const first = Array.from(document.querySelectorAll('.navbar__item')).find(el => el.style.display !== 'none');
+      if (first) setActive(first);
+    }
+
+    // Вешаем обработчик на пункты меню
+    const navItems = document.querySelectorAll('.navbar__item');
+    navItems.forEach(item => {
+      item.addEventListener('mouseenter', function() {
+        moveIndicatorTo(this);
+      });
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        setActive(this);
+        const pageId = this.getAttribute('data-modal');
+        showRightModal(pageId);
+      });
+    });
+
+    // После загрузки меню формируем массив доступных страниц
+    window.ADMIN_PAGES = Array.from(document.querySelectorAll('.navbar__item'))
+      .filter(item => item.id !== 'settingsMenuItem')
+      .map(item => ({
+        code: item.dataset.levels,
+        title: item.querySelector('.title')?.textContent.trim() || item.dataset.levels
+      }));
+
+    window.logout = function() {
+      location.reload();
+    };
+  </script>
+  <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
+<script>
+  // ========================= НАСТРОЙКИ (меняйте здесь) =========================
+  const SEPARATION = 200;          // расстояние между точками сетки
+  const AMOUNTX = 40;              // количество точек по X
+  const AMOUNTY = 60;              // количество точек по Y
+
+  const AMP_X = 50;                // амплитуда колебаний по X (высота волны от sin(ix))
+  const AMP_Y = 50;                // амплитуда колебаний по Y (высота волны от sin(iy))
+  const FREQ_X = 0.3;              // «частота» по X (чем меньше, тем более растянута волна)
+  const FREQ_Y = 0.5;              // «частота» по Y
+  const WAVE_SPEED = 0.025;         // скорость течения времени волны (меньше — медленнее)
+
+  const POINT_SIZE = 10;           // размер точки
+  const POINT_COLOR = 0x2C2C2B;    // цвет точек
+  const USE_ROUND_SPRITE = true;   // true — круглые точки (спрайт), false — квадратные
+
+  // =============== ВНУТРЕННИЕ ПЕРЕМЕННЫЕ СЦЕНЫ (лучше не трогать) ===============
+  let camera, renderer, scene, points, count = 0;
+
+  // //функция: создать круглый спрайт для точек (если включено)
+  function makeCircleSpriteTexture(size = 64, softness = 1.0) {
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    // фон прозрачный
+    ctx.clearRect(0, 0, size, size);
+
+    // //отрисовка мягкого круга
+    const r = size * 0.5;
+    const gradient = ctx.createRadialGradient(r, r, r * 0.0, r, r, r);
+    // центр — непрозрачный, к краям — к прозрачному
+    gradient.addColorStop(0, `rgba(255,255,255,1)`);
+    gradient.addColorStop(Math.min(1, 0.7 * softness), `rgba(255,255,255,0.9)`);
+    gradient.addColorStop(1, `rgba(255,255,255,0)`);
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(r, r, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    const tx = new THREE.CanvasTexture(canvas);
+    tx.needsUpdate = true;
+    return tx;
+  }
+
+  // //функция: инициализация сцены/камеры/рендера/геометрии
+  function init(container) {
+    // //сцена
+    scene = new THREE.Scene();
+
+    // //камера
+    camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 10000);
+    camera.position.set(0, 355, 122);
+
+    // //рендерер
+    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    // //подготовка позиций точек сетки
+    const positions = [];
+    for (let ix = 0; ix < AMOUNTX; ix++) {
+      for (let iy = 0; iy < AMOUNTY; iy++) {
+        positions.push(
+          ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2),
+          0,
+          iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2)
+        );
+      }
+    }
+
+    // //геометрия точек
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+    // //материал точек (форма/цвет/размер)
+    const materialOptions = {
+      color: POINT_COLOR,         // цвет точек
+      size: POINT_SIZE,           // размер точек
+      sizeAttenuation: true       // затухание размера с расстоянием (оставьте true)
+    };
+
+    if (USE_ROUND_SPRITE) {
+      // //включаем спрайт для круглой формы
+      materialOptions.map = makeCircleSpriteTexture(64, 1.0);  // круглый спрайт
+      materialOptions.transparent = true;
+      materialOptions.alphaTest = 0.5; // отсечь края
+      materialOptions.depthWrite = false; // красивее блендится
+    }
+
+    const material = new THREE.PointsMaterial(materialOptions);
+
+    // //объект из точек
+    points = new THREE.Points(geometry, material);
+    scene.add(points);
+
+    // //адаптация к ресайзу
+    window.addEventListener('resize', onWindowResize);
+  }
+
+  // //функция: обработка ресайза окна
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  // //функция: запуск цикла анимации
+  function animate() {
+    requestAnimationFrame(animate);
+    render();
+  }
+
+  // //функция: один кадр отрисовки (волны + рендер)
+  function render() {
+    const pos = points.geometry.attributes.position.array;
+    let i = 0;
+
+    // //обновляем Y-координату каждой точки сетки как сумму двух синусоид
+    for (let ix = 0; ix < AMOUNTX; ix++) {
+      for (let iy = 0; iy < AMOUNTY; iy++) {
+        const waveX = Math.sin((ix + count) * FREQ_X) * AMP_X;
+        const waveY = Math.sin((iy + count) * FREQ_Y) * AMP_Y;
+        pos[i + 1] = waveX + waveY; // Y
+        i += 3; // переходим к следующей вершине (x,y,z)
+      }
+    }
+
+    points.geometry.attributes.position.needsUpdate = true;
+    renderer.render(scene, camera);
+
+    // //скорость волны (уменьшите WAVE_SPEED — волны замедлятся)
+    count += WAVE_SPEED;
+  }
+
+  // //точка входа
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('home_wave');
+    if (container) {
+      init(container);
+      animate();
+    }
+  });
+</script>
+</body>
+</html>
