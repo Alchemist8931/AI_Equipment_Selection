@@ -461,6 +461,8 @@
       const specRowTemplate = root.querySelector('#spec-row-template');
       const block2Template = root.querySelector('#spec-block2-template');
       const block21Template = root.querySelector('#spec-block21-template');
+      const block3Template = root.querySelector('#spec-block3-template');
+      const block31Template = root.querySelector('#spec-block31-template');
       const attrPairTemplate = root.querySelector('#spec-attr-template');
       const updatesPanel = root.querySelector('.modal9-updates');
       const updatesToggle = root.querySelector('.modal9-updates-toggle');
@@ -815,6 +817,10 @@
           const rf = specRowTemplate.content.cloneNode(true);
           const posInput = rf.querySelector('[data-field="pos_number"]'); if (posInput) posInput.value = row.pos_number || '';
           const nameInput = rf.querySelector('[data-field="name"]'); if (nameInput) nameInput.value = row.name || '';
+          // ИСПРАВЛЕНО: Добавлено заполнение qty и unit
+          const qtyInput = rf.querySelector('[data-field="qty"]'); if (qtyInput) qtyInput.value = row.qty || '';
+          const unitInput = rf.querySelector('[data-field="unit"]'); if (unitInput) unitInput.value = row.unit || '';
+          
           const attrsWrap = rf.querySelector('.block1 .modal-content');
           if (attrsWrap) {
             attrsWrap.innerHTML = '';
@@ -825,7 +831,7 @@
           const block2 = rf.querySelector('.block2 .modal-content');
           if (block2) {
             block2.innerHTML = '';
-            if (sels.length) { sels.forEach(sel => { const frag = block2Template?.content.cloneNode(true); if (!frag) return; const inputs = frag.querySelectorAll('input'); if (inputs[0]) inputs[0].value = sel.article || ''; if (inputs[1]) inputs[1].value = sel.model_name || ''; const rowEl = frag.firstElementChild; if (rowEl) rowEl.classList.add('fade-in'); block2.appendChild(frag); }); }
+            if (sels.length) { sels.forEach(sel => { const frag = block2Template?.content.cloneNode(true); if (!frag) return; const inputs = frag.querySelectorAll('input'); if (inputs[0]) inputs[0].value = sel.article || ''; if (inputs[1]) inputs[1].value = sel.model_name || ''; if (inputs[2]) inputs[2].value = sel.qty || ''; if (inputs[3]) inputs[3].value = sel.unit || ''; if (inputs[4]) inputs[4].value = formatNumericValue(sel.price); if (inputs[5]) inputs[5].value = formatNumericValue(sel.sum); const rowEl = frag.firstElementChild; if (rowEl) rowEl.classList.add('fade-in'); block2.appendChild(frag); }); }
             else { const frag = block2Template?.content.cloneNode(true); if (frag) block2.appendChild(frag); }
           }
           const block21 = rf.querySelector('.block21 .modal-content');
