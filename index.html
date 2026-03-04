@@ -246,39 +246,37 @@
     .spec-action-btn--excel { border-color: var(--success); color: var(--success); background: rgba(16, 185, 129, 0.05); }
     .spec-action-btn--excel:hover { background: var(--success); color: #fff; }
 
-    /* === SLIDESHOW STYLES (Dynamic Height) === */
+        /* === SLIDESHOW STYLES (Dynamic Height) === */
     .slideshow-container {
       position: relative;
       width: 100%;
       min-width: 700px;
-      height: auto; /* Dynamic height */
-      min-height: 0; /* Reset min-height */
-      overflow: visible; /* Disable scrolls */
+      display: grid; /* Используем Grid для схлопывания слоев */
       border-radius: 8px;
       background: var(--bg-primary);
       border: 1px solid var(--border-color);
     }
 
     .slide {
-      position: relative;
+      grid-area: 1 / 1; /* Размещаем все слайды в одной ячейке сетки */
       width: 100%;
-      height: auto; /* Dynamic height */
-      opacity: 1;
-      pointer-events: none;
-      transition: opacity 0.5s ease;
-      display: none; /* Hidden by default */
+      height: auto;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+      /* display: none убрано, чтобы высота считалась */
     }
 
     .slide.active {
       opacity: 1;
-      pointer-events: auto;
-      display: block; /* Show active */
+      visibility: visible;
+      z-index: 2;
     }
 
     .slide-content {
       padding: 15px;
       height: auto;
-      overflow: visible; /* Disable scrolls */
+      overflow: visible; /* Отключаем скроллы */
     }
 
     .caption {
@@ -290,13 +288,15 @@
       text-align: right;
       color: var(--text-secondary);
       font-weight: 500;
+      position: relative; /* Чтобы быть поверх контента */
+      z-index: 3;
     }
 
     /* Navigation */
     .prev, .next {
       cursor: pointer;
       position: absolute;
-      top: 20px; /* Fixed position at top to avoid moving with content height */
+      top: 20px;
       transform: translateY(0); 
       color: var(--text-muted);
       font-size: 18px;
@@ -321,7 +321,7 @@
     /* Dots */
     .dots-container {
       position: absolute;
-      bottom: 45px; /* Above caption */
+      bottom: 45px; /* Над подписью */
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -339,6 +339,31 @@
     .dot.active {
       background: var(--accent);
       transform: scale(1.2);
+    }
+
+    /* === CLOSE BUTTON ACCENT STYLE === */
+    .spec-close-btn-accent {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      height: 34px; /* Высота как у input */
+      width: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.2s;
+      position: absolute;
+      right: -12px; /* Сдвиг вправо */
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .spec-close-btn-accent:hover {
+      background: var(--accent-hover);
     }
   </style>
 </head>
@@ -411,7 +436,7 @@
           <div class="block1-wrapper"></div>
           <template id="spec-template"><div class="spec-container"><div class="spec-header"><div class="spec-title"></div><button class="group-close ans5-close" style="display:none;">×</button></div><div class="spec-content"></div></div></template>
           <template id="button-group-spec"><div class="modalRow spec-action-row"><button type="button" class="spec-action-btn spec-action-btn--excel" data-action="excel"><span class="label">скачать excel</span></button><button type="button" class="spec-action-btn spec-action-btn--copy" data-action="copy"><span class="label">скопировать</span></button></div></template>
-          <template id="spec-progress-template"><div class="spec-progress multistep" style="margin-bottom: 10px;"><div class="step" data-step="1"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 1</div><button class="darkmatter-btn refresh" title="Перезапустить парсер"><span class="button-text">запуск</span><span class="loader"></span></button></div></div><div class="step" data-step="2"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 2</div><button class="darkmatter-btn refresh" title="Перезапустить селектор"><span class="button-text">запуск</span><span class="loader"></span></button></div></div><div class="step" data-step="3"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 3</div><button class="darkmatter-btn refresh" disabled><span class="button-text">запуск</span><span class="loader"></span></button></div></div></div></template>
+          <template id="spec-progress-template"><div class="spec-progress multistep" style="margin-bottom: 10px;"><div class="step" data-step="1"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 1</div><button class="darkmatter-btn refresh" title="Перезапустить парсер"><span class="button-text">запуск</span><span class="loader"></span></button></div></div><div class="step" data-step="2"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 2</div><button class="darkmatter-btn refresh" title="Перезапустить селектор"><span class="button-text">запуск</span><span class="loader"></span></button></div></div></div></template>
           
           <!-- ROW TEMPLATE WITH SLIDESHOW -->
           <template id="spec-row-template">
@@ -1037,7 +1062,33 @@
 
       function updateSpecProgress(specId, info) { const idStr = String(specId); let statuses = info; if (!statuses || (typeof statuses === 'object' && !('parser' in statuses) && !('selector' in statuses) && !('pricer' in statuses))) { const row = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`); const parser = row?.querySelector('[data-field="status_parser"]')?.value || row?.querySelector('[data-field="status_parser"]')?.textContent || ''; const selector = row?.querySelector('[data-field="status_selector"]')?.value || row?.querySelector('[data-field="status_selector"]')?.textContent || ''; const pricer = row?.querySelector('[data-field="status_pricer"]')?.value || row?.querySelector('[data-field="status_pricer"]')?.textContent || ''; statuses = { parser, selector, pricer }; } root.querySelectorAll(`.spec-progress[data-spec-id="${idStr}"]`).forEach(el => setProgress(el, statuses)); }
       
-      function setProgress(progressEl, info) { if (!progressEl) return; const specId = progressEl.dataset.specId; const row = historyList.querySelector(`.history-item[data-spec-id="${specId}"]`); let parserStatus = row?.querySelector('[data-field="status_parser"]')?.value || ''; let selectorStatus = row?.querySelector('[data-field="status_selector"]')?.value || row?.querySelector('[data-field="status_selector"]')?.textContent || ''; let pricerStatus = row?.querySelector('[data-field="status_pricer"]')?.value || row?.querySelector('[data-field="status_pricer"]')?.textContent || ''; if (typeof info === 'object' && info && ('parser' in info || 'selector' in info || 'pricer' in info)) { parserStatus = info.parser ?? parserStatus; selectorStatus = info.selector ?? selectorStatus; pricerStatus = info.pricer ?? pricerStatus; } const steps = progressEl.querySelectorAll('.step'); const pDone = interpretDone(parserStatus); const sDone = interpretDone(selectorStatus); const rDone = interpretDone(pricerStatus); const apply = (stepEl, done) => { const icon = stepEl.querySelector('.status'); if (done) { stepEl.classList.add('active'); if (icon) icon.textContent = 'done_all'; } else { stepEl.classList.remove('active'); if (icon) icon.textContent = 'indeterminate_check_box'; } }; apply(steps[0], pDone); apply(steps[1], sDone); apply(steps[2], rDone); }
+      function setProgress(progressEl, info) { 
+        if (!progressEl) return; 
+        const specId = progressEl.dataset.specId; 
+        const row = historyList.querySelector(`.history-item[data-spec-id="${specId}"]`); 
+        let parserStatus = row?.querySelector('[data-field="status_parser"]')?.value || ''; 
+        let selectorStatus = row?.querySelector('[data-field="status_selector"]')?.value || row?.querySelector('[data-field="status_selector"]')?.textContent || ''; 
+        // pricerStatus удален, так как шаг 3 убран
+        if (typeof info === 'object' && info && ('parser' in info || 'selector' in info)) { 
+          parserStatus = info.parser ?? parserStatus; 
+          selectorStatus = info.selector ?? selectorStatus; 
+        } 
+        const steps = progressEl.querySelectorAll('.step'); 
+        const pDone = interpretDone(parserStatus); 
+        const sDone = interpretDone(selectorStatus); 
+        const apply = (stepEl, done) => { 
+          const icon = stepEl.querySelector('.status'); 
+          if (done) { 
+            stepEl.classList.add('active'); 
+            if (icon) icon.textContent = 'done_all'; 
+          } else { 
+            stepEl.classList.remove('active'); 
+            if (icon) icon.textContent = 'indeterminate_check_box'; 
+          } 
+        }; 
+        apply(steps[0], pDone); 
+        apply(steps[1], sDone); 
+      }
       function interpretDone(str) { const s = String(str || '').toLowerCase(); const c = parseSelectorCounts(s); return c ? (c.total > 0 && c.received >= c.total) : /(готов|done)/i.test(s); }
       function parseSelectorCounts(str) { const m = String(str || '').match(/(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)/); return m ? { sent: Number(m[1]), received: Number(m[2]), total: Number(m[3]) } : null; }
       
@@ -1062,7 +1113,16 @@
         const row = historyList.querySelector(`.history-item[data-spec-id="${id}"]`);
         if (row) {
           const specCont = row.querySelector('[data-field="id"]').closest('.input-container');
-          if (specCont) { specCont.style.position = 'relative'; if (!specCont.querySelector('.spec-close-btn')) { const extraBtn = document.createElement('button'); extraBtn.textContent = '×'; extraBtn.className = 'group-close ans5-close spec-close-btn'; extraBtn.style.position = 'absolute'; extraBtn.style.right = '-25px'; extraBtn.style.color = 'var(--text-muted)'; extraBtn.addEventListener('click', e => { e.stopPropagation(); closeRowGroup(id); }); specCont.appendChild(extraBtn); } }
+                    if (specCont) { 
+            specCont.style.position = 'relative'; 
+            if (!specCont.querySelector('.spec-close-btn-accent')) { 
+              const extraBtn = document.createElement('button'); 
+              extraBtn.textContent = '×'; 
+              extraBtn.className = 'spec-close-btn-accent'; // Применяем новый класс стилей
+              extraBtn.addEventListener('click', e => { e.stopPropagation(); closeRowGroup(id); }); 
+              specCont.appendChild(extraBtn); 
+            } 
+          }
         }
       }
       
