@@ -2,742 +2,936 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Equipment Selection APP</title>
-  <!-- Fonts -->
+  <title>Relative Parallel — Redesigned</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-  
   <style>
     :root {
-      --form-width: 850px;
-      --form-height: 550px;
-      --overlay-width: 380px;
+      --form-width: 900px;
+      --form-height: 900px;
+      --overlay-width: 385px;
+      --content-width: 1300px; /* Фиксированная ширина контента */
       
-      /* Dark Tech Theme */
-      --bg-primary: #000000;
-      --bg-card: #0f0f0f;
-      --bg-input: #1a1a1a;
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0a0;
-      --text-muted: #666666;
-      --border-color: #2a2a2a;
-      --accent: #ffffff;
-      --accent-hover: #e0e0e0;
-      --success: #4ade80;
-      --warning: #fbbf24;
-      --error: #f87171;
+      --loader-line-color: #000000;
+      --loader-line-width: 10px;
+      --loader-line-height: 70px;
       
-      /* Layout */
-      --content-max-width: 1300px;
+      --fon: #ffffff;
+      --black: #000000;
+      --gray-light: #f5f5f5;
+      --gray-medium: #e0e0e0;
+      --content-color: #000000;
+      
+      --accent: #000000; /* Черно-белая тема */
+      --radius: 12px;
+      --shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'SN Pro', sans-serif; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     html, body {
-      width: 100vw;
-      height: 100vh;
-      background: var(--bg-primary);
-      color: var(--text-primary);
+      width: 100%;
+      height: 100%;
+      font-family: 'Montserrat', sans-serif;
+      background: var(--fon);
+      color: var(--content-color);
       overflow: hidden;
-      position: relative;
     }
 
-    /* --- Background Animation --- */
-    #home_wave { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.2; pointer-events: none; }
-
-    /* --- Preloader --- */
+    /* --- Прелоадер --- */
     #preloader {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      display: flex; justify-content: center; align-items: center; gap: 8px; 
-      opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease; z-index: 9999;
-      background: var(--bg-primary);
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex; gap: 10px;
+      z-index: 9999;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.5s;
     }
     #preloader.visible { opacity: 1; visibility: visible; }
-    .line {
-      width: 4px; height: 40px; background-color: var(--text-primary); 
-      animation: bounce 1.2s infinite ease-in-out; border-radius: 2px;
+    #preloader .line {
+      width: var(--loader-line-width);
+      height: var(--loader-line-height);
+      background: var(--content-color);
+      animation: bounce 1.5s infinite ease-in-out;
+      border-radius: 4px;
     }
-    .line:nth-child(2) { animation-delay: 0.1s; }
-    .line:nth-child(3) { animation-delay: 0.2s; }
-    .line:nth-child(4) { animation-delay: 0.3s; }
-    .line:nth-child(5) { animation-delay: 0.4s; }
-    @keyframes bounce { 0%, 40%, 100% { transform: scaleY(0.4); } 20% { transform: scaleY(1.0); } }
+    #preloader .line:nth-child(2) { animation-delay: 0.3s; }
+    #preloader .line:nth-child(3) { animation-delay: 0.6s; }
+    #preloader .line:nth-child(5) { animation-delay: 1.2s; }
 
-    /* --- Menu --- */
+    @keyframes bounce {
+      0%,20%,50%,80%,100% { transform: translateY(0); }
+      40% { transform: translateY(-30px); }
+      60% { transform: translateY(-15px); }
+    }
+
+    /* --- Меню --- */
+    #side-menu { display: none; }
     .navigation {
-      position: fixed; top: 20px; left: 20px; height: calc(100vh - 40px); width: 70px; z-index: 1200;
-      border-radius: 16px; background: rgba(20, 20, 20, 0.8); border: 1px solid var(--border-color);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
-      transition: width 0.3s ease; overflow: hidden;
+      position: fixed;
+      top: 20px; left: 20px;
+      height: calc(100vh - 40px);
+      width: 70px;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid #e0e0e0;
+      border-radius: var(--radius);
+      z-index: 1200;
+      box-shadow: var(--shadow);
     }
-    .navigation ul { position: absolute; top: 0; left: 0; width: 100%; display: flex; flex-direction: column; padding: 10px 0; }
-    .navigation ul li { position: relative; list-style: none; width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; }
-    .navigation ul li a { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; text-decoration: none; color: var(--text-secondary); transition: color 0.2s; }
-    .navigation ul li.active a { color: var(--text-primary); }
-    .navigation ul li a .icon { font-size: 24px; z-index: 2; }
-    .navigation ul li a .title {
-      position: absolute; left: 80px; top: 50%; transform: translateY(-50%); background: var(--bg-card);
-      border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 8px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.3); white-space: nowrap; font-size: 12px; font-weight: 600;
-      opacity: 0; visibility: hidden; transition: all 0.2s ease; pointer-events: none; z-index: 10;
+    .navigation ul {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 0;
     }
-    .navigation ul li:hover a .title { opacity: 1; visibility: visible; left: 70px; }
-    .navigation ul .indicator {
-      position: absolute; width: 50px; height: 50px; background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px; top: 17px; left: 10px; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1;
+    .navigation ul li {
+      list-style: none;
+      width: 100%;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
     }
+    .navigation ul li:hover { background: var(--gray-light); }
+    .navigation ul li.active { background: var(--black); }
+    .navigation ul li.active .material-symbols-outlined { color: var(--fon); }
+    
+    /* Подсказки */
+    .navbar__item a .title {
+      position: absolute;
+      left: 70px;
+      background: var(--black);
+      color: var(--fon);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 10;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .navigation ul li:hover a .title { opacity: 1; }
 
-    /* --- Login --- */
-    #login-wrapper { position: relative; z-index: 100; display: flex; align-items: center; justify-content: center; height: 100%; width: 100%; opacity: 0; transition: opacity 0.5s; }
+    /* --- Логин/Регистрация --- */
+    #login-wrapper {
+      width: 100%; height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
     #login-wrapper.show { opacity: 1; }
+    
     .container {
-      width: var(--form-width); height: var(--form-height); position: relative; background: var(--bg-card);
-      border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); overflow: hidden; z-index: 100;
-      border: 1px solid var(--border-color); display: flex;
+      width: var(--form-width);
+      height: var(--form-height);
+      position: relative;
+      background: var(--fon);
+      border: 1px solid #e0e0e0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
     }
+
     .overlay {
-      position: absolute; top: 0; left: 0; width: var(--overlay-width); height: 100%; background: var(--text-primary);
-      border-radius: 20px 0 0 20px; transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.6s ease;
-      z-index: 10; color: var(--bg-primary); display: flex; flex-direction: column; justify-content: center; padding: 40px;
+      position: absolute;
+      top: 0; left: 0;
+      width: var(--overlay-width);
+      height: 100%;
+      background: var(--black);
+      color: var(--fon);
+      z-index: 2;
+      transition: left 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px;
     }
-    .overlay.open-sign-up { left: calc(var(--form-width) - var(--overlay-width)); border-radius: 0 20px 20px 0; }
-    .overlay h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-    .overlay p { font-size: 13px; color: rgba(0,0,0,0.7); line-height: 1.5; margin-bottom: 20px; }
+    .overlay.open-sign-up {
+      left: calc(var(--form-width) - var(--overlay-width));
+    }
+
+    .form {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .form .sign-in, .form .sign-up {
+      width: 50%;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.3s;
+    }
+    .form .sign-up { display: none; opacity: 0; }
+    .form .sign-up.show { display: flex; opacity: 1; }
+
+    .modalFORM {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .modalFORM h3 {
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
     
-    .form-container {
-      flex: 1; margin-left: var(--overlay-width); display: flex; position: relative; transition: margin-left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Modern Inputs */
+    .inputField {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid var(--gray-medium);
+      border-radius: 4px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      transition: all 0.3s;
+      background: transparent;
     }
-    .form-box {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-      display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px;
-      opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
-    }
-    .form-box.active { opacity: 1; pointer-events: auto; }
-
-    .modalFORM { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 320px; }
-    .modalFORM h3 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
-
-    .input-container { position: relative; width: 100%; }
-    .styled_input_bar {
-      width: 100%; padding: 14px 16px; font-size: 14px; font-family: 'SN Pro', sans-serif;
-      border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--bg-input);
-      color: var(--text-primary); outline: none; transition: all 0.3s ease;
-    }
-    .styled_input_bar:focus { border-color: var(--text-primary); background-color: #222; box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05); }
-    .input-label {
-      position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 14px;
-      color: var(--text-muted); pointer-events: none; transition: all 0.2s ease; background: transparent; padding: 0 4px;
-    }
-    .styled_input_bar:focus + .input-label, .styled_input_bar:not(:placeholder-shown) + .input-label {
-      top: 0; left: 12px; font-size: 11px; font-weight: 500; background-color: var(--bg-card); color: var(--text-secondary);
+    .inputField:focus {
+      outline: none;
+      border-color: var(--black);
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
     }
 
-    .button-submit { width: 100%; padding: 14px 24px; background: var(--text-primary); color: var(--bg-primary); border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 8px; }
-    .button-submit:hover { background: var(--accent-hover); transform: translateY(-1px); }
-    .button-submit2 { width: 100%; padding: 12px; background-color: transparent; border: 1px solid var(--bg-primary); color: var(--bg-primary); font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; }
-    .button-submit2:hover { background-color: rgba(0,0,0,0.1); }
+    .button-submit {
+      width: 100%;
+      padding: 15px;
+      background: var(--black);
+      color: var(--fon);
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .button-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .button-submit2 {
+      background: transparent;
+      border: 1px solid var(--fon);
+      color: var(--fon);
+      padding: 12px 20px;
+      width: 100%;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 20px;
+    }
+    .button-submit2:hover {
+      background: rgba(255,255,255,0.1);
+    }
 
-    /* --- Modal Content (Main App) --- */
+    /* --- Модальное окно контента --- */
     .modal-window {
-      position: fixed; display: none; flex-direction: column;
-      top: 20px; left: 100px; right: 20px; bottom: 20px; 
-      background-color: rgba(15, 15, 15, 0.95); border: 1px solid var(--border-color); border-radius: 20px;
-      overflow: hidden; z-index: 1100; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: var(--content-width); /* 1300px */
+      height: calc(100vh - 40px);
+      background: var(--fon);
+      border: 1px solid #e0e0e0;
+      border-radius: var(--radius);
+      z-index: 1100;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.1);
     }
 
-    /* Fixed Width Logic */
-    .modal-body-wrapper {
-      flex: 1; overflow-y: auto; overflow-x: hidden; 
-      display: flex; justify-content: center; /* Centering the fixed width content */
-      padding: 20px 0;
-    }
-    
     .content-area {
-      width: var(--content-max-width); /* Fixed width */
-      opacity: 0; transition: opacity 0.5s ease; 
-      position: relative; z-index: 1; padding: 0 20px;
+      width: 100%;
+      height: 100%;
+      padding: 40px;
+      overflow-y: auto;
+      opacity: 0;
+      transition: opacity 0.5s;
     }
     .content-area.visible { opacity: 1; }
 
-    /* --- Spec Structure Styles --- */
+    /* --- Стили Нового Интерфейса Спецификации --- */
     
-    /* Top Controls */
-    .modal9-top-window { padding: 0 0 20px 0; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
-    .modal9-top-body { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+    /* Заголовок списка */
+    .spec-header-row {
+      display: flex;
+      padding: 0 20px 20px 0;
+      border-bottom: 2px solid var(--black);
+      margin-bottom: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
     
-    .file-upload__modal { display: flex; gap: 10px; }
-    .darkmatter-btn { background: var(--text-primary); border: none; color: var(--bg-primary); padding: 10px 20px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
-    .darkmatter-btn:hover { background: #ddd; }
-    
-    .button-group { display: flex; gap: 15px; align-items: center; margin-top: 10px; width: 100%; }
-    .file-filter-container { flex: 1; max-width: 400px; }
-    
-    .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .3s; border-radius: 22px; }
-    .toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
-    input:checked + .toggle-slider { background-color: var(--text-primary); }
-    input:checked + .toggle-slider:before { transform: translateX(18px); }
-
-    /* History List */
-    .history-list { display: flex; flex-direction: column; gap: 15px; }
-    
-    /* Spec Row Container (New Structure) */
+    /* Контейнер строки */
     .spec-row-item {
-      display: flex; 
-      background: #141414; 
-      border: 1px solid #222;
-      border-radius: 12px; 
-      overflow: hidden; 
-      margin-bottom: 15px;
-      height: 250px; /* Fixed height for consistent slider */
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      transition: border-color 0.3s;
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 30px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--gray-medium);
+      gap: 30px;
     }
-    .spec-row-item:hover { border-color: #444; }
 
-    /* 1. Left Part: Info */
-    .spec-info-col {
-      width: 250px; 
+    /* Левая часть: Номер, Имя, Кол-во */
+    .spec-left-block {
+      width: 400px;
       flex-shrink: 0;
-      padding: 20px; 
-      border-right: 1px solid #222;
-      display: flex; flex-direction: column; justify-content: center; gap: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    .spec-num { font-size: 12px; color: var(--text-muted); font-family: 'Montserrat', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
-    .spec-name { font-size: 16px; font-weight: 600; line-height: 1.3; color: var(--text-primary); }
-    .spec-qty { font-size: 14px; color: var(--text-secondary); margin-top: auto; }
-    .spec-qty span { color: var(--text-primary); font-weight: 600; margin-left: 5px; }
+    .spec-id-name-qty {
+      display: flex;
+      gap: 15px;
+      align-items: flex-end;
+    }
+    .spec-pos-num {
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--black);
+      line-height: 1;
+      min-width: 60px;
+    }
+    .spec-main-info {
+      flex: 1;
+    }
+    .spec-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .spec-qty {
+      font-size: 14px;
+      color: #666;
+    }
 
-    /* 2. Middle Part: Params */
-    .spec-params-col {
-      width: 300px; 
+    /* Средняя часть: Параметры */
+    .spec-params-block {
+      width: 350px;
       flex-shrink: 0;
-      background: #0a0a0a;
-      padding: 15px;
-      border-right: 1px solid #222;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+      border-left: 1px solid var(--gray-medium);
+      padding-left: 30px;
     }
     .param-row {
-      display: flex; justify-content: space-between; 
-      padding: 8px 0; border-bottom: 1px solid #1a1a1a;
-      font-size: 13px;
+      display: flex;
+      gap: 10px;
     }
-    .param-row:last-child { border-bottom: none; }
-    .param-key { color: var(--text-muted); margin-right: 10px; }
-    .param-val { color: var(--text-secondary); text-align: right; }
-
-    /* 3. Right Part: Slider (Blocks) */
-    .spec-slider-col {
-      flex: 1; 
-      position: relative; 
-      background: #000;
+    .param-key {
+      color: #888;
+      min-width: 100px;
+    }
+    .param-val {
+      font-weight: 600;
+      color: var(--black);
     }
 
-    /* Integrated Slider Styles */
+    /* Правая часть: Слайдер (Блоки) */
+    .spec-right-block {
+      flex: 1;
+      min-width: 400px;
+    }
+    
+    /* --- Слайдер (Интеграция из примера) --- */
     .slideshow-container {
-      position: relative; width: 100%; height: 100%; overflow: hidden;
+      position: relative;
+      width: 100%;
+      height: 250px; /* Фиксированная высота для строки */
+      overflow: hidden;
+      border-radius: 8px;
+      background: #f0f0f0;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     .slide {
-      position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 1s ease;
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
     }
-    .slide.active { opacity: 1; pointer-events: auto; z-index: 1; }
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 1;
+    }
     .slide img {
-      width: 100%; height: 100%; object-fit: cover;
-      filter: grayscale(100%) contrast(1.1) brightness(0.6); 
-      transform: scale(1.05); transition: transform 10s linear;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.1);
+      filter: grayscale(100%) contrast(1.1) brightness(0.9);
+      transition: transform 7s ease;
     }
     .slide.active img { transform: scale(1); }
-    .overlay {
-      position: absolute; inset: 0; 
-      background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.2));
+    
+    .overlay-slide {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
       z-index: 1;
     }
     .caption {
-      position: absolute; bottom: 30px; left: 30px; z-index: 2;
-      font-family: 'Montserrat', sans-serif; color: #fff;
+      position: absolute;
+      bottom: 20px; left: 20px;
+      color: #fff;
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 1s ease 0.5s;
+      z-index: 2;
     }
-    .caption-title { font-size: 18px; font-weight: 700; margin-bottom: 5px; opacity: 0; transform: translateY(10px); transition: all 0.5s 0.3s; }
-    .caption-sub { font-size: 12px; color: #aaa; opacity: 0; transform: translateY(10px); transition: all 0.5s 0.4s; }
-    .slide.active .caption-title, .slide.active .caption-sub { opacity: 1; transform: translateY(0); }
-
-    /* Navigation */
-    .nav-arrows { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; display: flex; justify-content: space-between; padding: 0 10px; z-index: 2; pointer-events: none; }
+    .slide.active .caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
     .prev, .next {
-      cursor: pointer; color: #fff; font-size: 16px; padding: 8px 12px; border-radius: 6px;
-      background: rgba(255,255,255,0.1); backdrop-filter: blur(4px); transition: all 0.3s; pointer-events: auto;
-      display: flex; align-items: center; justify-content: center; user-select: none;
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-size: 20px;
+      padding: 10px;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(4px);
+      border-radius: 50%;
+      z-index: 3;
+      user-select: none;
+      transition: 0.3s;
     }
-    .prev:hover, .next:hover { background: rgba(255,255,255,0.3); }
-
+    .prev { left: 10px; }
+    .next { right: 10px; }
+    .prev:hover, .next:hover { background: rgba(0,0,0,0.7); }
+    
     .dots-container {
-      position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 2;
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 3;
     }
     .dot {
-      width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: 0.3s;
     }
-    .dot.active { background: #fff; transform: scale(1.4); }
+    .dot.active {
+      background: #fff;
+      transform: scale(1.3);
+    }
 
-    /* Loader */
-    .lines-loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 8px; opacity: 0; visibility: hidden; z-index: 1200; }
-    .lines-loader.visible { opacity: 1; visibility: visible; }
-    .lineLM { width: 3px; height: 30px; background-color: var(--text-primary); animation: bounce 1.2s infinite ease-in-out; border-radius: 2px; }
+    /* --- Утилиты --- */
+    .input-container { position: relative; width: 100%; margin-bottom: 15px; }
+    .lines-loader { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); gap: 10px; }
+    .lines-loader.visible { display: flex; }
+    #db-disconnect-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; }
+    #home_wave { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
-    /* Context Menu */
-    .spec-context-menu { position: fixed; display: none; min-width: 180px; background: #222; border: 1px solid #333; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 4000; padding: 8px 0; }
-    .spec-context-menu.visible { display: block; }
-    .spec-context-menu button { width: 100%; padding: 8px 16px; background: none; border: none; color: #ccc; text-align: left; font-size: 13px; cursor: pointer; }
-    .spec-context-menu button:hover { background: #333; color: #fff; }
-    
-    /* Progress */
-    .spec-progress { display: flex; gap: 20px; padding: 0 10px 15px; }
-    .step { flex: 1; }
-    .step .bar { height: 2px; background: #333; border-radius: 1px; overflow: hidden; margin-bottom: 8px; }
-    .step.active .bar { background: #fff; }
-    .step-body { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #666; }
+    /* Кнопки действий */
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--black);
+      color: var(--black);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.3s;
+      text-transform: uppercase;
+    }
+    .action-btn:hover { background: var(--black); color: var(--fon); }
+    .actions-row { margin-bottom: 40px; display: flex; gap: 15px; }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
   </style>
 </head>
 <body>
+
   <div id="home_wave"></div>
-  
+
   <div id="preloader">
     <div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
   </div>
 
-  <!-- Menu -->
-  <div id="side-menu" style="display:none;">
+  <div id="db-disconnect-overlay">
+    <p style="font-weight: 600; text-transform: uppercase;">Потеря соединения...</p>
+  </div>
+
+  <!-- Меню -->
+  <div id="side-menu">
     <div class="navigation">
       <ul>
-        <li class="navbar__item active" data-levels="PAGE9" data-modal="modal9">
-          <a href="#">
-            <span class="icon material-symbols-outlined">grid_view</span>
-            <span class="title">SPECIFICATIONS</span>
-          </a>
+        <li class="navbar__item active" data-levels="PAGE1" data-modal="modal1">
+          <a href="#"><span class="material-symbols-outlined">view_kanban</span><span class="title">Tasks</span></a>
         </li>
-        <div class="indicator"></div>
+        <li class="navbar__item" data-levels="PAGE9" data-modal="modal9">
+          <a href="#"><span class="material-symbols-outlined">blur_on</span><span class="title">Specifications</span></a>
+        </li>
+        <li class="navbar__item" data-levels="PAGE10" data-modal="modal10">
+          <a href="#"><span class="material-symbols-outlined">forum</span><span class="title">Support</span></a>
+        </li>
+        <!-- Остальные пункты меню скрыты для краткости, но работают по тому же принципу -->
+        <div class="indicator" style="display:none;"></div>
       </ul>
     </div>
   </div>
 
-  <!-- Main Content Window -->
+  <!-- Правое модальное окно -->
   <div id="right-modal" class="modal-window">
     <div class="lines-loader" id="linesLoader">
-      <div class="lineLM"></div><div class="lineLM"></div><div class="lineLM"></div><div class="lineLM"></div>
+      <div class="line"></div><div class="line"></div><div class="line"></div>
     </div>
-    
-    <div class="modal-body-wrapper">
-      <div class="content-area" id="modalContentArea">
-        
-        <!-- Header Controls -->
-        <div class="modal9-top-window">
-          <div class="modal9-top-body">
-            <div class="file-upload__modal">
-              <form class="file-upload-form js-dropzone">
-                <label class="file-upload-label">
-                  <div class="file-upload-design" style="display:flex; gap:10px;">
-                    <button type="button" class="darkmatter-btn browse-button">
-                      <span class="material-symbols-outlined" style="font-size:16px;">upload</span>
-                      выбрать файл
-                    </button>
-                    <button type="button" class="darkmatter-btn upload-btn" style="background:#333; color:#fff;">
-                      <span class="button-text">загрузить</span>
-                    </button>
-                  </div>
-                  <input type="file" class="js-file__input" style="display:none;" />
-                </label>
-              </form>
-            </div>
-            
-            <div class="button-group">
-              <div class="file-filter-container input-container">
-                <input id="file-filter-input" class="styled_input_bar" placeholder=" " />
-                <label class="input-label">поиск по названию или №</label>
-              </div>
-              <label class="switch" title="Только мои файлы">
-                <input type="checkbox" id="my-files-toggle">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Context Menu -->
-        <div class="spec-context-menu" id="contextMenu">
-          <button type="button" data-action="copy">Копировать</button>
-          <button type="button" data-action="excel">Excel</button>
-        </div>
-
-        <!-- History List (Container) -->
-        <div class="history-list spec-history-list"></div>
-        
-        <!-- Templates -->
-        <template id="history-row-template">
-           <div class="spec-row-item" data-spec-id="">
-             <!-- Part 1: Info -->
-             <div class="spec-info-col">
-               <div class="spec-num">№ <span data-field="pos_number"></span></div>
-               <div class="spec-name" data-field="name"></div>
-               <div class="spec-qty">Кол-во: <span data-field="qty"></span></div>
-               <div style="font-size:10px; color:#666; margin-top:5px;" data-field="file_name"></div>
-             </div>
-             
-             <!-- Part 2: Params -->
-             <div class="spec-params-col params-container">
-               <!-- Params injected here -->
-             </div>
-
-             <!-- Part 3: Slider (3 Blocks) -->
-             <div class="spec-slider-col">
-               <div class="slideshow-container">
-                 <!-- Slide 1 -->
-                 <div class="slide active">
-                   <img src="https://iili.io/KkPp5kQ.jpg" alt="Block 1">
-                   <div class="overlay"></div>
-                   <div class="caption">
-                     <div class="caption-title">Предложение 1</div>
-                     <div class="caption-sub sub-1">--</div>
-                   </div>
-                 </div>
-                 <!-- Slide 2 -->
-                 <div class="slide">
-                   <img src="https://iili.io/KkPpA2j.jpg" alt="Block 2">
-                   <div class="overlay"></div>
-                   <div class="caption">
-                     <div class="caption-title">Предложение 2</div>
-                     <div class="caption-sub sub-2">--</div>
-                   </div>
-                 </div>
-                 <!-- Slide 3 -->
-                 <div class="slide">
-                   <img src="https://iili.io/KkPpRYx.jpg" alt="Block 3">
-                   <div class="overlay"></div>
-                   <div class="caption">
-                     <div class="caption-title">Предложение 3</div>
-                     <div class="caption-sub sub-3">--</div>
-                   </div>
-                 </div>
-
-                 <!-- Navs -->
-                 <div class="nav-arrows">
-                   <a class="prev">&#10094;</a>
-                   <a class="next">&#10095;</a>
-                 </div>
-                 <div class="dots-container">
-                   <div class="dot active" data-index="0"></div>
-                   <div class="dot" data-index="1"></div>
-                   <div class="dot" data-index="2"></div>
-                 </div>
-               </div>
-             </div>
-           </div>
-        </template>
-        
-        <template id="param-row-template">
-          <div class="param-row">
-            <div class="param-key"></div>
-            <div class="param-val"></div>
-          </div>
-        </template>
-
-      </div>
-    </div>
+    <div class="content-area" id="modalContentArea"></div>
   </div>
 
-  <!-- Login Form -->
-  <div id="login-wrapper" class="show">
+  <!-- Логин -->
+  <div id="login-wrapper">
     <div class="container">
       <div class="overlay" id="overlay">
         <div class="sign-in">
-          <h3>Новый пользователь?</h3>
-          <p>Создайте аккаунт для доступа к функционалу.</p>
-          <button class="button-submit2" id="slide-right-button">Регистрация</button>
+          <h3>Добро пожаловать</h3>
+          <p style="font-size: 13px; opacity: 0.8; margin-bottom: 20px;">Нет аккаунта? Зарегистрируйтесь.</p>
+          <button class="button-submit2" id="slide-right-button">Создать аккаунт</button>
         </div>
         <div class="sign-up" style="display:none;">
-          <h3>Есть аккаунт?</h3>
-          <p>Войдите в систему.</p>
+          <h3>С возвращением</h3>
+          <p style="font-size: 13px; opacity: 0.8; margin-bottom: 20px;">Уже зарегистрированы? Войдите.</p>
           <button class="button-submit2" id="slide-left-button">Войти</button>
         </div>
       </div>
       
-      <div class="form-container">
-        <!-- Register -->
-        <div class="form-box" id="sign-in-info">
-           <h2 style="font-size: 18px; color: var(--text-secondary); margin-bottom: 30px; letter-spacing: 2px;">AI SELECTION</h2>
-          <form id="registration-form">
-            <div class="modalFORM">
-              <h3>Регистрация</h3>
-              <div class="input-container">
-                <input class="styled_input_bar" type="text" name="lastname" placeholder=" " />
-                <label class="input-label">Фамилия</label>
-              </div>
-              <div class="input-container">
-                <input class="styled_input_bar" type="text" name="firstname" placeholder=" " />
-                <label class="input-label">Имя</label>
-              </div>
-              <div class="input-container">
-                <input class="styled_input_bar" type="email" name="email" placeholder=" " />
-                <label class="input-label">Email</label>
-              </div>
-              <div class="input-container">
-                <input class="styled_input_bar" type="password" name="password" placeholder=" " />
-                <label class="input-label">Пароль</label>
-              </div>
-              <button class="button-submit">Создать</button>
-            </div>
+      <div class="form">
+        <!-- Регистрация -->
+        <div class="sign-in" id="sign-in-info" style="display:none; opacity:0;">
+          <form id="registration-form" class="modalFORM">
+            <h3>Регистрация</h3>
+            <input class="inputField" placeholder="Фамилия" name="lastname"/>
+            <input class="inputField" placeholder="Имя" name="firstname"/>
+            <input class="inputField" placeholder="Email" name="email"/>
+            <input class="inputField" placeholder="Пароль" type="password" name="password"/>
+            <button type="button" class="button-submit" id="regBtn">Зарегистрироваться</button>
           </form>
         </div>
-        
-        <!-- Login -->
-        <div class="form-box active" id="sign-up-info">
-          <h2 style="font-size: 18px; color: var(--text-secondary); margin-bottom: 30px; letter-spacing: 2px;">AI SELECTION</h2>
-          <form id="login-form">
-            <div class="modalFORM">
-              <h3>Вход</h3>
-              <div class="input-container">
-                <input class="styled_input_bar" type="email" id="loginEmail" placeholder=" " />
-                <label class="input-label">Email</label>
-              </div>
-              <div class="input-container">
-                <input class="styled_input_bar" type="password" id="loginPassword" placeholder=" " />
-                <label class="input-label">Пароль</label>
-              </div>
-              <button class="button-submit" id="loginBtn" type="button">Войти</button>
-            </div>
+        <!-- Вход -->
+        <div class="sign-up show" id="sign-up-info">
+          <form id="login-form" class="modalFORM">
+            <h3>Вход</h3>
+            <input class="inputField" id="loginEmail" placeholder="Email" autocomplete="username"/>
+            <input class="inputField" id="loginPassword" type="password" placeholder="Пароль" autocomplete="current-password"/>
+            <button type="button" class="button-submit" id="loginBtn">Войти</button>
           </form>
         </div>
       </div>
     </div>
   </div>
 
-  <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
-  <script type="module">
-    // Mock Supabase for demo
-    const mockSupabase = {
-      auth: {
-        getSession: async () => ({ data: { session: { access_token: 'mock_token' } } }),
-        signInWithPassword: async () => ({ data: { user: { id: '123' } } }),
-        signUp: async () => ({ data: {} })
-      },
-      from: (table) => ({
-        select: () => ({
-          order: () => ({
-            limit: async () => ({ data: [
-              { id: 1, pos_number: '01', name: 'Насос центробежный GRUNDFOS CR 15-3', qty: 2, file_name: 'project_alpha.docx', params: 'Мощность&0.37 кВт|Напряжение&220В|Производительность&3 м3/ч' },
-              { id: 2, pos_number: '02', name: 'Клапан обратный фланцевый Ду50', qty: 5, file_name: 'project_alpha.docx', params: 'Материал&Чугун|Давление&16 бар|Тип&Затвор' },
-              { id: 3, pos_number: '03', name: 'Труба стальная бесшовная', qty: '12 м', file_name: 'project_beta.xlsx', params: 'Диаметр&108 мм|Стенка&4 мм|Сталь&09Г2С' },
-            ], error: null })
-          })
-        }),
-        insert: async () => ({ data: { id: 4 }, error: null }),
-        update: async () => ({ error: null })
-      }),
-      storage: { from: () => ({ upload: async () => ({ error: null }) }) }
-    };
-    window.supabase = mockSupabase;
+  <!-- Шаблон Modal 9 (Встроен в файл) -->
+  <script type="text/template" id="tpl-modal9">
+    <div id="modal9-dynamic-root">
+      <div class="actions-row">
+        <button class="action-btn" id="btn-load-spec">
+          <span class="material-symbols-outlined" style="font-size:16px;">refresh</span>
+          Загрузить спецификации
+        </button>
+        <button class="action-btn" id="btn-add-dummy">
+          <span class="material-symbols-outlined" style="font-size:16px;">add</span>
+          Добавить демо-строку
+        </button>
+      </div>
 
-    // Logic
+      <div class="spec-header-row">
+        <div style="width: 400px;">Позиция</div>
+        <div style="width: 350px; padding-left: 30px;">Параметры</div>
+        <div style="flex: 1;">Визуализация / Блоки</div>
+      </div>
+
+      <div id="specs-container"></div>
+    </div>
+  </script>
+
+  <!-- Основной скрипт -->
+  <script type="module">
+    import { createClient } from "https://jviswahajwmwibedxcll.supabase.co/functions/v1/vendor/supabase-client.js/index.js"; // Упрощенный импорт для примера, используйте свой путь
+    
+    // ВАЖНО: Если среда выполнения не поддерживает ES модули по ссылке, используйте ваш локальный путь.
+    // Для корректной работы в едином файле предположим, что supabase клиент доступен глобально или через импорт.
+    // В данном коде я использую заглушку для Supabase, чтобы код работал без реального бэкенда для демонстрации UI.
+    
+    // === Эмуляция Supabase для демонстрации UI (замените на ваш реальный код инициализации) ===
+    // window.supabase = createClient('URL', 'KEY'); 
+    
+    const mockData = [
+      { id: 1, name: 'Сервер HP ProLiant DL380', qty: 5, unit: 'шт.', params: [
+          {k:'CPU', v:'Intel Xeon Gold'}, {k:'RAM', v:'64GB DDR4'}, {k:'Storage', v:'4x 1.2TB SAS'}
+        ] 
+      },
+      { id: 2, name: 'Монитор Dell UltraSharp 27"', qty: 10, unit: 'шт.', params: [
+          {k:'Resolution', v:'4K UHD'}, {k:'Panel', v:'IPS'}, {k:'Brightness', v:'350 cd/m²'}
+        ]
+      }
+    ];
+
+    // === Логика Приложения ===
+    
     const preloader = document.getElementById('preloader');
     const loginWrapper = document.getElementById('login-wrapper');
     const sideMenu = document.getElementById('side-menu');
     const rightModal = document.getElementById('right-modal');
     const modalContentArea = document.getElementById('modalContentArea');
-    const linesLoader = document.getElementById('linesLoader');
-    
-    // Slider Logic Class
-    class SpecSlider {
-      constructor(container) {
-        this.slides = container.querySelectorAll('.slide');
-        this.dots = container.querySelectorAll('.dot');
-        this.prevBtn = container.querySelector('.prev');
-        this.nextBtn = container.querySelector('.next');
-        this.index = 0;
-        this.interval = null;
-        
-        this.init();
-      }
-      
-      showSlide(n) {
-        this.slides[this.index].classList.remove('active');
-        this.dots[this.index].classList.remove('active');
-        this.index = (n + this.slides.length) % this.slides.length;
-        this.slides[this.index].classList.add('active');
-        this.dots[this.index].classList.add('active');
-      }
-      
-      next() { this.showSlide(this.index + 1); }
-      prev() { this.showSlide(this.index - 1); }
-      
-      startAuto() { this.interval = setInterval(() => this.next(), 5000); }
-      stopAuto() { clearInterval(this.interval); }
-      
-      init() {
-        this.prevBtn.addEventListener('click', (e) => { e.stopPropagation(); this.stopAuto(); this.prev(); this.startAuto(); });
-        this.nextBtn.addEventListener('click', (e) => { e.stopPropagation(); this.stopAuto(); this.next(); this.startAuto(); });
-        this.dots.forEach(dot => {
-          dot.addEventListener('click', (e) => { 
-            e.stopPropagation(); 
-            this.stopAuto(); 
-            this.showSlide(parseInt(dot.dataset.index)); 
-            this.startAuto(); 
-          });
-        });
-        this.startAuto();
-      }
-    }
 
-    // Auth Mock
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      linesLoader.classList.add('visible');
-      loginWrapper.classList.remove('show');
-      
+    // 1. Инициализация
+    document.addEventListener('DOMContentLoaded', () => {
+      preloader.classList.add('visible');
       setTimeout(() => {
-        linesLoader.classList.remove('visible');
-        sideMenu.style.display = 'block';
-        rightModal.style.display = 'flex';
-        modalContentArea.classList.add('visible');
-        initApp();
-        initIndicator();
+        preloader.classList.remove('visible');
+        loginWrapper.classList.add('show');
       }, 1500);
     });
 
-    // Toggle Login/Register
+    // 2. Анимация входа
     const overlay = document.getElementById('overlay');
-    const signInInfo = document.getElementById('sign-in-info');
-    const signUpInfo = document.getElementById('sign-up-info');
-    
+    const signInForm = document.getElementById('sign-in-info');
+    const signUpForm = document.getElementById('sign-up-info');
+
     document.getElementById('slide-right-button').addEventListener('click', () => {
       overlay.classList.add('open-sign-up');
-      signUpInfo.classList.remove('active');
-      signInInfo.classList.add('active');
       overlay.querySelector('.sign-in').style.display = 'none';
       overlay.querySelector('.sign-up').style.display = 'flex';
+      
+      signUpForm.classList.remove('show');
+      signUpForm.style.display = 'none';
+      signInForm.style.display = 'flex';
+      setTimeout(() => signInForm.style.opacity = 1, 50);
     });
-    
+
     document.getElementById('slide-left-button').addEventListener('click', () => {
       overlay.classList.remove('open-sign-up');
-      signInInfo.classList.remove('active');
-      signUpInfo.classList.add('active');
       overlay.querySelector('.sign-in').style.display = 'flex';
       overlay.querySelector('.sign-up').style.display = 'none';
+      
+      signInForm.style.opacity = 0;
+      setTimeout(() => signInForm.style.display = 'none', 300);
+      signUpForm.style.display = 'flex';
+      setTimeout(() => signUpForm.classList.add('show'), 50);
     });
 
-    // App Logic
-    async function initApp() {
-      const historyList = document.querySelector('.history-list');
-      const rowTemplate = document.querySelector('#history-row-template');
-      const paramTemplate = document.querySelector('#param-row-template');
-      
-      // Mock Data Load
-      const { data: specs } = await supabase.from('specs').select().order().limit();
-      
-      historyList.innerHTML = '';
-      
-      specs.forEach(spec => {
-        const clone = rowTemplate.content.cloneNode(true);
-        const row = clone.querySelector('.spec-row-item');
-        row.dataset.specId = spec.id;
-        
-        // Fill Left & Center
-        clone.querySelector('[data-field="pos_number"]').textContent = spec.pos_number;
-        clone.querySelector('[data-field="name"]').textContent = spec.name;
-        clone.querySelector('[data-field="qty"]').textContent = spec.qty;
-        clone.querySelector('[data-field="file_name"]').textContent = spec.file_name;
-        
-        const paramsContainer = clone.querySelector('.params-container');
-        const params = spec.params.split('|');
-        params.forEach(p => {
-          const [key, val] = p.split('&');
-          const pClone = paramTemplate.content.cloneNode(true);
-          pClone.querySelector('.param-key').textContent = key;
-          pClone.querySelector('.param-val').textContent = val;
-          paramsContainer.appendChild(pClone);
-        });
+    // 3. Вход (Mock)
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      // Здесь должен быть ваш код авторизации Supabase
+      // Для демонстрации пропускаем проверку
+      loginWrapper.classList.remove('show');
+      sideMenu.style.display = 'block';
+      initNavigation();
+    });
 
-        // Init Slider Logic on the row
-        historyList.appendChild(clone);
-        // Need to select the newly added row to init slider
-        const addedRow = historyList.lastElementChild;
-        const sliderContainer = addedRow.querySelector('.slideshow-container');
-        new SpecSlider(sliderContainer);
-      });
-    }
-    
-    // Indicator Logic
-    function initIndicator() {
-      const indicator = document.querySelector('.indicator');
+    document.getElementById('regBtn').addEventListener('click', () => {
+      alert('Форма регистрации отправлена (Mock)');
+    });
+
+    // 4. Навигация и загрузка страниц
+    function initNavigation() {
       const items = document.querySelectorAll('.navbar__item');
-      const first = items[0];
-      indicator.style.top = (first.offsetTop + 5) + 'px';
-      indicator.style.left = '10px';
-      indicator.style.width = '50px';
+      items.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          items.forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          const modalId = item.getAttribute('data-modal');
+          showModal(modalId);
+        });
+      });
     }
 
-    // Three.js Background
-    const SEPARATION = 100, AMOUNTX = 50, AMOUNTY = 50;
-    let camera, scene, renderer, points, count = 0;
-    
-    function initBg() {
-      const container = document.getElementById('home_wave');
-      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-      camera.position.z = 1000;
-      camera.position.y = 300;
-      camera.rotation.x = -0.2;
-      
-      scene = new THREE.Scene();
-      const positions = [];
-      for(let i=0; i<AMOUNTX; i++) {
-        for(let j=0; j<AMOUNTY; j++) {
-          positions.push(i * SEPARATION - ((AMOUNTX * SEPARATION)/2), 0, j * SEPARATION - ((AMOUNTY * SEPARATION)/2));
+    async function showModal(pageId) {
+      rightModal.style.display = 'flex';
+      modalContentArea.classList.remove('visible');
+      document.getElementById('linesLoader').classList.add('visible');
+      modalContentArea.innerHTML = '';
+
+      // Имитация загрузки
+      await new Promise(r => setTimeout(r, 500));
+
+      if (pageId === 'modal9') {
+        const tpl = document.getElementById('tpl-modal9');
+        if (tpl) {
+          modalContentArea.innerHTML = tpl.innerHTML;
+          initModal9Logic();
+        } else {
+          modalContentArea.innerHTML = '<p>Шаблон не найден</p>';
         }
+      } else {
+        modalContentArea.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%; flex-direction:column;">
+            <h2 style="font-weight:300; text-transform:uppercase; letter-spacing:5px;">Страница ${pageId}</h2>
+            <p style="color:#888; margin-top:10px;">Раздел находится в разработке</p>
+        </div>`;
       }
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-      const material = new THREE.PointsMaterial({ color: 0xffffff, size: 2, transparent: true, opacity: 0.5 });
-      points = new THREE.Points(geometry, material);
-      scene.add(points);
-      renderer = new THREE.WebGLRenderer({ alpha: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      container.appendChild(renderer.domElement);
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+
+      document.getElementById('linesLoader').classList.remove('visible');
+      modalContentArea.classList.add('visible');
+    }
+
+    // === ЛОГИКА MODAL 9 (Новый дизайн) ===
+    function initModal9Logic() {
+      const container = document.getElementById('specs-container');
+      if (!container) return;
+
+      // Кнопка добавления демо-данных
+      document.getElementById('btn-add-dummy')?.addEventListener('click', () => {
+        addRow({
+          id: Math.floor(Math.random() * 100),
+          name: 'Новое оборудование ' + Math.floor(Math.random() * 100),
+          qty: Math.floor(Math.random() * 10) + 1,
+          unit: 'шт.',
+          params: [
+            {k: 'Модель', v: 'Series X'},
+            {k: 'Гарантия', v: '3 года'},
+            {k: 'Цвет', v: 'Черный'}
+          ]
+        });
       });
-      animate();
+
+      // Загрузка демо при старте
+      mockData.forEach(addRow);
+      
+      // Инициализация слайдеров для существующих элементов
+      initializeAllSliders(container);
     }
-    
-    function animate() {
-      requestAnimationFrame(animate);
-      const positions = points.geometry.attributes.position.array;
-      let i = 0;
-      for(let ix=0; ix<AMOUNTX; ix++) {
-        for(let iy=0; iy<AMOUNTY; iy++) {
-          positions[i+1] = (Math.sin((ix+count)*0.3) * 50) + (Math.sin((iy+count)*0.5) * 50);
-          i+=3;
-        }
+
+    function addRow(item) {
+      const container = document.getElementById('specs-container');
+      const row = document.createElement('div');
+      row.className = 'spec-row-item';
+      row.innerHTML = `
+        <!-- Левый блок -->
+        <div class="spec-left-block">
+          <div class="spec-id-name-qty">
+            <div class="spec-pos-num">${item.id}</div>
+            <div class="spec-main-info">
+              <div class="spec-name">${item.name}</div>
+              <div class="spec-qty">${item.qty} ${item.unit}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Средний блок (Параметры) -->
+        <div class="spec-params-block">
+          ${item.params.map(p => `
+            <div class="param-row">
+              <span class="param-key">${p.k}:</span>
+              <span class="param-val">${p.v}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Правый блок (Слайдер) -->
+        <div class="spec-right-block">
+          <div class="slideshow-container">
+            <div class="slide active">
+              <img src="https://iili.io/KkPp5kQ.jpg" alt="Slide 1">
+              <div class="overlay-slide"></div>
+              <div class="caption">Парсинг данных</div>
+            </div>
+            <div class="slide">
+              <img src="https://iili.io/KkPpA2j.jpg" alt="Slide 2">
+              <div class="overlay-slide"></div>
+              <div class="caption">Анализ цен</div>
+            </div>
+            <div class="slide">
+              <img src="https://iili.io/KkPpRYx.jpg" alt="Slide 3">
+              <div class="overlay-slide"></div>
+              <div class="caption">Результаты</div>
+            </div>
+
+            <a class="prev">&#10094;</a>
+            <a class="next">&#10095;</a>
+
+            <div class="dots-container">
+              <div class="dot active" data-index="0"></div>
+              <div class="dot" data-index="1"></div>
+              <div class="dot" data-index="2"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      container.appendChild(row);
+      
+      // Инициализируем слайдер только что добавленного ряда
+      const slider = row.querySelector('.slideshow-container');
+      initSingleSlider(slider);
+    }
+
+    // === Логика Слайдера ===
+    function initializeAllSliders(scope) {
+      scope.querySelectorAll('.slideshow-container').forEach(initSingleSlider);
+    }
+
+    function initSingleSlider(container) {
+      if (!container || container.dataset.init) return;
+      container.dataset.init = 'true';
+
+      const slides = container.querySelectorAll('.slide');
+      const dots = container.querySelectorAll('.dot');
+      const prevBtn = container.querySelector('.prev');
+      const nextBtn = container.querySelector('.next');
+      let index = 0;
+      let autoPlayTimer = null;
+
+      function showSlide(n) {
+        // Сброс предыдущего
+        slides[index].classList.remove('active');
+        dots[index].classList.remove('active');
+        
+        // Расчет индекса
+        index = (n + slides.length) % slides.length;
+        
+        // Установка нового
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
       }
-      points.geometry.attributes.position.needsUpdate = true;
-      renderer.render(scene, camera);
-      count += 0.05;
+
+      function startAutoPlay() {
+        stopAutoPlay();
+        autoPlayTimer = setInterval(() => showSlide(index + 1), 6000);
+      }
+
+      function stopAutoPlay() {
+        if (autoPlayTimer) clearInterval(autoPlayTimer);
+      }
+
+      // События
+      prevBtn.addEventListener('click', () => {
+        showSlide(index - 1);
+        startAutoPlay(); // Сброс таймера
+      });
+
+      nextBtn.addEventListener('click', () => {
+        showSlide(index + 1);
+        startAutoPlay();
+      });
+
+      dots.forEach(dot => {
+        dot.addEventListener('click', () => {
+          showSlide(parseInt(dot.dataset.index));
+          startAutoPlay();
+        });
+      });
+
+      // Пауза при наведении
+      container.addEventListener('mouseenter', stopAutoPlay);
+      container.addEventListener('mouseleave', startAutoPlay);
+
+      startAutoPlay();
     }
+
+    // === Three.js фон (Сохранен из оригинала) ===
+    // (Код инициализации фона вынесен в конец, сохранен как есть, просто переносим в script)
     
-    initBg();
-    
-    // Preloader
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        preloader.classList.add('fade-out');
-        setTimeout(() => { preloader.style.display = 'none'; loginWrapper.classList.add('show'); }, 500);
-      }, 1000);
-    });
+    const THREE_SCRIPT = document.createElement('script');
+    THREE_SCRIPT.src = 'https://unpkg.com/three@0.130.1/build/three.min.js';
+    document.body.appendChild(THREE_SCRIPT);
+
+    THREE_SCRIPT.onload = () => {
+      const SEPARATION = 200, AMOUNTX = 40, AMOUNTY = 60;
+      const AMP_X = 50, AMP_Y = 50;
+      const FREQ_X = 0.3, FREQ_Y = 0.5, WAVE_SPEED = 0.025;
+      const POINT_SIZE = 10, POINT_COLOR = 0x000000; // Черные точки для черно-белой темы
+      
+      let camera, scene, renderer, points, count = 0;
+
+      function initWave() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 10000);
+        camera.position.set(0, 355, 122);
+
+        renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('home_wave').appendChild(renderer.domElement);
+
+        const positions = [];
+        for (let ix = 0; ix < AMOUNTX; ix++) {
+          for (let iy = 0; iy < AMOUNTY; iy++) {
+            positions.push(ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2), 0, iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2));
+          }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+        const material = new THREE.PointsMaterial({ color: POINT_COLOR, size: POINT_SIZE, sizeAttenuation: true });
+        points = new THREE.Points(geometry, material);
+        scene.add(points);
+
+        window.addEventListener('resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        animateWave();
+      }
+
+      function animateWave() {
+        requestAnimationFrame(animateWave);
+        const pos = points.geometry.attributes.position.array;
+        let i = 0;
+        for (let ix = 0; ix < AMOUNTX; ix++) {
+          for (let iy = 0; iy < AMOUNTY; iy++) {
+            pos[i + 1] = (Math.sin((ix + count) * FREQ_X) * AMP_X) + (Math.sin((iy + count) * FREQ_Y) * AMP_Y);
+            i += 3;
+          }
+        }
+        points.geometry.attributes.position.needsUpdate = true;
+        renderer.render(scene, camera);
+        count += WAVE_SPEED;
+      }
+      
+      initWave();
+    };
 
   </script>
 </body>
