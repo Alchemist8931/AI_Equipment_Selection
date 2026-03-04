@@ -48,11 +48,11 @@
       height: 100%; 
       position: relative; 
       z-index: 100; 
-      pointer-events: none;
+      pointer-events: none; /* ИСПРАВЛЕНО: пропускает клики, когда скрыто */
     }
     #login-wrapper.show { 
       opacity: 1; 
-      pointer-events: auto;
+      pointer-events: auto; /* ИСПРАВЛЕНО: ловит клики, когда активно */
     }
     .container { width: var(--form-width); height: var(--form-height); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); overflow: hidden; position: relative; z-index: 100; }
     .overlay { position: absolute; top: 0; left: 0; width: var(--overlay-width); height: 100%; background: #1B1C1D; border-radius: 10px; transition: left 1s ease; z-index: 9999 !important; pointer-events: auto !important; }
@@ -288,10 +288,8 @@
     </div>
   </div>
 
-  <!-- ИСПРАВЛЕНО: Используем CDN модуль -->
   <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-    
+    import { createClient } from "./vendor/supabase-client.js";
     window.SUPABASE_URL = 'https://jviswahajwmwibedxcll.supabase.co';
     window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2aXN3YWhhandtd2liZWR4Y2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMzU5NDcsImV4cCI6MjA2NDkxMTk0N30.Bkgknn8BAhlUp429fhyOErV-afbPkfcneTdVhKwgn7c';
 
@@ -699,7 +697,7 @@
         specGroups = {};
         block1Rows.forEach(r => { const key = String(r.spec_id); (specGroups[key] = specGroups[key] || []).push(r); });
         renderBlock1();
-        // ИСПРАВЛЕНО: Добавлен вызов updateHistorySpecContainers
+        // === ИСПРАВЛЕНИЕ: Добавлен вызов обновления контейнеров истории ===
         updateHistorySpecContainers({ forceAll: true });
       }
 
@@ -935,7 +933,7 @@
 
       function openSupportTicketModal(specId) { if (!ticketModal) return; const normalizedSpec = specId != null ? String(specId).replace(/[^0-9]/g, '') : ''; lastSupportSpecId = normalizedSpec || null; if (ticketSpecInput) ticketSpecInput.value = normalizedSpec; if (ticketSubjectInput) ticketSubjectInput.value = ''; if (ticketMessageInput) ticketMessageInput.value = ''; ticketModal.style.display = 'flex'; }
       function closeSupportTicketModal(options = {}) { if (!ticketModal) return; const { preserveSpec = false } = options; ticketModal.style.display = 'none'; if (ticketSubjectInput) ticketSubjectInput.value = ''; if (ticketMessageInput) ticketMessageInput.value = ''; if (ticketSpecInput) { if (preserveSpec && lastSupportSpecId) ticketSpecInput.value = lastSupportSpecId; else { ticketSpecInput.value = ''; lastSupportSpecId = null; } } }
-      if (ticketCloseBtn) ticketCloseBtn.addEventListener('click', () => closeSupportTicketModal({ preserveSpec: false })); 
+      if (ticketCloseBtn) ticketCloseBtn.addEventListener('click', () => closeSupportTicketModal({ preserveSpec: false }));
       if (ticketModal) ticketModal.addEventListener('click', event => { if (event.target === ticketModal) closeSupportTicketModal({ preserveSpec: true }); });
       if (ticketSpecInput) ticketSpecInput.addEventListener('input', () => ticketSpecInput.value = ticketSpecInput.value.replace(/\D/g, ''));
       if (ticketSubmitBtn) ticketSubmitBtn.addEventListener('click', async () => { if (!supabase) return; const specId = (ticketSpecInput?.value || '').trim(); const subject = (ticketSubjectInput?.value || '').trim(); const message = (ticketMessageInput?.value || '').trim(); if (!specId || !subject || !message) { alert('Заполните все поля'); return; } if (!currentUserEmail) { alert('Не удалось получить email пользователя'); return; } try { const { error } = await supabase.from('support_tickets').insert({ spec_id: specId, subject, message, user_login: currentUserEmail }); if (error) throw error; closeSupportTicketModal({ preserveSpec: false }); } catch (err) { console.error('[modal9] support ticket insert error:', err); alert('Ошибка отправки'); } });
