@@ -680,14 +680,18 @@
       
       function updateLoadMoreVisibility() { if (!loadMoreBtn) return; const hasMore = history.length > 0 && history.length < historyTotalCount; loadMoreBtn.style.display = hasMore ? 'inline-flex' : 'none'; }
 
-      async function loadBlock1(options = {}) {
+       async function loadBlock1(options = {}) {
         const { fromHistory = false } = options;
-        // В следующей строке добавлена скобка в самом конце перед ";"
+        // ИСПРАВЛЕНО: добавлена закрывающая скобка в конце строки
         const specIds = Array.from(new Set((history || []).map(h => h?.id).filter(id => id !== null && id !== undefined)));
+        
         if (!specIds.length) { block1Rows = []; specGroups = {}; selectionMap = {}; renderBlock1(); return; }
+        
         const { data, error } = await supabase.from(POS_TABLE).select('file_number, user_login, file_name, id, spec_id, pos_number, pos_number_int, name, qty, unit, attrs, attrs_json').in('spec_id', specIds).order('spec_id', { ascending: false }).order('pos_number_int', { ascending: true });
         if (error) { console.error(error); return; }
+        
         block1Rows = (data || []).map(r => ({ file_number: r.file_number, user_login: r.user_login, file_name: r.file_name, id: r.id, spec_id: r.spec_id, pos_number: r.pos_number, pos_number_int: toPosNum(r.pos_number_int ?? r.pos_number), name: r.name, qty: r.qty, unit: r.unit, attrs: r.attrs, attrs_json: r.attrs_json }));
+        
         const posIds = block1Rows.map(r => r.id);
         selectionMap = {};
         if (posIds.length) {
@@ -697,10 +701,12 @@
         }
         specGroups = {};
         block1Rows.forEach(r => { const key = String(r.spec_id); (specGroups[key] = specGroups[key] || []).push(r); });
+        
         renderBlock1();
-        // === ИСПРАВЛЕНИЕ: Добавлен вызов обновления контейнеров истории ===
+        
+        // === ИСПРАВЛЕНИЕ: Обязательный вызов для отображения спецификаций в истории ===
         updateHistorySpecContainers({ forceAll: true });
-      }}
+      }
 
       function renderBlock1() { updateBlock1SpecContainers({ forceAll: true }); }
       
