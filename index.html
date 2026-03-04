@@ -715,6 +715,8 @@
       const mainUploadBtn = root.querySelector('.upload-btn-main');
 
       const STATUS_FIELDS = new Set(['status_parser', 'status_selector', 'status_pricer']);
+      // Добавьте эту функцию:
+      const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
       
       let history = [];
       let lastHistoryStatus = {};
@@ -1191,7 +1193,58 @@
       
       function initProgressHandlers(progress, specId) { const buttons = progress.querySelectorAll('.refresh'); if (buttons[0]) buttons[0].addEventListener('click', async e => { e.stopPropagation(); const btn = e.currentTarget; btn.classList.add('loading'); btn.disabled = true; try { await refreshParser(specId, progress); } finally { btn.classList.remove('loading'); btn.disabled = false; } }); if (buttons[1]) buttons[1].addEventListener('click', async e => { e.stopPropagation(); const btn = e.currentTarget; btn.classList.add('loading'); btn.disabled = true; try { await refreshSelector(specId, progress); } finally { btn.classList.remove('loading'); btn.disabled = false; } }); }
       async function refreshParser(specId, progress) { try { await supabase.from(SELECT_TABLE).delete().eq('spec_id', specId); await supabase.from(POS_TABLE).delete().eq('spec_id', specId); await supabase.from(TABLE).update({ status: 'BLOCK 1 ( в работе )' }).eq('id', specId); await supabase.functions.invoke('modal9-parser', { body: { request_id: specId } }); await loadHistory(); } catch (err) { console.error('refreshParser error:', err); } }
-      async function refreshSelector(specId, progress) { try { await supabase.from(TABLE).update({ status: 'подготовка' }).eq('id', specId); const { error } = await supabase.functions.invoke('modal9-selector', { body: { spec_id: specId } }); if (error) throw error; await loadHistory(); } catch (err) { console.error('refreshSelector error:', err); } }
+      async function refreshSelector(specId, progress) {
+        try {
+          // 1. Сбрасываем статус перед стартом
+          await supabase.from(TABLE).update({ 
+            status: 'подготовка', 
+            status_selector: '0 / 0 / 0' 
+          }).eq('id', specId);
+          
+          // Обновляем UI немедленно
+          await loadHistory(); 
+
+          // 2. Запускаем Edge Function
+          const { error } = await supabase.functions.invoke('modal9-selector', { 
+            body: { spec_id: specId } 
+          });
+          if (error) throw error;
+
+          // 3. Запускаем цикл отслеживания прогресса (аналог старого trackSelectorProgress)
+          let lastStatus = null;
+          while (true) {
+            // Получаем цифры из таблицы статусов (STATUS_TABLE)
+            const { sent, received, total } = await getSelectorProgress(specId);
+            const countsText = `${sent} / ${received} / ${total}`;
+            
+            // Обновляем UI (поле ввода и прогресс-бар)
+            const row = historyList.querySelector(`.history-item[data-spec-id="${specId}"]`);
+            const selEl = row?.querySelector('[data-field="status_selector"]');
+            if (selEl) updateStatus(selEl, countsText);
+            setProgress(progress, { status: 'BLOCK 2', sent, received, total });
+
+            // Записываем в БД (чтобы Realtime увидел и другие клиенты)
+            if (countsText !== lastStatus) {
+              await supabase.from(TABLE).update({ status_selector: countsText }).eq('id', specId);
+              lastStatus = countsText;
+            }
+
+            // Условие выхода: всё готово
+            if (total > 0 && received >= total) {
+              break;
+            }
+
+            // Ждем перед следующим опросом
+            await delay(2000);
+          }
+
+          // 4. Финальная синхронизация
+          await loadHistory();
+
+        } catch (err) {
+          console.error('refreshSelector error:', err);
+        }
+      }
 
       function openGroup(id, saved) { }
       function closeGroup(id) { }
