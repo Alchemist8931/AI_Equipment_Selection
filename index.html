@@ -5,6 +5,11 @@
   <title>APP</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  <!-- Montserrat for Slideshow -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  
   <style>
     :root {
       --form-width: 900px;
@@ -48,11 +53,11 @@
       height: 100%; 
       position: relative; 
       z-index: 100; 
-      pointer-events: none; /* ИСПРАВЛЕНО: пропускает клики, когда скрыто */
+      pointer-events: none;
     }
     #login-wrapper.show { 
       opacity: 1; 
-      pointer-events: auto; /* ИСПРАВЛЕНО: ловит клики, когда активно */
+      pointer-events: auto;
     }
     .container { width: var(--form-width); height: var(--form-height); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); overflow: hidden; position: relative; z-index: 100; }
     .overlay { position: absolute; top: 0; left: 0; width: var(--overlay-width); height: 100%; background: #1B1C1D; border-radius: 10px; transition: left 1s ease; z-index: 9999 !important; pointer-events: auto !important; }
@@ -198,19 +203,6 @@
     .spec-header { background:transparent; cursor:pointer; font-weight:700; }
     .group-close { float:right; background:none; border:none; cursor:pointer; }
 
-    .dynamic-modals { display:flex; gap:10px; align-items:flex-start; width:max-content; user-select:none; --block1-height:auto; }
-    .modal-block { position:relative; width:50px; height:var(--block1-height, auto); border:1px solid var(--content-color); border-radius:6px; background: var(--fon); overflow:hidden; transition:width 0.3s; box-sizing:border-box; display:flex; flex-direction:column; }
-    .modal-title { position:absolute; top:8px; left:50%; transform:translateX(-50%) rotate(180deg); writing-mode:vertical-rl; text-orientation:mixed; font:600 14px/1 Arial, sans-serif; color:#333; pointer-events:none; transition:0.3s; }
-    .modal-content { opacity:0; padding:0; transition:0.5s; box-sizing:border-box; height:100%; overflow-y:auto; }
-    .modal-block.open { width:max-content; border:none; height:var(--block1-height, auto); }
-    .modal-block.open .modal-content { opacity:1; }
-    .modal-block.open .modal-title { opacity:0.15; }
-    .dynamic-modals .modal-block { width:50px; }
-    .dynamic-modals .modal-block.open { width:max-content; border:none; }
-    /* Скрытие контента в свернутом состоянии */
-    .dynamic-modals .block2 .modal-content, .dynamic-modals .block21 .modal-content, .dynamic-modals .block3 .modal-content, .dynamic-modals .block31 .modal-content { display: none; }
-    .dynamic-modals .block2.open .modal-content, .dynamic-modals .block21.open .modal-content, .dynamic-modals .block3.open .modal-content, .dynamic-modals .block31.open .modal-content { display: block; }
-
     #modal9-container .glass3d { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--content-color); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); box-shadow: 0 0 0.75px hsl(205 20% 10% / 0.2), 0.7px 0.8px 1.2px -0.4px hsl(205 20% 10% / 0.1), 1.3px 1.5px 2.2px -0.8px hsl(205 20% 10% / 0.1), 2.3px 2.6px 3.9px -1.2px hsl(205 20% 10% / 0.1), 3.9px 4.4px 6.6px -1.7px hsl(205 20% 10% / 0.1), 6.5px 7.2px 10.9px -2.1px hsl(205 20% 10% / 0.1), 8px 9px 14px -2.5px hsl(205 20% 10% / 0.2); }
 
    .spec-action-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
@@ -223,6 +215,112 @@
     .modal9-updates.is-expanded { max-height: 800px; box-shadow: 0 24px 42px -10px rgba(0, 0, 0, 0.75); }
     .modal9-updates-toggle { padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(48, 119, 80, 0.6); background: rgba(48, 119, 80, 0.25); color: var(--content-color); font-size: 12px; cursor: pointer; }
     .modal9-update-card { padding: 14px 16px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(48, 119, 80, 0.3); box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.8); display: flex; flex-direction: column; gap: 8px; }
+
+    /* === SLIDESHOW STYLES === */
+    .slideshow-container {
+      position: relative;
+      width: 100%; /* Full width of the modal column */
+      min-width: 800px; /* Ensure enough space for content */
+      height: auto; /* Dynamic height */
+      min-height: 300px;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #f5f5f5;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+      margin-left: 10px;
+    }
+
+    .slide {
+      position: relative; /* Relative for dynamic height */
+      width: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.5s ease;
+      display: none; /* Hidden by default */
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      display: block; /* Show active slide */
+    }
+
+    .slide-content {
+      padding: 20px 30px; /* Padding inside the slide */
+      height: 100%;
+      overflow-y: auto;
+      max-height: 600px; /* Limit height if needed */
+    }
+
+    .caption {
+      padding: 10px 20px;
+      font-family: "Montserrat", sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+      background: rgba(240, 240, 240, 0.9);
+      border-top: 1px solid #ddd;
+      text-align: right;
+      color: #333;
+    }
+
+    /* navigation */
+    .prev,
+    .next {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #555;
+      font-size: 1.5rem;
+      padding: 10px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.05);
+      backdrop-filter: blur(4px);
+      transition: all 0.3s ease;
+      opacity: 0.6;
+      z-index: 3;
+      user-select: none;
+      font-weight: bold;
+    }
+
+    .prev:hover,
+    .next:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.15);
+      color: #000;
+    }
+
+    .prev { left: 5px; }
+    .next { right: 5px; }
+
+    /* indicator dots */
+    .dots-container {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 3;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      background: var(--content-color);
+      transform: scale(1.3);
+    }
+
+    .dot:hover {
+      background: rgba(0, 0, 0, 0.5);
+    }
   </style>
 </head>
 <body>
@@ -279,6 +377,8 @@
           <template id="spec-template"><div class="spec-container"><div class="spec-header"><div class="spec-title"></div><button class="group-close ans5-close" style="display:none;">×</button></div><div class="spec-content"></div></div></template>
           <template id="button-group-spec"><div class="modalRow spec-action-row"><button type="button" class="spec-action-btn spec-action-btn--excel" data-action="excel"><span class="label">скачать excel</span></button><button type="button" class="spec-action-btn spec-action-btn--copy" data-action="copy"><span class="label">скопировать</span></button><button type="button" class="spec-action-btn spec-action-btn--help" data-action="support"><span class="label">создать обращение</span></button></div></template>
           <template id="spec-progress-template"><div class="spec-progress multistep" style="margin-bottom: 16px;"><div class="step" data-step="1"><div class="bar"></div><div class="step-body" style="margin-top: 16px;"><div class="label" style="margin-top: 4px; font-size: 14px;">BLOCK 1</div><button class="darkmatter-btn refresh" title="Перезапустить парсер" style="border-radius: 4px;"><span class="button-text">запуск шага</span><span class="loader"></span></button></div></div><div class="step" data-step="2"><div class="bar"></div><div class="step-body" style="margin-top: 16px;"><div class="label" style="margin-top: 4px; font-size: 14px;">BLOCK 2 / 2.1</div><button class="darkmatter-btn refresh" title="Перезапустить селектор" style="border-radius: 4px;"><span class="button-text">запуск шага</span><span class="loader"></span></button></div></div><div class="step" data-step="3"><div class="bar"></div><div class="step-body" style="margin-top: 16px;"><div class="label" style="margin-top: 4px; font-size: 14px;">BLOCK 3 / 3.1</div><button class="darkmatter-btn refresh" style="border-radius: 4px;" disabled><span class="button-text">запуск шага</span><span class="loader"></span></button></div></div></div></template>
+          
+          <!-- NEW ROW TEMPLATE WITH SLIDESHOW -->
           <template id="spec-row-template">
             <div class="modalCONTEINERpost modalRow">
               <div class="modalColumn">
@@ -307,30 +407,35 @@
                 </div>
               </div>
               
-              <div class="dynamic-modals">
-                <div class="modal-block block1">
-                  <div class="modal-title">1 BLOCK</div>
-                  <div class="modal-content"></div>
+              <!-- Slideshow Container -->
+              <div class="slideshow-container">
+                <!-- Slide 1: Requirements -->
+                <div class="slide active" data-slide="1">
+                  <div class="slide-content"></div>
+                  <div class="caption">Блок 1, требования к ТЗ</div>
                 </div>
-                <div class="modal-block block2">
-                  <div class="modal-title">2 BLOCK</div>
-                  <div class="modal-content"></div>
+                <!-- Slide 2: Selection -->
+                <div class="slide" data-slide="2">
+                  <div class="slide-content"></div>
+                  <div class="caption">Блок 2, подобранная позиция</div>
                 </div>
-                <div class="modal-block block21">
-                  <div class="modal-title">2/1 BLOCK</div>
-                  <div class="modal-content"></div>
+                <!-- Slide 3: Price Sources -->
+                <div class="slide" data-slide="3">
+                  <div class="slide-content"></div>
+                  <div class="caption">Блок 3, ценовые источники</div>
                 </div>
-                <div class="modal-block block3">
-                  <div class="modal-title">3 BLOCK</div>
-                  <div class="modal-content"></div>
-                </div>
-                <div class="modal-block block31">
-                  <div class="modal-title">3/1 BLOCK</div>
-                  <div class="modal-content"></div>
+
+                <a class="prev">&#10094;</a>
+                <a class="next">&#10095;</a>
+                <div class="dots-container">
+                  <div class="dot active" data-index="0"></div>
+                  <div class="dot" data-index="1"></div>
+                  <div class="dot" data-index="2"></div>
                 </div>
               </div>
             </div>
           </template>
+
           <template id="spec-block2-template">
             <div class="modalRow">
               <div class="input-container">
@@ -402,72 +507,6 @@
             </div>
           </template>
           <template id="spec-attr-template"><div class="modalRow"><div class="input-container"><input type="text" style="width: 580px;" class="styled_input_bar param-input" placeholder="параметр" readonly><label class="input-label">параметр</label></div><div class="input-container"><input type="text" style="width: 280px;" class="styled_input_bar value-input" placeholder="значение" readonly><label class="input-label">значение</label></div></div></template>
-                    <template id="spec-block3-template">
-            <div class="modalRow">
-              <div class="input-container">
-                <input type="text" style="width: 140px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
-                <label class="input-label">артикул</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 300px;" class="styled_input_bar value-input" placeholder="наименование" readonly>
-                <label class="input-label">наименование</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 80px; text-align: center;" class="styled_input_bar value-input" placeholder="кол-во" readonly>
-                <label class="input-label">кол-во</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 80px; text-align: center;" class="styled_input_bar value-input" placeholder="ед. изм." readonly>
-                <label class="input-label">ед. изм.</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 110px; text-align: center;" class="styled_input_bar value-input" placeholder="000 000 000" readonly>
-                <label class="input-label">цена</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 110px; text-align: center;" class="styled_input_bar value-input" placeholder="000 000 000" readonly>
-                <label class="input-label">сумма</label>
-              </div>
-             </div>
-          </template>
-          
-          <template id="spec-block31-template">
-            <div class="modalRow">
-              <div class="input-container">
-                <input type="text" style="width: 146px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
-                <label class="input-label">артикул</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 90px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
-                <label class="input-label">магазин</label>
-              </div>
-              <div class="icons">
-                  <span class="material-symbols-outlined status">link</span>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 146px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
-                <label class="input-label">артикул</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 90px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
-                <label class="input-label">магазин</label>
-              </div>
-              <div class="icons">
-                  <span class="material-symbols-outlined status">link</span>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 146px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
-                <label class="input-label">артикул</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 90px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
-                <label class="input-label">магазин</label>
-              </div>
-              <div class="icons">
-                  <span class="material-symbols-outlined status">link</span>
-              </div>
-           </div>
-          </template>
         </div>
        </div>
     </div>
@@ -646,8 +685,6 @@
       const specRowTemplate = root.querySelector('#spec-row-template');
       const block2Template = root.querySelector('#spec-block2-template');
       const block21Template = root.querySelector('#spec-block21-template');
-      const block3Template = root.querySelector('#spec-block3-template');
-      const block31Template = root.querySelector('#spec-block31-template');
       const attrPairTemplate = root.querySelector('#spec-attr-template');
       const updatesPanel = root.querySelector('.modal9-updates');
       const updatesToggle = root.querySelector('.modal9-updates-toggle');
@@ -869,16 +906,11 @@
 
        async function loadBlock1(options = {}) {
         const { fromHistory = false } = options;
-        // ИСПРАВЛЕНО: добавлена закрывающая скобка в конце строки
         const specIds = Array.from(new Set((history || []).map(h => h?.id).filter(id => id !== null && id !== undefined)));
-        
         if (!specIds.length) { block1Rows = []; specGroups = {}; selectionMap = {}; renderBlock1(); return; }
-        
         const { data, error } = await supabase.from(POS_TABLE).select('file_number, user_login, file_name, id, spec_id, pos_number, pos_number_int, name, qty, unit, attrs, attrs_json').in('spec_id', specIds).order('spec_id', { ascending: false }).order('pos_number_int', { ascending: true });
         if (error) { console.error(error); return; }
-        
         block1Rows = (data || []).map(r => ({ file_number: r.file_number, user_login: r.user_login, file_name: r.file_name, id: r.id, spec_id: r.spec_id, pos_number: r.pos_number, pos_number_int: toPosNum(r.pos_number_int ?? r.pos_number), name: r.name, qty: r.qty, unit: r.unit, attrs: r.attrs, attrs_json: r.attrs_json }));
-        
         const posIds = block1Rows.map(r => r.id);
         selectionMap = {};
         if (posIds.length) {
@@ -888,10 +920,7 @@
         }
         specGroups = {};
         block1Rows.forEach(r => { const key = String(r.spec_id); (specGroups[key] = specGroups[key] || []).push(r); });
-        
         renderBlock1();
-        
-        // === ИСПРАВЛЕНИЕ: Обязательный вызов для отображения спецификаций в истории ===
         updateHistorySpecContainers({ forceAll: true });
       }
 
@@ -917,7 +946,7 @@
           anchor = container ? container.nextSibling : anchor;
         });
         setupOverflowTooltips(block1List);
-        setupDynamicBlocks(block1List);
+        setupSlideshows(block1List);
       }
       
       function updateHistorySpecContainers(options = {}) {
@@ -938,7 +967,7 @@
           updateSpecContent(content, idStr, { mode: 'history' });
         });
         setupOverflowTooltips(historyList);
-        setupDynamicBlocks(historyList);
+        setupSlideshows(historyList);
       }
 
       function createSpecContainer(specId, options = {}) {
@@ -993,7 +1022,7 @@
         const idStr = String(specId);
         const rows = (specGroups[idStr] || []).slice().sort((a, b) => toPosNum(a.pos_number_int ?? a.pos_number) - toPosNum(b.pos_number_int ?? b.pos_number));
         if (!rows.length) { content.innerHTML = ''; content.dataset.renderHash = ''; return; }
-        const hash = JSON.stringify(rows.map(r => r.id)); // Simple hash
+        const hash = JSON.stringify(rows.map(r => r.id)); 
         if (content.dataset.renderHash === hash) return;
         content.dataset.renderHash = hash;
 
@@ -1002,64 +1031,66 @@
           const rf = specRowTemplate.content.cloneNode(true);
           const posInput = rf.querySelector('[data-field="pos_number"]'); if (posInput) posInput.value = row.pos_number || '';
           const nameInput = rf.querySelector('[data-field="name"]'); if (nameInput) nameInput.value = row.name || '';
-          // ИСПРАВЛЕНО: Добавлено заполнение qty и unit
           const qtyInput = rf.querySelector('[data-field="qty"]'); if (qtyInput) qtyInput.value = row.qty || '';
           const unitInput = rf.querySelector('[data-field="unit"]'); if (unitInput) unitInput.value = row.unit || '';
           
-          const attrsWrap = rf.querySelector('.block1 .modal-content');
-          if (attrsWrap) {
-            attrsWrap.innerHTML = '';
+          // Slide 1: Attributes
+          const slide1Content = rf.querySelector('.slide[data-slide="1"] .slide-content');
+          if (slide1Content) {
+            slide1Content.innerHTML = '';
             const pairs = (Array.isArray(row.attrs_json) && row.attrs_json.length) ? row.attrs_json : parseAttrsString(row.attrs);
-            pairs.forEach(({ param, value }) => { const attrFrag = attrPairTemplate?.content.cloneNode(true); if (!attrFrag) return; const pInp = attrFrag.querySelector('.param-input'); const vInp = attrFrag.querySelector('.value-input'); if (pInp) { pInp.value = (param || ''); pInp.readOnly = true; } if (vInp) { vInp.value = (value || ''); vInp.readOnly = true; } attrsWrap.appendChild(attrFrag); });
+            pairs.forEach(({ param, value }) => { const attrFrag = attrPairTemplate?.content.cloneNode(true); if (!attrFrag) return; const pInp = attrFrag.querySelector('.param-input'); const vInp = attrFrag.querySelector('.value-input'); if (pInp) { pInp.value = (param || ''); pInp.readOnly = true; } if (vInp) { vInp.value = (value || ''); vInp.readOnly = true; } slide1Content.appendChild(attrFrag); });
           }
+
           const sels = selectionMap[row.id] || [];
-          const block2 = rf.querySelector('.block2 .modal-content');
-          if (block2) {
-            block2.innerHTML = '';
-            if (sels.length) { sels.forEach(sel => { const frag = block2Template?.content.cloneNode(true); if (!frag) return; const inputs = frag.querySelectorAll('input'); if (inputs[0]) inputs[0].value = sel.article || ''; if (inputs[1]) inputs[1].value = sel.model_name || ''; if (inputs[2]) inputs[2].value = sel.qty || ''; if (inputs[3]) inputs[3].value = sel.unit || ''; if (inputs[4]) inputs[4].value = formatNumericValue(sel.price); if (inputs[5]) inputs[5].value = formatNumericValue(sel.sum); const rowEl = frag.firstElementChild; if (rowEl) rowEl.classList.add('fade-in'); block2.appendChild(frag); }); }
-            else { const frag = block2Template?.content.cloneNode(true); if (frag) block2.appendChild(frag); }
+
+          // Slide 2: Selection Details (Block 2)
+          const slide2Content = rf.querySelector('.slide[data-slide="2"] .slide-content');
+          if (slide2Content) {
+            slide2Content.innerHTML = '';
+            if (sels.length) { sels.forEach(sel => { const frag = block2Template?.content.cloneNode(true); if (!frag) return; const inputs = frag.querySelectorAll('input'); if (inputs[0]) inputs[0].value = sel.article || ''; if (inputs[1]) inputs[1].value = sel.model_name || ''; if (inputs[2]) inputs[2].value = sel.qty || ''; if (inputs[3]) inputs[3].value = sel.unit || ''; if (inputs[4]) inputs[4].value = formatNumericValue(sel.price); if (inputs[5]) inputs[5].value = formatNumericValue(sel.sum); slide2Content.appendChild(frag); }); }
+            else { const frag = block2Template?.content.cloneNode(true); if (frag) slide2Content.appendChild(frag); }
           }
-          const block21 = rf.querySelector('.block21 .modal-content');
-          if (block21) appendBlock21Content(block21, sels);
+
+          // Slide 3: Price Sources (Block 3 / old 2.1)
+          const slide3Content = rf.querySelector('.slide[data-slide="3"] .slide-content');
+          if (slide3Content) {
+            slide3Content.innerHTML = '';
+            const records = sels.filter(Boolean);
+            if (records.length) {
+              records.forEach((record, index) => {
+                const frag = block21Template.content.cloneNode(true);
+                const rowEl = frag.firstElementChild;
+                if (rowEl) { rowEl.classList.add('block21-entry'); rowEl.dataset.selectionIndex = String(index + 1); if (record?.article) rowEl.dataset.article = record.article; if (record?.pos_id) rowEl.dataset.posId = String(record.pos_id); }
+                const setOffer = (n, amount, curr, store, url) => {
+                  const priceEl = frag.querySelector(`[data-offer="${n}-price"]`);
+                  const storeEl = frag.querySelector(`[data-offer="${n}-store"]`);
+                  const urlEl = frag.querySelector(`[data-offer="${n}-url"]`);
+                  if (priceEl) priceEl.value = (amount ?? '') === '' ? '' : `${formatNumericValue(amount)}${curr ? ' ' + curr : ''}`;
+                  if (storeEl) storeEl.value = store || '';
+                  if (urlEl) { const href = url || ''; if (href) { urlEl.setAttribute('href', href); urlEl.removeAttribute('aria-disabled'); urlEl.removeAttribute('tabindex'); urlEl.classList.remove('disabled'); urlEl.style.pointerEvents = ''; urlEl.style.opacity = ''; urlEl.setAttribute('title', href); } else { urlEl.setAttribute('href', '#'); urlEl.setAttribute('aria-disabled', 'true'); urlEl.setAttribute('tabindex', '-1'); urlEl.classList.add('disabled'); urlEl.style.pointerEvents = 'none'; urlEl.style.opacity = '0.5'; urlEl.removeAttribute('title'); } }
+                };
+                setOffer(1, record?.price1_amount, record?.price1_currency, record?.price1_store, record?.price1_url);
+                setOffer(2, record?.price2_amount, record?.price2_currency, record?.price2_store, record?.price2_url);
+                setOffer(3, record?.price3_amount, record?.price3_currency, record?.price3_store, record?.price3_url);
+                slide3Content.appendChild(frag);
+              });
+            } else { slide3Content.appendChild(block21Template.content.cloneNode(true)); }
+          }
           
-          const block1 = rf.querySelector('.block1'); if (block1) block1.classList.add('open');
           fragment.appendChild(rf);
         });
         content.innerHTML = '';
         content.appendChild(fragment);
         if (mode === 'history') restoreHistoryBlockState(specId, content); else restoreBlock1State(specId, content);
-        setupDynamicBlocks(content);
+        setupSlideshows(content);
         setupOverflowTooltips(content);
       }
 
-      function appendBlock21Content(target, selections = []) {
-        if (!target || !block21Template) return;
-        target.innerHTML = '';
-        const records = Array.isArray(selections) ? selections.filter(Boolean) : [];
-        if (!records.length) { target.appendChild(block21Template.content.cloneNode(true)); return; }
-        records.forEach((record, index) => {
-          const frag = block21Template.content.cloneNode(true);
-          const row = frag.firstElementChild;
-          if (row) { row.classList.add('block21-entry'); row.dataset.selectionIndex = String(index + 1); if (record?.article) row.dataset.article = record.article; if (record?.pos_id) row.dataset.posId = String(record.pos_id); }
-          const setOffer = (n, amount, curr, store, url) => {
-            const priceEl = frag.querySelector(`[data-offer="${n}-price"]`);
-            const storeEl = frag.querySelector(`[data-offer="${n}-store"]`);
-            const urlEl = frag.querySelector(`[data-offer="${n}-url"]`);
-            if (priceEl) priceEl.value = (amount ?? '') === '' ? '' : `${formatNumericValue(amount)}${curr ? ' ' + curr : ''}`;
-            if (storeEl) storeEl.value = store || '';
-            if (urlEl) { const href = url || ''; if (href) { urlEl.setAttribute('href', href); urlEl.removeAttribute('aria-disabled'); urlEl.removeAttribute('tabindex'); urlEl.classList.remove('disabled'); urlEl.style.pointerEvents = ''; urlEl.style.opacity = ''; urlEl.setAttribute('title', href); } else { urlEl.setAttribute('href', '#'); urlEl.setAttribute('aria-disabled', 'true'); urlEl.setAttribute('tabindex', '-1'); urlEl.classList.add('disabled'); urlEl.style.pointerEvents = 'none'; urlEl.style.opacity = '0.5'; urlEl.removeAttribute('title'); } }
-          };
-          setOffer(1, record?.price1_amount, record?.price1_currency, record?.price1_store, record?.price1_url);
-          setOffer(2, record?.price2_amount, record?.price2_currency, record?.price2_store, record?.price2_url);
-          setOffer(3, record?.price3_amount, record?.price3_currency, record?.price3_store, record?.price3_url);
-          target.appendChild(frag);
-        });
-      }
+      function restoreHistoryBlockState(specId, content) { if (!content) return; const saved = historyOpenBlocks[specId]; if (!saved) return; /* Add logic if needed */ }
+      function restoreBlock1State(specId, content) { if (!content) return; const saved = block1OpenBlocks[specId]; if (!saved) return; /* Add logic if needed */ }
 
-      function restoreHistoryBlockState(specId, content) { if (!content) return; const saved = historyOpenBlocks[specId]; if (!saved) { const first = content.querySelector('.modal-block'); if (first) first.classList.add('open'); return; } const targets = content.querySelectorAll(`.modal-block.${saved}`); if (targets.length) { content.querySelectorAll('.modal-block').forEach(b => b.classList.remove('open')); targets.forEach(t => t.classList.add('open')); } }
-      function restoreBlock1State(specId, content) { if (!content) return; const saved = block1OpenBlocks[specId]; let row = null; if (saved?.pos) { row = Array.from(content.querySelectorAll('.modalCONTEINERpost')).find(node => { const input = node.querySelector('[data-field="pos_number"]'); return input && input.value === saved.pos; }) || null; } if (!row) row = content.querySelector('.modalCONTEINERpost'); if (!row) return; const blockToOpen = saved?.block ? row.querySelector(`.${saved.block}`) : null; row.querySelectorAll('.modal-block').forEach(block => block.classList.remove('open')); (blockToOpen || row.querySelector('.modal-block') || row)?.classList.add('open'); }
-
-      function updateSpecProgress(specId, info) { const idStr = String(specId); let statuses = info; if (!statuses || (typeof statuses === 'object' && !('parser' in statuses) && !('selector' in statuses) && !('pricer' in statuses))) { const row = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`); const parser = row?.querySelector('[data-field="status_parser"]')?.value || row?.querySelector('[data-field="status_parser"]')?.textContent || ''; const selector = row?.querySelector('[data-field="status_selector"]')?.value || row?.querySelector('[data-field="status_selector"]')?.textContent || ''; const pricer = row?.querySelector('[data-field="status_pricer"]')?.value || row?.querySelector('[data-field="status_pricer"]')?.textContent || ''; statuses = { parser, selector, pricer }; } root.querySelectorAll(`.spec-progress[data-spec-id="${idStr}"]`).forEach(el => setProgress(el, statuses)); }
+      function updateSpecProgress(specId, info) { const idStr = String(specId); let statuses = info; if (!statuses || (typeof statuses === 'object' && !('parser' in statuses) && !('selector' in statuses) && !('pricer' in statuses))) { const row = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`); const parser = row?.querySelector('[data-field="status_parser"]')?.value || ''; const selector = row?.querySelector('[data-field="status_selector"]')?.value || ''; const pricer = row?.querySelector('[data-field="status_pricer"]')?.value || ''; statuses = { parser, selector, pricer }; } root.querySelectorAll(`.spec-progress[data-spec-id="${idStr}"]`).forEach(el => setProgress(el, statuses)); }
       
       function setProgress(progressEl, info) { if (!progressEl) return; const specId = progressEl.dataset.specId; const row = historyList.querySelector(`.history-item[data-spec-id="${specId}"]`); let parserStatus = row?.querySelector('[data-field="status_parser"]')?.value || ''; let selectorStatus = row?.querySelector('[data-field="status_selector"]')?.value || ''; let pricerStatus = row?.querySelector('[data-field="status_pricer"]')?.value || ''; if (typeof info === 'object' && info && ('parser' in info || 'selector' in info || 'pricer' in info)) { parserStatus = info.parser ?? parserStatus; selectorStatus = info.selector ?? selectorStatus; pricerStatus = info.pricer ?? pricerStatus; } const steps = progressEl.querySelectorAll('.step'); const pDone = interpretDone(parserStatus); const sDone = interpretDone(selectorStatus); const rDone = interpretDone(pricerStatus); const apply = (stepEl, done) => { const icon = stepEl.querySelector('.status'); if (done) { stepEl.classList.add('active'); if (icon) icon.textContent = 'done_all'; } else { stepEl.classList.remove('active'); if (icon) icon.textContent = 'indeterminate_check_box'; } }; apply(steps[0], pDone); apply(steps[1], sDone); apply(steps[2], rDone); }
       function interpretDone(str) { const s = String(str || '').toLowerCase(); const c = parseSelectorCounts(s); return c ? (c.total > 0 && c.received >= c.total) : /(готов|done)/i.test(s); }
@@ -1081,8 +1112,9 @@
         if (cont) {
           const oldT = hideTimers.get(cont); if (oldT) { clearTimeout(oldT); hideTimers.delete(cont); }
           cont.style.display = 'block'; requestAnimationFrame(() => cont.classList.remove('hidden'));
-          if (blockClass) { const targets = cont.querySelectorAll(`.modal-block.${blockClass}`); if (targets.length) { cont.querySelectorAll('.modal-block').forEach(b => b.classList.remove('open')); targets.forEach(t => t.classList.add('open')); } else resetDynamicBlocks(cont); } else resetDynamicBlocks(cont);
-          const current = cont.querySelector('.modal-block.open'); if (current) { const cls = Array.from(current.classList).find(c => c.startsWith('block')); if (cls) historyOpenBlocks[id] = cls; }
+          // Logic to open specific slide if blockClass provided? For now just show container
+          const current = cont.querySelector('.slide.active');
+          if (current) { const cls = 'active'; historyOpenBlocks[id] = cls; } // Store index or class
         }
         if (actions) { const oldT = hideTimers.get(actions); if (oldT) { clearTimeout(oldT); hideTimers.delete(actions); } actions.style.display = 'flex'; requestAnimationFrame(() => actions.classList.remove('hidden')); }
         if (prog) { const oldT = hideTimers.get(prog); if (oldT) { clearTimeout(oldT); hideTimers.delete(prog); } prog.style.display = 'flex'; requestAnimationFrame(() => prog.classList.remove('hidden')); }
@@ -1109,10 +1141,34 @@
         if (extra) extra.remove();
       }
 
-      function updateDynamicModalHeight(dm) { if (!dm) return; const block1Content = dm.querySelector('.modal-block.block1 .modal-content'); if (!block1Content) { dm.style.removeProperty('--block1-height'); return; } requestAnimationFrame(() => { const height = block1Content.scrollHeight; if (height) { dm.style.setProperty('--block1-height', `${height}px`); dm.style.height = `${height}px`; } else { dm.style.removeProperty('--block1-height'); dm.style.removeProperty('height'); } }); }
-      function resetDynamicBlocks(scope) { scope.querySelectorAll('.dynamic-modals').forEach(dm => { const blocks = dm.querySelectorAll('.modal-block'); blocks.forEach((b, i) => { if (i === 0) b.classList.add('open'); else b.classList.remove('open'); }); updateDynamicModalHeight(dm); }); }
-      function setupDynamicBlocks(scope) { scope.querySelectorAll('.dynamic-modals').forEach(dm => { const blocks = dm.querySelectorAll('.modal-block'); const initiallyOpen = dm.querySelector('.modal-block.open') || blocks[0]; if (initiallyOpen) initiallyOpen.classList.add('open'); updateDynamicModalHeight(dm); blocks.forEach(block => { block.addEventListener('dblclick', () => { dm.querySelectorAll('.modal-block').forEach(b => b.classList.remove('open')); block.classList.add('open'); const specId = block.closest('.spec-content')?.dataset.specId; const cls = Array.from(block.classList).find(c => c.startsWith('block')); const posInput = block.closest('.modalCONTEINERpost')?.querySelector('[data-field="pos_number"]'); if (specId && cls && posInput) block1OpenBlocks[specId] = { block: cls, pos: posInput.value }; updateDynamicModalHeight(dm); }); }); });
+      // NEW Slideshow Logic
+      function setupSlideshows(scope) {
+        scope.querySelectorAll('.slideshow-container').forEach(container => {
+          const slides = container.querySelectorAll(".slide");
+          const dots = container.querySelectorAll(".dot");
+          let index = 0;
+
+          const showSlide = (n) => {
+            slides[index].classList.remove("active");
+            dots[index].classList.remove("active");
+            index = (n + slides.length) % slides.length;
+            slides[index].classList.add("active");
+            dots[index].classList.add("active");
+          };
+
+          // Nav buttons
+          const prevBtn = container.querySelector(".prev");
+          const nextBtn = container.querySelector(".next");
+          if (prevBtn) prevBtn.addEventListener("click", () => showSlide(index - 1));
+          if (nextBtn) nextBtn.addEventListener("click", () => showSlide(index + 1));
+
+          // Dots click
+          dots.forEach((dot) => {
+            dot.addEventListener("click", () => showSlide(parseInt(dot.dataset.index)));
+          });
+        });
       }
+
       function setupOverflowTooltips(scope) { scope.querySelectorAll('.styled_input_bar').forEach(input => { const updateOverflow = () => { const container = input.closest('.input-container'); if (!container) return; if (input.scrollWidth > input.clientWidth) container.classList.add('overflow'); else container.classList.remove('overflow'); }; updateOverflow(); input.addEventListener('input', updateOverflow); input.addEventListener('mouseenter', () => { if (input.scrollWidth > input.clientWidth) input.setAttribute('title', input.value || input.textContent || ''); }); input.addEventListener('mouseleave', () => input.removeAttribute('title')); }); }
       
       function hideContextMenu() { if (!contextMenu) return; contextMenu.classList.remove('visible'); contextMenu.style.display = 'none'; contextSpecContent = null; }
@@ -1123,7 +1179,7 @@
       window.addEventListener('resize', hideContextMenu); root.addEventListener('scroll', hideContextMenu, true); window.addEventListener('keydown', event => { if (event.key === 'Escape') hideContextMenu(); });
       if (contextMenu) { contextMenu.addEventListener('click', async event => { const button = event.target.closest('button[data-action]'); if (!button) return; event.preventDefault(); event.stopPropagation(); const action = button.dataset.action; const specId = contextMenu.dataset.specId; if (!specId) return; const specData = collectSpecData(specId, contextSpecContent); if (!specData) { hideContextMenu(); return; } try { if (action === 'copy') { const text = formatSpecForClipboard(specData); if (text) { await navigator.clipboard.writeText(text); showCopyTip(button); } } else if (action === 'excel') { const blob = createExcelBlob(specData); if (blob) downloadSpecExcel(specData, blob); } } catch (err) { console.error('context menu action error:', err); } finally { hideContextMenu(); } }); contextMenu.addEventListener('contextmenu', event => event.preventDefault()); contextMenu.addEventListener('mousedown', event => event.stopPropagation()); }
 
-      function collectSpecData(specId, specContent) { if (!specId) return null; const idStr = String(specId); const container = specContent || historyList.querySelector(`.spec-content[data-spec-id="${idStr}"]`) || block1List.querySelector(`.spec-content[data-spec-id="${idStr}"]`); if (!container) return null; const historyItem = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`); const historyEntry = history.find(h => String(h.id) === idStr); const readField = (field) => { if (historyItem) { const el = historyItem.querySelector(`[data-field="${field}"]`); if (el) { const raw = el.tagName === 'INPUT' ? el.value : el.textContent; if (typeof raw === 'string') return raw.trim(); } } if (historyEntry) { if (field === 'created_at') return historyEntry.created_at ? new Date(historyEntry.created_at).toLocaleString() : ''; const value = historyEntry[field]; if (value != null) return String(value).trim(); } return ''; }; const data = { id: idStr, header: { file_number: readField('file_number'), user_login: readField('user_login'), created_at: readField('created_at'), file_name: readField('file_name'), file_ext: readField('file_ext'), status: readField('status'), spec_id: idStr }, positions: [] }; container.querySelectorAll('.modalCONTEINERpost').forEach(node => { const pos = { posNumber: node.querySelector('[data-field="pos_number"]')?.value?.trim() || '', name: node.querySelector('[data-field="name"]')?.value?.trim() || '', block1: [], block2: [] }; const block1Content = node.querySelector('.block1 .modal-content'); if (block1Content) block1Content.querySelectorAll('.modalRow').forEach(row => { const param = (row.querySelector('.param-input')?.value || '').trim(); const value = (row.querySelector('.value-input')?.value || '').trim(); if (param || value) pos.block1.push({ param, value }); }); const block2Content = node.querySelector('.block2 .modal-content'); if (block2Content) block2Content.querySelectorAll('.modalRow').forEach(row => { const inputs = row.querySelectorAll('input'); if (!inputs.length) return; pos.block2.push(Array.from(inputs, input => (input.value || '').trim())); }); data.positions.push(pos); }); return data; }
+      function collectSpecData(specId, specContent) { if (!specId) return null; const idStr = String(specId); const container = specContent || historyList.querySelector(`.spec-content[data-spec-id="${idStr}"]`) || block1List.querySelector(`.spec-content[data-spec-id="${idStr}"]`); if (!container) return null; const historyItem = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`); const historyEntry = history.find(h => String(h.id) === idStr); const readField = (field) => { if (historyItem) { const el = historyItem.querySelector(`[data-field="${field}"]`); if (el) { const raw = el.tagName === 'INPUT' ? el.value : el.textContent; if (typeof raw === 'string') return raw.trim(); } } if (historyEntry) { if (field === 'created_at') return historyEntry.created_at ? new Date(historyEntry.created_at).toLocaleString() : ''; const value = historyEntry[field]; if (value != null) return String(value).trim(); } return ''; }; const data = { id: idStr, header: { file_number: readField('file_number'), user_login: readField('user_login'), created_at: readField('created_at'), file_name: readField('file_name'), file_ext: readField('file_ext'), status: readField('status'), spec_id: idStr }, positions: [] }; container.querySelectorAll('.modalCONTEINERpost').forEach(node => { const pos = { posNumber: node.querySelector('[data-field="pos_number"]')?.value?.trim() || '', name: node.querySelector('[data-field="name"]')?.value?.trim() || '', block1: [], block2: [] }; const block1Content = node.querySelector('.slide[data-slide="1"] .slide-content'); if (block1Content) block1Content.querySelectorAll('.modalRow').forEach(row => { const param = (row.querySelector('.param-input')?.value || '').trim(); const value = (row.querySelector('.value-input')?.value || '').trim(); if (param || value) pos.block1.push({ param, value }); }); const block2Content = node.querySelector('.slide[data-slide="2"] .slide-content'); if (block2Content) block2Content.querySelectorAll('.modalRow').forEach(row => { const inputs = row.querySelectorAll('input'); if (!inputs.length) return; pos.block2.push(Array.from(inputs, input => (input.value || '').trim())); }); data.positions.push(pos); }); return data; }
       async function runSpecAction(action, specId, specContent, button) { if (action === 'support') openSupportTicketModal(specId); return; const specData = collectSpecData(specId, specContent); if (!specData) return; try { if (action === 'copy') { const text = formatSpecForClipboard(specData); if (text) { await navigator.clipboard.writeText(text); if (button) showCopyTip(button); } } else if (action === 'excel') { const blob = createExcelBlob(specData); if (blob) downloadSpecExcel(specData, blob); } } catch (err) { console.error('spec action error:', err); } }
       function formatSpecForClipboard(data) { if (!data) return ''; const lines = []; lines.push(`Spec #${data.id}`); lines.push(`File: ${data.header.file_name}`); lines.push(''); data.positions.forEach(pos => { lines.push(`${pos.posNumber}. ${pos.name}`); pos.block1.forEach(attr => lines.push(`\t${attr.param}: ${attr.value}`)); pos.block2.forEach(row => lines.push(`\t${row.join('\t')}`)); }); return lines.join('\n'); }
       function createExcelBlob(data) { const html = `<table><tr><th>Spec</th><th>${data.id}</th></tr>${data.positions.map(p => `<tr><td>${p.posNumber}</td><td>${p.name}</td></tr>`).join('')}</table>`; return new Blob(['\uFEFF', html], { type: 'application/vnd.ms-excel' }); }
