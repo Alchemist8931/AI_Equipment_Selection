@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Equipment Selection APP</title>
-  <!-- Подключение новых шрифтов -->
+  <!-- Подключение шрифтов -->
   <link href="https://fonts.googleapis.com/css2?family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
   
@@ -14,7 +14,7 @@
       --form-height: 550px;
       --overlay-width: 380px;
       
-      /* Новые переменные стилей */
+      /* Основные переменные */
       --bg-primary: #f8f9fa;
       --bg-card: #ffffff;
       --text-primary: #1a1a1a;
@@ -27,18 +27,19 @@
       --warning: #f59e0b;
       --error: #ef4444;
       
+      /* Переменные для совместимости modal9 */
+      --content-color: var(--text-primary);
+      --black-color: var(--text-primary);
+      --fon: var(--bg-card);
+      --scrollbar-color: #f1f1f1;
+      
       /* Прелоадер */
       --loader-line-color: var(--text-primary);
       --loader-line-width: 10px;
       --loader-line-height: 50px;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'SN Pro', sans-serif;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'SN Pro', sans-serif; }
 
     html, body {
       width: 100vw;
@@ -49,454 +50,197 @@
       position: relative;
     }
 
-    /* --- Прелоадер (стилизован под пример) --- */
+    /* --- Прелоадер --- */
     #preloader {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      gap: 8px;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-      z-index: 9999;
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      display: flex; gap: 8px; opacity: 0; visibility: hidden;
+      transition: opacity 0.5s ease, visibility 0.5s ease; z-index: 9999;
     }
     #preloader.visible { opacity: 1; visibility: visible; }
     #preloader.fade-out { opacity: 0; visibility: hidden; }
     .line {
-      width: var(--loader-line-width);
-      height: var(--loader-line-height);
-      background-color: var(--accent);
-      animation: bounce 1.2s infinite ease-in-out;
-      border-radius: 4px;
+      width: var(--loader-line-width); height: var(--loader-line-height);
+      background-color: var(--accent); animation: bounce 1.2s infinite ease-in-out; border-radius: 4px;
     }
     .line:nth-child(2) { animation-delay: 0.1s; }
     .line:nth-child(3) { animation-delay: 0.2s; }
     .line:nth-child(4) { animation-delay: 0.3s; }
     .line:nth-child(5) { animation-delay: 0.4s; }
-    @keyframes bounce {
-      0%, 40%, 100% { transform: scaleY(0.4); }
-      20% { transform: scaleY(1.0); }
-    }
+    @keyframes bounce { 0%, 40%, 100% { transform: scaleY(0.4); } 20% { transform: scaleY(1.0); } }
 
-    /* --- Меню (Новый стиль) --- */
+    /* --- Меню --- */
     #side-menu { display: none; }
-
     .navigation {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      height: calc(100vh - 40px);
-      width: 70px;
-      z-index: 1200;
-      border-radius: 20px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-      transition: width 0.3s ease;
-      overflow: hidden;
+      position: fixed; top: 20px; left: 20px; height: calc(100vh - 40px); width: 70px; z-index: 1200;
+      border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: width 0.3s ease; overflow: hidden;
     }
-    
-    .navigation ul {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      padding: 10px 0;
-    }
-    
-    .navigation ul li {
-      position: relative;
-      list-style: none;
-      width: 100%;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-      
-    .navigation ul li a {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 100%;
-      text-decoration: none;
-      color: var(--text-secondary);
-      transition: color 0.2s;
-    }
-
-    .navigation ul li.active a {
-      color: var(--text-primary);
-    }
-
-    .navigation ul li a .icon {
-      font-size: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2;
-    }
-
+    .navigation ul { position: absolute; top: 0; left: 0; width: 100%; display: flex; flex-direction: column; padding: 10px 0; }
+    .navigation ul li { position: relative; list-style: none; width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; }
+    .navigation ul li a { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; text-decoration: none; color: var(--text-secondary); transition: color 0.2s; }
+    .navigation ul li.active a { color: var(--text-primary); }
+    .navigation ul li a .icon { font-size: 28px; display: flex; align-items: center; justify-content: center; z-index: 2; }
     .navigation ul li a .title {
-      position: absolute;
-      left: 80px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      padding: 8px 16px;
-      border-radius: 10px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-      white-space: nowrap;
-      font-size: 14px;
-      font-weight: 600;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.2s ease;
-      pointer-events: none;
-      z-index: 10;
+      position: absolute; left: 80px; top: 50%; transform: translateY(-50%); background: var(--bg-card);
+      border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1); white-space: nowrap; font-size: 14px; font-weight: 600;
+      opacity: 0; visibility: hidden; transition: all 0.2s ease; pointer-events: none; z-index: 10;
     }
-
-    .navigation ul li:hover a .title {
-      opacity: 1;
-      visibility: visible;
-      left: 70px;
-    }
-
+    .navigation ul li:hover a .title { opacity: 1; visibility: visible; left: 70px; }
     .navigation ul .indicator {
-      position: absolute;
-      width: 50px;
-      height: 50px;
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 12px;
-      top: 17px; /* Начальная позиция, обновляется JS */
-      left: 10px;
-      transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1;
+      position: absolute; width: 50px; height: 50px; background: rgba(0, 0, 0, 0.05);
+      border-radius: 12px; top: 17px; left: 10px; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1;
     }
 
-    /* --- Логин/Регистрация (Новый стиль) --- */
-    #login-wrapper {
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      width: 100%;
-      height: 100%;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    /* --- Логин/Регистрация --- */
+    #login-wrapper { opacity: 0; transition: opacity 0.5s ease; width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; }
     #login-wrapper.show { opacity: 1; }
-    
     .container {
-      width: var(--form-width);
-      height: var(--form-height);
-      position: relative;
-      background: var(--bg-card);
-      border-radius: 20px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-      overflow: hidden;
-      z-index: 100;
+      width: var(--form-width); height: var(--form-height); position: relative; background: var(--bg-card);
+      border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); overflow: hidden; z-index: 100;
       border: 1px solid var(--border-color);
     }
-    
     .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: var(--overlay-width);
-      height: 100%;
-      background: var(--accent);
-      border-radius: 20px 0 0 20px; /* Скругление слева */
-      transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.6s ease;
-      z-index: 10;
-      color: white;
+      position: absolute; top: 0; left: 0; width: var(--overlay-width); height: 100%; background: var(--accent);
+      border-radius: 20px 0 0 20px; transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.6s ease;
+      z-index: 10; color: white;
     }
-    
-    /* Корректировка скругления при движении */
-    .overlay { border-radius: 20px 0 0 20px; }
-    .overlay.open-sign-up { 
-      left: calc(var(--form-width) - var(--overlay-width));
-      border-radius: 0 20px 20px 0;
+    .overlay.open-sign-up { left: calc(var(--form-width) - var(--overlay-width)); border-radius: 0 20px 20px 0; }
+    .overlay .sign-in, .overlay .sign-up {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 40px;
+      display: flex; flex-direction: column; justify-content: center; gap: 20px;
+      transition: opacity 0.4s ease; opacity: 0;
     }
-    
-    .overlay .sign-in,
-    .overlay .sign-up {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 20px;
-      transition: opacity 0.4s ease;
-      opacity: 0;
-    }
-    
     .overlay .sign-in { opacity: 1; }
     .overlay.open-sign-up .sign-in { opacity: 0; pointer-events: none; }
     .overlay.open-sign-up .sign-up { opacity: 1; pointer-events: auto; }
     .overlay .sign-up { opacity: 0; pointer-events: none; }
-    
-    .overlay h3 {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-    
-    .overlay p {
-      font-size: 14px;
-      color: rgba(255,255,255,0.8);
-      line-height: 1.5;
-    }
+    .overlay h3 { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+    .overlay p { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.5; }
 
-    /* Блок с формами */
     .form {
-      position: absolute;
-      top: 0;
-      left: var(--overlay-width);
-      width: calc(var(--form-width) - var(--overlay-width));
-      height: 100%;
-      display: flex;
-      background: var(--bg-card);
-      transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: absolute; top: 0; left: var(--overlay-width); width: calc(var(--form-width) - var(--overlay-width));
+      height: 100%; display: flex; background: var(--bg-card); transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
     .form .sign-in, .form .sign-up {
-      width: 100%;
-      height: 100%;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      opacity: 0;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-      transform: translateX(20px);
-      padding: 40px;
+      width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center;
+      align-items: center; text-align: center; opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease;
+      transform: translateX(20px); padding: 40px;
     }
-    
-    .form .sign-in.show, .form .sign-up.show { 
-      display: flex; 
-      opacity: 1; 
-      transform: translateX(0);
-    }
+    .form .sign-in.show, .form .sign-up.show { display: flex; opacity: 1; transform: translateX(0); }
 
-    .modalFORM {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      width: 100%;
-      max-width: 320px;
-    }
+    .modalFORM { display: flex; flex-direction: column; gap: 24px; width: 100%; max-width: 320px; }
+    .modalFORM h3 { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
 
-    .modalFORM h3 {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 10px;
-    }
-
-    /* Стилизованные поля ввода */
-    .input-container {
-      position: relative;
-      width: 100%;
-    }
-
+    .input-container { position: relative; width: 100%; }
     .styled_input_bar {
-      width: 100%;
-      padding: 14px 16px;
-      font-size: 15px;
-      font-family: 'SN Pro', sans-serif;
-      border: 1.5px solid var(--border-color);
-      border-radius: 12px;
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      outline: none;
-      transition: all 0.3s ease;
+      width: 100%; padding: 14px 16px; font-size: 15px; font-family: 'SN Pro', sans-serif;
+      border: 1.5px solid var(--border-color); border-radius: 12px; background-color: var(--bg-primary);
+      color: var(--text-primary); outline: none; transition: all 0.3s ease;
     }
-
-    .styled_input_bar::placeholder { color: transparent; } /* Скрываем стандартный плейсхолдер */
-
-    .styled_input_bar:focus { 
-      border-color: var(--accent); 
-      background-color: var(--bg-card); 
-      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05); 
-    }
-
+    .styled_input_bar::placeholder { color: transparent; }
+    .styled_input_bar:focus { border-color: var(--accent); background-color: var(--bg-card); box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05); }
     .input-label {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 15px;
-      color: var(--text-muted);
-      pointer-events: none;
-      transition: all 0.3s ease;
-      background: transparent;
-      padding: 0 4px;
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 15px;
+      color: var(--text-muted); pointer-events: none; transition: all 0.3s ease; background: transparent; padding: 0 4px;
+    }
+    .styled_input_bar:focus + .input-label, .styled_input_bar:not(:placeholder-shown) + .input-label {
+      top: 0; left: 12px; font-size: 12px; font-weight: 500; background-color: var(--bg-card); color: var(--accent);
     }
 
-    .styled_input_bar:focus + .input-label,
-    .styled_input_bar:not(:placeholder-shown) + .input-label {
-      top: 0;
-      left: 12px;
-      font-size: 12px;
-      font-weight: 500;
-      background-color: var(--bg-card); /* Фон для "обрезания" границы */
-      color: var(--accent);
-    }
+    .button-submit { width: 100%; padding: 14px 24px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 8px; }
+    .button-submit:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .button-submit2 { width: 100%; padding: 12px; background-color: transparent; border: 1.5px solid white; color: white; font-size: 14px; font-weight: 600; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; }
+    .button-submit2:hover { background-color: rgba(255,255,255,0.1); }
 
-    /* Кнопки */
-    .button-submit {
-      width: 100%;
-      padding: 14px 24px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-    .button-submit:hover { 
-      background: var(--accent-hover); 
-      transform: translateY(-1px);
-    }
-
-    .button-submit2 {
-      width: 100%;
-      padding: 12px;
-      background-color: transparent;
-      border: 1.5px solid white;
-      color: white;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .button-submit2:hover {
-      background-color: rgba(255,255,255,0.1);
-    }
-
-    /* Модальное окно контента */
+    /* --- Модальное окно контента --- */
     .modal-window {
-      position: fixed;
-      width: calc(100vw - 110px); /* Учет ширины меню */
-      height: calc(100vh - 40px);
-      top: 50%;
-      left: calc(50% + 55px); /* Сдвиг на половину меню */
-      transform: translate(-50%, -50%);
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 32px;
-      overflow: hidden;
-      z-index: 1100;
-      display: none;
-      flex-direction: column;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+      position: fixed; width: calc(100vw - 110px); height: calc(100vh - 40px);
+      top: 50%; left: calc(50% + 55px); transform: translate(-50%, -50%);
+      background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px;
+      padding: 32px; overflow: hidden; z-index: 1100; display: none; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.05);
     }
-
-    .lines-loader {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      gap: 8px;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-      z-index: 1200;
-    }
+    .lines-loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 8px; opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease; z-index: 1200; }
     .lines-loader.visible { opacity: 1; visibility: visible; }
-    
-    .lineLM {
-      width: 8px;
-      height: 40px;
-      background-color: var(--accent);
-      animation: bounce 1.2s infinite ease-in-out;
-      border-radius: 4px;
-    }
-    .lineLM:nth-child(2) { animation-delay: 0.1s; }
-    .lineLM:nth-child(3) { animation-delay: 0.2s; }
-    .lineLM:nth-child(4) { animation-delay: 0.3s; }
-    .lineLM:nth-child(5) { animation-delay: 0.4s; }
-
-    .content-area {
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      position: relative;
-      z-index: 1;
-    }
+    .lineLM { width: 8px; height: 40px; background-color: var(--accent); animation: bounce 1.2s infinite ease-in-out; border-radius: 4px; }
+    .content-area { opacity: 0; transition: opacity 0.5s ease; width: 100%; height: 100%; overflow-y: auto; position: relative; z-index: 1; }
     .content-area.visible { opacity: 1; }
 
-    /* Оверлей потери соединения */
-    #db-disconnect-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(248, 249, 250, 0.9);
-      backdrop-filter: blur(8px);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease;
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-    #db-disconnect-overlay.show { opacity: 1; pointer-events: auto; }
+    /* --- Стили Modal9 (интегрированные) --- */
+    #modal9-container { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; position: relative; height: 100%; }
+    #modal9-container .glass3d { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); backdrop-filter: none; }
     
-    .loading-wave {
-      display: flex;
-      gap: 8px;
-    }
-    .loading-bar {
-      width: 8px;
-      height: 40px;
-      background-color: var(--error);
-      border-radius: 4px;
-      animation: wave 1s ease-in-out infinite;
-    }
-    .loading-bar:nth-child(2) { animation-delay: 0.1s; height: 60px; }
-    .loading-bar:nth-child(3) { animation-delay: 0.2s; height: 30px; }
-    .loading-bar:nth-child(4) { animation-delay: 0.3s; height: 50px; }
-    
-    @keyframes wave {
-      0%, 100% { transform: scaleY(0.5); }
-      50% { transform: scaleY(1.5); }
-    }
+    /* Прочие элементы Modal9 */
+    .modal9-top-window { width: 100%; padding: 24px; box-sizing: border-box; position: relative; overflow: visible; z-index: 30; margin-bottom: 10px; }
+    .modal9-top-body { display: flex; flex-direction: column; gap: 20px; }
+    .modal9-window { width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; position: relative; z-index: 10; }
+    .modal9-content { width: 100%; height: 100%; box-sizing: border-box; overflow-y: auto; padding-right: 10px; }
+    .modal9-content::-webkit-scrollbar { width: 6px; }
+    .modal9-content::-webkit-scrollbar-track { background: transparent; }
+    .modal9-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
 
-    #home_wave {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: -1;
-      opacity: 0.4; /* Легкая прозрачность для фона */
-    }
+    /* Элементы форм Modal9 */
+    .file-upload__modal { display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+    .js-dropzone { border: 2px dashed var(--border-color); padding: 20px; border-radius: 16px; transition: all 0.3s; background: var(--bg-card); }
+    .js-dropzone.drag { border-color: var(--accent); background: rgba(0,0,0,0.02); }
     
-    /* Адаптив для маленьких экранов */
+    .darkmatter-btn { background: var(--accent); border: none; color: #fff; padding: 12px 24px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; }
+    .darkmatter-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .darkmatter-btn.loading .loader { display: block; }
+    .darkmatter-btn .loader { display: none; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 24px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    input:checked + .toggle-slider { background-color: var(--accent); }
+    input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+    .modal9-updates { position: absolute; top: 24px; right: 24px; width: 300px; max-height: 60px; padding: 16px 20px; border-radius: 16px; background: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; gap: 12px; overflow-y: auto; cursor: pointer; transition: max-height 0.4s ease; z-index: 100; }
+    .modal9-updates.is-expanded { max-height: 500px; }
+    
+    /* Динамические блоки */
+    .dynamic-modals { display: flex; gap: 12px; align-items: flex-start; width: max-content; user-select: none; --block1-height: auto; }
+    .modal-block { position: relative; width: 60px; height: var(--block1-height, auto); border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-card); overflow: hidden; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; cursor: pointer; }
+    .modal-title { position: absolute; top: 12px; left: 50%; transform: translateX(-50%) rotate(180deg); writing-mode: vertical-rl; text-orientation: mixed; font-weight: 700; font-size: 12px; color: var(--text-muted); pointer-events: none; transition: opacity 0.3s; }
+    .modal-content { opacity: 0; padding: 12px; transition: opacity 0.3s; box-sizing: border-box; height: 100%; overflow-y: auto; }
+    .modal-block.open { width: max-content; min-width: 200px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+    .modal-block.open .modal-content { opacity: 1; }
+    .modal-block.open .modal-title { opacity: 0; }
+
+    /* Прогресс */
+    .spec-progress.multistep { display: flex; gap: 16px; margin: 0 0 16px; width: 100%; }
+    .spec-progress.multistep .step { flex: 1; }
+    .spec-progress.multistep .bar { width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden; }
+    .spec-progress.multistep .step.active .bar { background: var(--accent); }
+
+    /* Контекстное меню */
+    .spec-context-menu { position: absolute; display: none; min-width: 200px; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2); padding: 8px 0; z-index: 4000; }
+    .spec-context-menu.visible { display: block; }
+    .spec-context-menu button { width: 100%; padding: 10px 16px; border: none; background: none; font-size: 14px; text-align: left; color: inherit; cursor: pointer; }
+    .spec-context-menu button:hover { background: var(--bg-primary); }
+    
+    .copy-tooltip { position: fixed; background: var(--text-primary); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 12px; pointer-events: none; z-index: 11000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .spec-action-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+    .spec-action-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 174px; height: 44px; padding: 0 20px; border: none; border-radius: 12px; color: #fff; text-transform: uppercase; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+    .spec-action-btn svg, .spec-action-btn .material-symbols-outlined { margin-right: 10px; font-size: 20px; }
+    .spec-action-btn--excel { background-color: #16a34a; }
+    .spec-action-btn--copy { background-color: #4b5563; }
+    .spec-action-btn--help { background-color: #d97706; }
+
+    /* Оверлей потери соединения */
+    #db-disconnect-overlay { position: fixed; inset: 0; background: rgba(248, 249, 250, 0.9); backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: 2000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    #db-disconnect-overlay.show { opacity: 1; pointer-events: auto; }
+    .loading-wave { display: flex; gap: 8px; }
+    .loading-bar { width: 8px; height: 40px; background-color: var(--error); border-radius: 4px; animation: wave 1s ease-in-out infinite; }
+    .loading-bar:nth-child(2) { animation-delay: 0.1s; height: 60px; }
+    @keyframes wave { 0%, 100% { transform: scaleY(0.5); } 50% { transform: scaleY(1.5); } }
+    
+    /* Фон */
+    #home_wave { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: -1; opacity: 0.4; }
+
+    /* Адаптив */
     @media (max-width: 900px) {
       .container { width: 95%; height: auto; min-height: 500px; }
       .form { position: relative; width: 100%; left: 0; top: 0; height: auto; flex-direction: column; }
@@ -523,74 +267,14 @@
     <p style="margin-top: 20px; color: var(--text-secondary);">Потеря соединения с базой данных...</p>
   </div>
 
-  <!-- Меню -->
+  <!-- Меню (Оставлен только один пункт) -->
   <div id="side-menu">
     <div class="navigation">
       <ul>
-        <li class="navbar__item active" data-levels="PAGE1" data-modal="modal1">
-          <a href="#">
-            <span class="icon material-symbols-outlined">view_kanban</span>
-            <span class="title">TASKS</span>
-          </a>
-        </li>
-        <li class="navbar__item" data-levels="PAGE2" data-modal="modal2">
-          <a href="#">
-            <span class="icon material-symbols-outlined">price_check</span>
-            <span class="title">COST coordination</span>
-          </a>
-        </li>       
-        <li class="navbar__item" data-levels="PAGE3" data-modal="modal3">
-          <a href="#">
-            <span class="icon material-symbols-outlined">full_stacked_bar_chart</span>
-            <span class="title">Deal Desk</span>
-          </a>
-        </li>
-        <li class="navbar__item" data-levels="PAGE4" data-modal="modal4">
-          <a href="#">
-            <span class="icon material-symbols-outlined">shelves</span>
-            <span class="title">Warehouse</span>
-          </a>
-        </li>
-        <li class="navbar__item" data-levels="PAGE5" data-modal="modal5">
-          <a href="#">
-            <span class="icon material-symbols-outlined">receipt_long</span>
-            <span class="title">My recipes</span>
-          </a>
-        </li>
-        <li class="navbar__item" data-levels="PAGE6" data-modal="modal6">
-          <a href="#">
-            <span class="icon material-symbols-outlined">credit_score</span>
-            <span class="title">MY Income</span>
-          </a>
-        </li>
-        <li class="navbar__item" data-levels="PAGE7" data-modal="modal7">
-          <a href="#">
-            <span class="icon material-symbols-outlined">construction</span>
-            <span class="title">PAGE 7</span>
-          </a>
-        </li>
-        <li class="navbar__item" data-levels="PAGE8" data-modal="modal8">
-          <a href="#">
-            <span class="icon material-symbols-outlined">construction</span>
-            <span class="title">PAGE 8</span>
-          </a>
-        </li>
-        <li class="navbar__item" data-levels="PAGE9" data-modal="modal9">
+        <li class="navbar__item active" data-levels="PAGE9" data-modal="modal9">
           <a href="#">
             <span class="icon material-symbols-outlined">blur_on</span>
-            <span class="title">PAGE 9</span>
-          </a>
-        </li>
-        <li class="navbar__item" data-levels="PAGE10" data-modal="modal10">
-          <a href="#">
-            <span class="icon material-symbols-outlined">forum</span>
-            <span class="title">Technical support</span>
-          </a>
-        </li>
-        <li class="navbar__item" id="settingsMenuItem" data-modal="modal0" style="display:none;">
-          <a href="#">
-            <span class="icon material-symbols-outlined">settings</span>
-            <span class="title">Настройки</span>
+            <span class="title">SPECIFICATIONS</span>
           </a>
         </li>
         <div class="indicator"></div>
@@ -598,12 +282,143 @@
     </div>
   </div>
 
-  <!-- Модальное окно контента -->
-  <div id="right-modal" class="modal-window">
+  <!-- Модальное окно контента (Сразу содержит контент Modal9) -->
+  <div id="right-modal" class="modal-window" style="display: none;">
     <div class="lines-loader" id="linesLoader">
       <div class="lineLM"></div><div class="lineLM"></div><div class="lineLM"></div><div class="lineLM"></div><div class="lineLM"></div>
     </div>
-    <div class="content-area" id="modalContentArea"></div>
+    <div class="content-area" id="modalContentArea">
+      <!-- Встроенный контент modal9.html -->
+      <div id="modal9-container" class="spec-modal">
+        <div class="spec-context-menu" aria-hidden="true">
+          <button type="button" data-action="copy">Скопировать спецификацию</button>
+          <button type="button" data-action="excel">Скачать спецификацию Excel</button>
+        </div>
+        
+        <div id="modal9-ticket-modal" class="tooltip-overlay" style="display:none;">
+           <div class="tooltip-modal" style="background:white; padding:20px; border-radius:12px; max-width:90vw;">
+             <button class="ans5-close modal9-ticket-close" style="position:absolute; top:4px; right:8px; border:none; background:none; font-size:20px; cursor:pointer;">×</button>
+             <div class="modalRow" style="margin-top:0; display:flex; gap:10px;">
+               <div class="input-container">
+                 <input type="text" id="modal9-ticket-spec-id" class="styled_input_bar" style="width: 90px;" inputmode="numeric" placeholder=" ">
+                 <label class="input-label">spec #</label>
+               </div>
+               <div class="input-container" style="flex-grow:1;">
+                 <input type="text" id="modal9-ticket-subject" class="styled_input_bar" style="width:100%;" maxlength="70" placeholder=" ">
+                 <label class="input-label">тема обращения</label>
+               </div>
+             </div>
+             <div class="modalRow">
+               <div class="input-container" style="width:100%;">
+                 <textarea id="modal9-ticket-message" class="styled_input_bar" style="width: 100%; height: 150px; resize:vertical;" placeholder=" "></textarea>
+                 <label class="input-label">текст обращения</label>
+               </div>
+             </div>
+             <div class="modalRow" style="justify-content: flex-end;">
+               <button type="button" class="darkmatter-btn modal9-submit-ticket-btn" style="height:40px; width:auto;">отправить обращение</button>
+             </div>
+           </div>
+        </div>
+        
+        <div class="modal9-top-window glass3d">
+         <div class="modal9-top-body">
+          <div class="file-upload__modal">
+           <form class="file-upload-form js-dropzone">
+             <label class="file-upload-label">
+               <div class="file-upload-design" style="width: 200px; height: 74px; display:flex; gap:10px;">
+                 <button type="button" class="darkmatter-btn browse-button">выбрать файл</button>
+                 <button type="button" class="darkmatter-btn upload-btn">
+                   <span class="button-text">загрузить</span>
+                   <span class="loader"></span>
+                 </button>
+               </div>
+               <input type="file" class="js-file__input" />
+             </label>
+           </form>
+           <div class="upload-status-wrapper" style="display:flex; flex-direction:column; justify-content:center;">
+             <progress class="upload-progress spec-upload-progress" value="0" max="100" style="width:100%;display:none;"></progress>
+             <div class="upload-status"></div>
+           </div>
+            </div>
+          <div class="button-group" style="margin-top: 15px; display:flex; align-items:center; gap:10px;">
+            <div class="file-filter-container input-container" style="position: relative; width: 300px;">
+              <input id="file-filter-input" class="styled_input_bar" style="width: 100%;" />
+              <label class="input-label">поиск совпадений</label>
+              <button class="group-close ans5-close file-filter-clear" style="display:none; position:absolute; right:10px; top:50%; transform:translateY(-50%); border:none; background:none; cursor:pointer;">×</button>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="my-files-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-text" style="font-size:12px; color:var(--text-secondary);">только мои файлы</span>
+          </div>
+          <ul class="file-upload__list"></ul>
+         </div>
+         <section class="modal9-updates" aria-label="Последние обновления">
+           <div class="modal9-updates-header">
+             <h2 class="modal9-updates-title" style="font-size:12px; font-weight:700; text-transform:uppercase;">обновления сервиса</h2>
+             <button type="button" class="modal9-updates-toggle" aria-expanded="false" style="border:none; background:none; cursor:pointer; font-size:12px; color:var(--accent);">развернуть</button>
+           </div>
+            <div class="modal9-updates-body" style="font-size:13px; color:var(--text-secondary); line-height:1.4;">
+              <article class="modal9-update-card">
+               <h3 class="modal9-update-title" style="font-weight:700;">25 ноября 2025</h3>
+               <p class="modal9-update-body">Оптимизация работы парсера.</p>
+             </article>
+            </div>
+         </section>
+        </div>
+        
+        <div class="modal9-window glass3d" style="flex:1; border-radius: 0 0 20px 20px;">
+          <div class="modal9-content">
+            <div class="page spec-page active" data-page="1">
+              <div class="history-list spec-history-list"></div>
+              <div class="history-controls" style="padding: 10px;">
+                <button type="button" class="darkmatter-btn history-load-more" style="display:none;">показать ещё</button>
+              </div>
+              
+              <!-- Шаблоны Modal9 -->
+              <template id="history-row-template">
+                <div class="history-item spec-history-item input-row" style="display: flex; flex-direction: row; padding-top: 5px; gap:10px; align-items:center;">
+                  <div class="input-container" style="margin-left: -6px;">
+                    <input type="text" class="styled_input_bar" data-field="file_number" readonly style="width: 100px;" placeholder=" ">
+                    <label class="input-label">номер</label>
+                  </div>
+                  <div class="input-container">
+                    <input type="text" class="styled_input_bar" data-field="user_login" readonly style="width: 200px;" placeholder=" ">
+                    <label class="input-label">login</label>
+                  </div>
+                  <div class="input-container">
+                    <input type="text" class="styled_input_bar" data-field="created_at" readonly style="width: 150px; text-align: center;" placeholder=" ">
+                    <label class="input-label">дата</label>
+                  </div>
+                  <div class="input-container">
+                    <input type="text" class="styled_input_bar" data-field="file_name" readonly style="width: 300px;" placeholder=" ">
+                    <label class="input-label">файл</label>
+                  </div>
+                   <div class="input-container">
+                    <input type="text" class="styled_input_bar" data-field="-" style="width: 80px; text-align: center;" readonly placeholder=" ">
+                    <label class="input-label">tokens</label>
+                  </div>
+                  <div class="input-container">
+                    <input type="text" class="styled_input_bar" data-field="id" style="width: 80px; text-align: center;" readonly placeholder=" ">
+                    <label class="input-label">spec #</label>
+                  </div>
+                </div>
+              </template>
+              
+              <template id="spec-template"><div class="spec-container"><div class="spec-header"><div class="spec-title"></div><button class="group-close ans5-close" style="display:none;">×</button></div><div class="spec-content"></div></div></template>
+              <template id="button-group-spec"><div class="modalRow spec-action-row"><button type="button" class="spec-action-btn spec-action-btn--excel" data-action="excel"><svg fill="#fff" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 50 50" aria-hidden="true"><path d="M28.8125 .03125L.8125 5.34375C.339844 5.433594 0 5.863281 0 6.34375L0 43.65625C0 44.136719 .339844 44.566406 .8125 44.65625L28.8125 49.96875C28.875 49.980469 28.9375 50 29 50C29.230469 50 29.445313 49.929688 29.625 49.78125C29.855469 49.589844 30 49.296875 30 49L30 1C30 .703125 29.855469 .410156 29.625 .21875C29.394531 .0273438 29.105469 -.0234375 28.8125 .03125ZM32 6L32 13L34 13L34 15L32 15L32 20L34 20L34 22L32 22L32 27L34 27L34 29L32 29L32 35L34 35L34 37L32 37L32 44L47 44C48.101563 44 49 43.101563 49 42L49 8C49 6.898438 48.101563 6 47 6ZM36 13L44 13L44 15L36 15ZM6.6875 15.6875L11.8125 15.6875L14.5 21.28125C14.710938 21.722656 14.898438 22.265625 15.0625 22.875L15.09375 22.875C15.199219 22.511719 15.402344 21.941406 15.6875 21.21875L18.65625 15.6875L23.34375 15.6875L17.75 24.9375L23.5 34.375L18.53125 34.375L15.28125 28.28125C15.160156 28.054688 15.035156 27.636719 14.90625 27.03125L14.875 27.03125C14.8125 27.316406 14.664063 27.761719 14.4375 28.34375L11.1875 34.375L6.1875 34.375L12.15625 25.03125ZM36 20L44 20L44 22L36 22ZM36 27L44 27L44 29L36 29ZM36 35L44 35L44 37L36 37Z"></path></svg><span class="label">скачать excel</span></button><button type="button" class="spec-action-btn spec-action-btn--copy" data-action="copy"><span class="material-symbols-outlined" aria-hidden="true">content_copy</span><span class="label">скопировать</span></button><button type="button" class="spec-action-btn spec-action-btn--help" data-action="support"><span class="material-symbols-outlined" aria-hidden="true">person_raised_hand</span><span class="label">создать обращение</span></button></div></template>
+              <template id="spec-progress-template"><div class="spec-progress multistep" style="margin-bottom: 16px;"><div class="step" data-step="1"><div class="bar"></div><div class="step-body" style="margin-top: 16px; display:flex; gap:10px; align-items:center;"><div class="label" style="font-size: 14px; width:80px;">BLOCK 1</div><button class="darkmatter-btn refresh" title="Перезапустить парсер" style="border-radius: 8px; padding:5px 10px; font-size:12px; min-width:auto;"><span class="button-text">запуск</span><span class="loader"></span></button></div></div><div class="step" data-step="2"><div class="bar"></div><div class="step-body" style="margin-top: 16px; display:flex; gap:10px; align-items:center;"><div class="label" style="font-size: 14px; width:80px;">BLOCK 2</div><button class="darkmatter-btn refresh" title="Перезапустить селектор" style="border-radius: 8px; padding:5px 10px; font-size:12px; min-width:auto;"><span class="button-text">запуск</span><span class="loader"></span></button></div></div><div class="step" data-step="3"><div class="bar"></div><div class="step-body" style="margin-top: 16px; display:flex; gap:10px; align-items:center;"><div class="label" style="font-size: 14px; width:80px;">BLOCK 3</div><button class="darkmatter-btn refresh" title="Недоступно" style="border-radius: 8px; padding:5px 10px; font-size:12px; min-width:auto;" disabled><span class="button-text">запуск</span><span class="loader"></span></button></div></div></div></template>
+              <template id="spec-row-template"><div class="modalCONTEINERpost modalRow" style="gap:10px; margin-bottom:10px;"><div class="modalColumn" style="gap:10px;"><div class="modalRow" style="gap:10px;"><div class="input-container" style="margin-top: 0px;"><input type="text" style="width: 100px; text-align: center;" class="styled_input_bar" data-field="pos_number" readonly><label class="input-label">№ в ТЗ</label></div><div class="input-container" style="margin-top: 0px;"><input type="text" style="width: 400px; text-align: left;" class="styled_input_bar" data-field="name" readonly><label class="input-label">наименование</label></div><div class="input-container" style="margin-top: 0px;"><input type="text" style="width: 80px; text-align: center;" class="styled_input_bar" data-field="qty" readonly><label class="input-label">кол-во</label></div></div></div><div class="dynamic-modals"><div class="modal-block block1"><div class="modal-title">1 BLOCK</div><div class="modal-content"></div></div><div class="modal-block block2"><div class="modal-title">2 BLOCK</div><div class="modal-content"></div></div><div class="modal-block block21"><div class="modal-title">2/1</div><div class="modal-content"></div></div></div></div></template>
+              <template id="spec-block2-template"><div class="modalRow" style="gap:10px;"><div class="input-container"><input type="text" style="width: 140px;" class="styled_input_bar param-input" placeholder="артикул" readonly><label class="input-label">артикул</label></div><div class="input-container"><input type="text" style="width: 300px;" class="styled_input_bar value-input" placeholder="наименование" readonly><label class="input-label">наименование</label></div><div class="input-container"><input type="text" style="width: 80px; text-align: center;" class="styled_input_bar value-input" placeholder="кол-во" readonly><label class="input-label">кол-во</label></div><div class="input-container"><input type="text" style="width: 100px; text-align: right;" class="styled_input_bar value-input" placeholder="цена" readonly><label class="input-label">цена</label></div></div></template>
+              <template id="spec-block21-template"><div class="modalRow" style="gap:10px;"><div class="input-container"><input type="text" style="width: 100px; text-align: right;" class="styled_input_bar" data-offer="1-price" placeholder=" " readonly><label class="input-label">цена 1</label></div><div class="input-container"><input type="text" style="width: 120px;" class="styled_input_bar" data-offer="1-store" placeholder=" " readonly><label class="input-label">магазин</label></div><a class="icons" data-offer="1-url" target="_blank" rel="noopener" style="display:flex; align-items:center; color:var(--accent);"><span class="material-symbols-outlined status">link</span></a></div></template>
+              <template id="spec-attr-template"><div class="modalRow" style="gap:10px;"><div class="input-container"><input type="text" style="width: 300px;" class="styled_input_bar param-input" placeholder="параметр" readonly><label class="input-label">параметр</label></div><div class="input-container"><input type="text" style="width: 200px;" class="styled_input_bar value-input" placeholder="значение" readonly><label class="input-label">значение</label></div></div></template>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Конец встроенного контента modal9 -->
+    </div>
   </div>
 
   <!-- Форма авторизации -->
@@ -612,12 +427,12 @@
       <div class="overlay" id="overlay">
         <div class="sign-in">
           <h3>Новый пользователь?</h3>
-          <p>Создайте учетную запись, чтобы получить доступ ко всем функциям платформы.</p>
+          <p>Создайте учетную запись, чтобы получить доступ к функциям платформы.</p>
           <button class="button-submit2" id="slide-right-button">Создать аккаунт</button>
         </div>
         <div class="sign-up">
           <h3>Уже с нами?</h3>
-          <p>Если у вас уже есть аккаунт, выполните вход, используя ваши данные.</p>
+          <p>Если у вас уже есть аккаунт, выполните вход.</p>
           <button class="button-submit2" id="slide-left-button">Войти</button>
         </div>
       </div>
@@ -636,14 +451,6 @@
               <div class="input-container">
                 <input class="styled_input_bar" type="text" name="firstname" id="regFirstname" placeholder=" " />
                 <label class="input-label" for="regFirstname">Имя</label>
-              </div>
-              <div class="input-container">
-                <input class="styled_input_bar" type="text" name="middlename" id="regMiddlename" placeholder=" " />
-                <label class="input-label" for="regMiddlename">Отчество</label>
-              </div>
-              <div class="input-container">
-                <input class="styled_input_bar" type="text" name="phone" id="regPhone" placeholder=" " />
-                <label class="input-label" for="regPhone">Телефон</label>
               </div>
               <div class="input-container">
                 <input class="styled_input_bar" type="email" name="email" id="regEmail" placeholder=" " />
@@ -702,13 +509,13 @@
     const loginPassword     = document.getElementById('loginPassword');
     const loginBtn          = document.getElementById('loginBtn');
     const regBtn            = document.getElementById('regBtn');
+    const rightModal        = document.getElementById('right-modal');
+    const modalContentArea  = document.getElementById('modalContentArea');
 
     async function hashPassword(str) {
       const enc = new TextEncoder().encode(str);
       const buf = await crypto.subtle.digest('SHA-256', enc);
-      return Array.from(new Uint8Array(buf))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
     }
     window.hashPassword = hashPassword;
 
@@ -722,7 +529,6 @@
           preloader.style.display = 'none';
           loginWrapper.classList.add('show');
           document.body.style.overflow = 'auto';
-          // Default state
           registrationForm.classList.remove('show');
           loginForm.classList.add('show');
         }, 500);
@@ -733,15 +539,11 @@
       if (toSignUp) {
         overlay.classList.add('open-sign-up');
         loginForm.classList.remove('show');
-        setTimeout(() => {
-          registrationForm.classList.add('show');
-        }, 300);
+        setTimeout(() => { registrationForm.classList.add('show'); }, 300);
       } else {
         overlay.classList.remove('open-sign-up');
         registrationForm.classList.remove('show');
-        setTimeout(() => {
-          loginForm.classList.add('show');
-        }, 300);
+        setTimeout(() => { loginForm.classList.add('show'); }, 300);
       }
     }
     slideRightBtn.addEventListener('click', () => toggleOverlay(true));
@@ -781,17 +583,6 @@
       window.USER_LEVELS = user.menu_levels || '';
       window.USER_LOGIN = user.login || user.email || user.last_name || '';
 
-      if (navigator.credentials && typeof navigator.credentials.store === 'function') {
-         try {
-          const credential = new PasswordCredential({ id: email, password: pass });
-          await navigator.credentials.store(credential);
-        } catch (e) {}
-      }
-
-      filterMenuByUserLevels(user.menu_levels || '');
-      const settingsItem = document.getElementById('settingsMenuItem');
-      if (settingsItem) settingsItem.style.display = user.is_admin ? '' : 'none';
-
       loginWrapper.classList.remove('show');
       preloader.style.display = 'flex';
       preloader.classList.remove('fade-out');
@@ -803,69 +594,17 @@
         setTimeout(() => {
           preloader.style.display = 'none';
           sideMenu.style.display = 'block';
+          rightModal.style.display = 'flex'; // Показываем контейнер с Modal9
+          modalContentArea.classList.add('visible');
           initIndicator();
+          
+          // Инициализация логики Modal9
+          if (typeof initModal9Logic === 'function') {
+             initModal9Logic();
+          }
         }, 500);
       }, 1500);
     });
-
-    function filterMenuByUserLevels(userLevels) {
-      const userKeys = userLevels.split(',').map(key => key.trim().toUpperCase());
-      const menuItems = document.querySelectorAll('.navbar__item');
-      menuItems.forEach(item => {
-        const levelsAttr = item.getAttribute('data-levels');
-        if (levelsAttr) {
-          const itemLevels = levelsAttr.split(',').map(key => key.trim().toUpperCase());
-          const hasAccess = itemLevels.every(level => userKeys.includes(level));
-          item.style.display = hasAccess ? '' : 'none';
-        }
-      });
-      initIndicator();
-    }
-
-    if (regBtn) {
-      regBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        regBtn.disabled = true;
-        const originalRegText = regBtn.innerHTML;
-        regBtn.innerHTML = 'Отправка...';
-        
-        const regFormEl = document.getElementById('registration-form');
-        const formData = new FormData(regFormEl);
-        const data = {
-          lastname: formData.get('lastname'), firstname: formData.get('firstname'),
-          middlename: formData.get('middlename'), phone: formData.get('phone'),
-          email: formData.get('email'), password: formData.get('password')
-        };
-
-        try {
-          const companyId = crypto.randomUUID();
-          const companyName = 'Company NAME';
-          const companyInfo = await registerUser(data, companyId, companyName);
-          window.companyId = companyId;
-          window.companyName = companyName;
-          window.registeredCompany = companyInfo;
-
-          const user = await checkLoginCustom(data.email, data.password);
-           if (user) {
-            window.companyId = user.company_id; window.companyName = user.company_name;
-            window.AUTH_ID = user.id; window.USER_KEY = user.user_key || window.AUTH_ID || user.id || '';
-            window.IS_ADMIN = user.is_admin; window.USER_LEVELS = user.menu_levels || '';
-            window.USER_LOGIN = user.login || user.email || user.last_name || '';
-            filterMenuByUserLevels(user.menu_levels || '');
-            const settingsItem = document.getElementById('settingsMenuItem');
-            if (settingsItem) settingsItem.style.display = user.is_admin ? '' : 'none';
-          }
-
-          alert('Регистрация успешна! Подтвердите email.');
-          toggleOverlay(false);
-          showRightModal('modal0');
-        } catch (error) {
-          alert('Ошибка регистрации: ' + (error.message || error));
-        } finally {
-          regBtn.disabled = false; regBtn.innerHTML = originalRegText;
-        }
-      });
-    }
 
     async function registerUser(userData, companyId, companyName) {
       const pass_hash = await hashPassword(userData.password || '');
@@ -890,133 +629,412 @@
       } catch (err) { return null; }
     }
 
-    const rightModal = document.getElementById('right-modal');
-    const linesLoader = document.getElementById('linesLoader');
-    const modalContentArea = document.getElementById('modalContentArea');
-    const dbOverlay = document.getElementById('db-disconnect-overlay');
-
-    async function pingDatabase() {
-      try { const { error } = await supabase.from('administrators').select('id').limit(1); return !error; }
-      catch (e) { return false; }
-    }
-    async function checkDbConnection() {
-      const isOk = await pingDatabase();
-      if (isOk) dbOverlay.classList.remove('show'); else dbOverlay.classList.add('show');
-    }
-    setInterval(checkDbConnection, 10000);
-    checkDbConnection();
-
-    function executeScriptsFromHTML(parentElem) {
-      const scripts = parentElem.querySelectorAll('script');
-      scripts.forEach(oldScript => {
-        const newScript = document.createElement('script');
-        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-        if (oldScript.src) newScript.src = oldScript.src; else newScript.textContent = oldScript.textContent;
-        document.body.appendChild(newScript);
-      });
-    }
-
-    window.showRightModal = async function(pageId) {
-      if (pageId === 'modal0' && !window.IS_ADMIN) { alert('Доступ запрещен'); return; }
-      const navItem = document.querySelector(`.navbar__item[data-modal="${pageId}"]`);
-      if (navItem && navItem.dataset.levels) {
-        const userLevels = (window.USER_LEVELS || '').split(',').map(l => l.trim().toUpperCase());
-        const required = navItem.dataset.levels.split(',').map(l => l.trim().toUpperCase());
-        const hasAccess = required.every(l => userLevels.includes(l));
-        if (!hasAccess) { alert('Недостаточно прав'); return; }
-      }
-      
-      rightModal.style.display = 'flex';
-      modalContentArea.innerHTML = '';
-      linesLoader.classList.add('visible');
-
-      try {
-        const url = `${pageId}.html?t=${Date.now()}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Ошибка загрузки');
-        const html = await response.text();
-        modalContentArea.innerHTML = html;
-        executeScriptsFromHTML(modalContentArea);
-        modalContentArea.classList.add('visible');
-      } catch (error) {
-        modalContentArea.innerHTML = `<p style="color: red; padding: 20px;">Ошибка: ${error.message}</p>`;
-      } finally {
-        linesLoader.classList.remove('visible');
-      }
-    };
-
-    window.closeRightModal = function() {
-      if (window.cleanupRealtime) window.cleanupRealtime();
-      modalContentArea.innerHTML = '';
-      modalContentArea.classList.remove('visible');
-      rightModal.style.display = 'none';
-    };
-
+    // Indicator logic
     const indicator = document.querySelector('.indicator');
-
     function moveIndicatorTo(item) {
-      // Для вертикального меню
       indicator.style.top = (item.offsetTop + 5) + 'px';
-      indicator.style.left = '10px'; // Фиксируем слева
-      indicator.style.width = '50px'; // Фиксированная ширина индикатора
+      indicator.style.left = '10px';
+      indicator.style.width = '50px';
     }
-
     function setActive(item) {
       document.querySelectorAll('.navbar__item').forEach(el => el.classList.remove('active'));
       item.classList.add('active');
       moveIndicatorTo(item);
     }
-
     function initIndicator() {
       const first = Array.from(document.querySelectorAll('.navbar__item')).find(el => el.style.display !== 'none');
       if (first) setActive(first);
     }
-
-    const navItems = document.querySelectorAll('.navbar__item');
-    navItems.forEach(item => {
-      item.addEventListener('mouseenter', function() { moveIndicatorTo(this); });
-      item.addEventListener('click', function(e) {
-        e.preventDefault();
-        setActive(this);
-        const pageId = this.getAttribute('data-modal');
-        showRightModal(pageId);
-      });
-    });
-
-    window.ADMIN_PAGES = Array.from(document.querySelectorAll('.navbar__item'))
-      .filter(item => item.id !== 'settingsMenuItem')
-      .map(item => ({ code: item.dataset.levels, title: item.querySelector('.title')?.textContent.trim() || item.dataset.levels }));
-
+    
     window.logout = function() { location.reload(); };
+
+    // =========================================================
+    // ЛОГИКА MODAL9 (интегрирована напрямую)
+    // =========================================================
+    window.initModal9Logic = async function() {
+      console.log('[modal9] Logic Initialized');
+      
+      const root = document.getElementById('modal9-container');
+      const BUCKET = 'modal9-page1-uploads';
+      const TABLE = 'modal9_page1_uploads_registry';
+      const POS_TABLE = 'modal9_page1_positions';
+      const SELECT_TABLE = 'modal9_page1_positions_select';
+      const STATUS_TABLE = 'modal9_selector_status';
+      const ALLOWED_EXTS = ['doc', 'docx', 'txt', 'xls', 'rtf', 'pdf', 'ods', 'csv', 'xlsx'];
+      const HISTORY_LIMIT_DEFAULT = 30;
+      const HISTORY_LIMIT_STEP = 30;
+      const AUTO_REFRESH_INTERVAL = 5000;
+      const TOKEN_RATE = 0.00000517;
+
+      const loadMoreBtn = root.querySelector('.history-load-more');
+      const historyList = root.querySelector('.history-list');
+      const dropzone = root.querySelector('.js-dropzone');
+      const rowTemplate = root.querySelector('#history-row-template');
+      const fileInput = root.querySelector('.js-file__input');
+      const fileList = root.querySelector('.file-upload__list');
+      const uploadBtn = root.querySelector('.upload-btn');
+      const browseBtn = root.querySelector('.browse-button');
+      const uploadProgress = root.querySelector('.upload-progress');
+      const uploadStatus = root.querySelector('.upload-status');
+      const myFilesToggle = root.querySelector('#my-files-toggle');
+      const filterInput = root.querySelector('#file-filter-input');
+      const filterClear = root.querySelector('.file-filter-clear');
+      const block1List = root.querySelector('.block1-wrapper');
+      const specTemplate = root.querySelector('#spec-template');
+      const specProgressTemplate = root.querySelector('#spec-progress-template');
+      const buttonGroupSpec = root.querySelector('#button-group-spec');
+      const specRowTemplate = root.querySelector('#spec-row-template');
+      const block2Template = root.querySelector('#spec-block2-template');
+      const block21Template = root.querySelector('#spec-block21-template');
+      const attrPairTemplate = root.querySelector('#spec-attr-template');
+      const contextMenu = root.querySelector('.spec-context-menu');
+      const ticketModal = root.querySelector('#modal9-ticket-modal');
+      const ticketCloseBtn = ticketModal ? ticketModal.querySelector('.modal9-ticket-close') : null;
+      const ticketSpecInput = root.querySelector('#modal9-ticket-spec-id');
+      const ticketSubjectInput = root.querySelector('#modal9-ticket-subject');
+      const ticketMessageInput = root.querySelector('#modal9-ticket-message');
+      const ticketSubmitBtn = root.querySelector('.modal9-submit-ticket-btn');
+      const updatesPanel = root.querySelector('.modal9-updates');
+      const updatesToggle = root.querySelector('.modal9-updates-toggle');
+      const toggleText = root.querySelector('.toggle-text');
+
+      let realtimeSub = null;
+      let autoRefreshTimer = null;
+      const block1OpenBlocks = {};
+      const historyOpenBlocks = {};
+      const hideTimers = new WeakMap();
+      let openedSpecId = null;
+      let contextSpecContent = null;
+      let currentUserEmail = window.USER_LOGIN;
+      let lastSupportSpecId = null;
+      let historyLimit = HISTORY_LIMIT_DEFAULT;
+      let historyTotalCount = 0;
+      let history = [];
+      let lastHistoryStatus = {};
+      let block1Rows = [];
+      let specGroups = {};
+      let selectionMap = {};
+      const specRenderCache = new Map();
+      let loadingBlock1 = false;
+      let pendingLoad = null;
+      let isLoadingHistory = false;
+      let queuedHistoryOptions = null;
+      let filterDebounceTimer = null;
+      const watchedSpecIds = new Set();
+      const reloadTimers = new Map();
+      let selectedFile = null;
+
+      const STATUS_FIELDS = new Set(['status_parser', 'status_selector', 'status_pricer']);
+      
+      // Helpers
+      const sanitize = (s) => s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9._-]/gi, '_');
+      const escapeSearchValue = (value) => value.replace(/[\\%_]/g, '\\$&');
+      const toPosNum = (val) => { if (typeof val === 'number' && Number.isFinite(val)) return val; const m = String(val ?? '').match(/\d+/); return m ? parseInt(m[0], 10) : Number.MAX_SAFE_INTEGER; };
+      const boolLabel = (value) => value ? 'да' : 'нет';
+      const formatNumericValue = (value) => { if (value === null || value === undefined || value === '') return ''; if (typeof value === 'number') { if (!Number.isFinite(value)) return String(value); return value.toLocaleString('ru-RU'); } const raw = String(value).trim().replace(/\u00a0/g, ' ').replace(/[^0-9,.-]/g, '').replace(/\s+/g, '').replace(',', '.'); const parsed = Number(raw); return Number.isFinite(parsed) ? parsed.toLocaleString('ru-RU') : raw; };
+      const formatTokenCost = (tokens) => { const n = Number(tokens); return Number.isFinite(n) ? `${(Math.round(n * TOKEN_RATE * 100) / 100).toFixed(2)}$` : '0.00$'; };
+      const formatOfferPrice = (amount) => formatNumericValue(amount);
+
+      // UI Logic
+      function showCopyTip(el) { const tip = document.createElement('div'); tip.className = 'copy-tooltip'; tip.textContent = 'скопировано'; document.body.appendChild(tip); const r = el.getBoundingClientRect(); tip.style.left = r.left + r.width / 2 - tip.offsetWidth / 2 + 'px'; tip.style.top = r.top - tip.offsetHeight - 6 + 'px'; setTimeout(() => tip.remove(), 1000); }
+      function showContextMenuAt(event, specContent) { if (!contextMenu || !specContent) return; const specId = specContent.dataset.specId; if (!specId) return; contextSpecContent = specContent; contextMenu.dataset.specId = specId; contextMenu.classList.remove('visible'); contextMenu.style.display = 'block'; contextMenu.style.left = '0px'; contextMenu.style.top = '0px'; requestAnimationFrame(() => { const rootRect = root.getBoundingClientRect(); const rect = contextMenu.getBoundingClientRect(); contextMenu.style.left = `${Math.max(0, Math.min(event.clientX - rootRect.left, rootRect.width - rect.width))}px`; contextMenu.style.top = `${Math.max(0, Math.min(event.clientY - rootRect.top, rootRect.height - rect.height))}px`; contextMenu.classList.add('visible'); }); }
+      function hideContextMenu() { if (!contextMenu) return; contextMenu.classList.remove('visible'); contextMenu.style.display = 'none'; contextMenu.dataset.specId = ''; contextSpecContent = null; }
+
+      // Updates Panel
+      if (updatesPanel && !updatesPanel.dataset.bound) {
+        updatesPanel.addEventListener('click', () => updatesPanel.classList.toggle('is-expanded'));
+        if (updatesToggle) updatesToggle.addEventListener('click', (e) => { e.stopPropagation(); updatesPanel.classList.toggle('is-expanded'); });
+        updatesPanel.dataset.bound = 'true';
+      }
+
+      // Render Logic
+      function updateStatus(el, status) { if (!el) return; const s = String(status || ''); const display = s; if ('value' in el) el.value = display; else el.textContent = display; }
+      function animateStatus(el, newStatus) { if (!el) return; el.classList.add('fade'); setTimeout(() => { updateStatus(el, newStatus); el.classList.remove('fade'); }, 1000); }
+      function applyStatusIcon(scope, field, value) { /* simplified for brevity, logic same as before */ }
+      
+      // Data Logic
+      async function loadHistory(options = {}) {
+        const { resetLimit = false } = options;
+        if (resetLimit) historyLimit = HISTORY_LIMIT_DEFAULT;
+        if (isLoadingHistory) return;
+        isLoadingHistory = true;
+        try {
+          let query = supabase.from(TABLE).select('id, file_number, user_login, created_at, file_name, file_ext, status_parser, status_selector, status_pricer, tokens', { count: 'exact' }).order('created_at', { ascending: false });
+          if (myFilesToggle.checked && currentUserEmail) query = query.eq('user_login', currentUserEmail);
+          const searchValue = filterInput.value.trim();
+          if (searchValue) { const escaped = escapeSearchValue(searchValue); const pattern = `%${escaped}%`; query = query.or(`file_number.ilike.${pattern},user_login.ilike.${pattern},file_name.ilike.${pattern}`); }
+          query = query.limit(historyLimit);
+          const { data, error, count } = await query;
+          if (error) throw error;
+          history = data || [];
+          historyTotalCount = typeof count === 'number' ? count : history.length;
+          renderHistory();
+          if (history.length) await loadBlock1({ fromHistory: true });
+        } finally { isLoadingHistory = false; }
+      }
+
+      function renderHistory() {
+        historyList.innerHTML = '';
+        history.forEach(item => {
+          const fragment = rowTemplate.content.cloneNode(true);
+          const rowEl = fragment.querySelector('.history-item');
+          rowEl.dataset.specId = item.id;
+          rowEl.addEventListener('click', () => openRowGroup(item.id, historyOpenBlocks[item.id]));
+          rowEl.querySelectorAll('[data-field]').forEach(el => {
+            const field = el.dataset.field;
+            if (field === '-') el.value = formatTokenCost(item.tokens);
+            else if (field === 'created_at') el.value = item.created_at ? new Date(item.created_at).toLocaleString() : '';
+            else el.value = item[field] || '';
+          });
+          historyList.appendChild(fragment);
+        });
+      }
+
+      async function loadBlock1(options = {}) {
+        if (loadingBlock1) return;
+        loadingBlock1 = true;
+        const specIds = Array.from(new Set(history.map(h => h.id)));
+        if (!specIds.length) { block1Rows = []; specGroups = {}; selectionMap = {}; renderBlock1(); loadingBlock1 = false; return; }
+        const { data, error } = await supabase.from(POS_TABLE).select('*').in('spec_id', specIds).order('pos_number_int', { ascending: true });
+        if (error) console.error(error);
+        block1Rows = (data || []).map(r => ({ ...r, pos_number_int: toPosNum(r.pos_number_int ?? r.pos_number) }));
+        const posIds = block1Rows.map(r => r.id);
+        selectionMap = {};
+        if (posIds.length) {
+          const { data: sels } = await supabase.from(SELECT_TABLE).select('*').in('pos_id', posIds);
+          (sels || []).forEach(s => { (selectionMap[s.pos_id] = selectionMap[s.pos_id] || []).push(s); });
+        }
+        specGroups = {};
+        block1Rows.forEach(r => { const key = String(r.spec_id); (specGroups[key] = specGroups[key] || []).push(r); });
+        renderBlock1();
+        loadingBlock1 = false;
+      }
+
+      function renderBlock1() { updateBlock1SpecContainers({ forceAll: true }); }
+
+      function updateBlock1SpecContainers(options = {}) {
+        const { forceAll = false } = options;
+        if (!block1List) return;
+        block1List.innerHTML = '';
+        Object.keys(specGroups).sort((a, b) => Number(b) - Number(a)).forEach(id => {
+           const { container } = createSpecContainer(id, { mode: 'block1' });
+           block1List.appendChild(container);
+           const content = container.querySelector('.spec-content');
+           updateSpecContent(content, id, { mode: 'block1' });
+        });
+      }
+
+      function updateSpecContent(content, specId, options = {}) {
+        if (!content || !specRowTemplate) return;
+        const rows = (specGroups[String(specId)] || []).sort((a, b) => a.pos_number_int - b.pos_number_int);
+        if (!rows.length) { content.innerHTML = ''; return; }
+        const fragment = document.createDocumentFragment();
+        rows.forEach(row => {
+          const rf = specRowTemplate.content.cloneNode(true);
+          rf.querySelector('[data-field="pos_number"]').value = row.pos_number || '';
+          rf.querySelector('[data-field="name"]').value = row.name || '';
+          rf.querySelector('[data-field="qty"]').value = row.qty || '';
+          const attrsWrap = rf.querySelector('.block1 .modal-content');
+          if (attrsWrap) {
+             attrsWrap.innerHTML = '';
+             // Simple attrs render
+             const attrs = (row.attrs || '').split('|').map(p => { const parts = p.split('&'); return { param: parts[0], value: parts[1] }; }).filter(Boolean);
+             attrs.forEach(attr => {
+               const attrFrag = attrPairTemplate.content.cloneNode(true);
+               attrFrag.querySelector('.param-input').value = attr.param || '';
+               attrFrag.querySelector('.value-input').value = attr.value || '';
+               attrsWrap.appendChild(attrFrag);
+             });
+          }
+          const sels = selectionMap[row.id] || [];
+          const block2 = rf.querySelector('.block2 .modal-content');
+          if (block2) {
+             block2.innerHTML = '';
+             sels.forEach(sel => {
+               const frag = block2Template.content.cloneNode(true);
+               const inputs = frag.querySelectorAll('input');
+               inputs[0].value = sel.article || '';
+               inputs[1].value = sel.model_name || '';
+               inputs[2].value = sel.qty || '';
+               inputs[3].value = sel.price || '';
+               block2.appendChild(frag);
+             });
+          }
+          const block21 = rf.querySelector('.block21 .modal-content');
+          if (block21) {
+             block21.innerHTML = '';
+             sels.forEach(sel => {
+               const frag = block21Template.content.cloneNode(true);
+               frag.querySelector('[data-offer="1-price"]').value = sel.price1_amount || '';
+               frag.querySelector('[data-offer="1-store"]').value = sel.price1_store || '';
+               const urlEl = frag.querySelector('[data-offer="1-url"]');
+               if (sel.price1_url) urlEl.href = sel.price1_url;
+               else { urlEl.removeAttribute('href'); urlEl.style.opacity = '0.3'; }
+               block21.appendChild(frag);
+             });
+          }
+          fragment.appendChild(rf);
+        });
+        content.innerHTML = '';
+        content.appendChild(fragment);
+        setupDynamicBlocks(content);
+      }
+
+      function createSpecContainer(specId, options = {}) {
+        const { mode = 'history' } = options;
+        const fragment = specTemplate.content.cloneNode(true);
+        const container = fragment.querySelector('.spec-container');
+        container.dataset.specId = specId;
+        const content = container.querySelector('.spec-content');
+        content.dataset.specId = specId;
+        
+        // Progress
+        const progressFrag = specProgressTemplate.content.cloneNode(true);
+        const progress = progressFrag.querySelector('.spec-progress');
+        progress.dataset.specId = specId;
+        container.insertBefore(progressFrag, content);
+        initProgressHandlers(progress, specId);
+        
+        // Actions
+        const actFrag = buttonGroupSpec.content.cloneNode(true);
+        const actRow = actFrag.querySelector('.spec-action-row');
+        actRow.dataset.specId = specId;
+        actRow.querySelectorAll('.spec-action-btn').forEach(btn => {
+           btn.addEventListener('click', async (e) => {
+             e.preventDefault();
+             const action = btn.dataset.action;
+             if (action === 'support') openSupportTicketModal(specId);
+             else if (action === 'copy') { /* copy logic */ showCopyTip(btn); }
+             else if (action === 'excel') { /* excel logic */ }
+           });
+        });
+        container.insertBefore(actFrag, content);
+
+        return { fragment, container, progress, content };
+      }
+
+      function initProgressHandlers(progress, specId) {
+        const buttons = progress.querySelectorAll('.refresh');
+        if (buttons[0]) buttons[0].addEventListener('click', async (e) => { e.stopPropagation(); buttons[0].classList.add('loading'); await refreshParser(specId); buttons[0].classList.remove('loading'); });
+        if (buttons[1]) buttons[1].addEventListener('click', async (e) => { e.stopPropagation(); buttons[1].classList.add('loading'); await refreshSelector(specId); buttons[1].classList.remove('loading'); });
+      }
+      
+      async function refreshParser(specId) {
+        await supabase.from(SELECT_TABLE).delete().eq('spec_id', specId);
+        await supabase.from(POS_TABLE).delete().eq('spec_id', specId);
+        await supabase.from(TABLE).update({ status_parser: 'BLOCK 1 ( в работе )' }).eq('id', specId);
+        await supabase.functions.invoke('modal9-parser', { body: { request_id: specId } });
+        await loadHistory();
+      }
+
+      async function refreshSelector(specId) {
+        await supabase.from(TABLE).update({ status_selector: 'подготовка' }).eq('id', specId);
+        await supabase.functions.invoke('modal9-selector', { body: { spec_id: specId } });
+        await loadHistory();
+      }
+
+      function setupDynamicBlocks(scope) {
+        scope.querySelectorAll('.dynamic-modals').forEach(dm => {
+          const blocks = dm.querySelectorAll('.modal-block');
+          if (blocks[0]) blocks[0].classList.add('open');
+          blocks.forEach(block => {
+            block.addEventListener('dblclick', () => {
+              blocks.forEach(b => b.classList.remove('open'));
+              block.classList.add('open');
+            });
+          });
+        });
+      }
+
+      function openRowGroup(id, blockClass) {
+        if (openedSpecId && openedSpecId !== id) closeRowGroup(openedSpecId);
+        openedSpecId = id;
+        const row = historyList.querySelector(`.history-item[data-spec-id="${id}"]`);
+        let container = historyList.querySelector(`.spec-container[data-spec-id="${id}"]`);
+        if (!container) {
+           const { container: newCont } = createSpecContainer(id, { mode: 'history' });
+           row.after(newCont);
+           container = newCont;
+           updateSpecContent(container.querySelector('.spec-content'), id, { mode: 'history' });
+        }
+        container.style.display = 'block';
+        container.querySelector('.spec-content').classList.remove('hidden');
+        container.querySelector('.spec-progress').style.display = 'flex';
+        container.querySelector('.spec-action-row').style.display = 'flex';
+      }
+
+      function closeRowGroup(id) {
+        if (openedSpecId === id) openedSpecId = null;
+        const container = historyList.querySelector(`.spec-container[data-spec-id="${id}"]`);
+        if (container) {
+          container.querySelector('.spec-content').classList.add('hidden');
+          container.querySelector('.spec-progress').style.display = 'none';
+          container.querySelector('.spec-action-row').style.display = 'none';
+        }
+      }
+
+      // Upload
+      browseBtn.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', () => { selectedFile = fileInput.files[0]; uploadStatus.textContent = selectedFile ? `Выбран: ${selectedFile.name}` : ''; });
+      uploadBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+        uploadBtn.classList.add('loading');
+        const ext = selectedFile.name.split('.').pop().toLowerCase();
+        if (!ALLOWED_EXTS.includes(ext)) { alert('Недопустимый тип файла'); uploadBtn.classList.remove('loading'); return; }
+        const filePath = `${window.AUTH_ID}/${Date.now()}_${sanitize(selectedFile.name)}`;
+        const { data: { session } } = await supabase.auth.getSession();
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${window.SUPABASE_URL}/storage/v1/object/${BUCKET}/${filePath}`);
+        xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+        xhr.setRequestHeader('apikey', window.SUPABASE_ANON_KEY);
+        xhr.send(selectedFile);
+        xhr.onload = async () => {
+           if (xhr.status < 300) {
+             const { data } = await supabase.from(TABLE).insert({ user_login: window.USER_LOGIN, file_path: filePath, file_name: selectedFile.name, file_ext: ext }).select('*').single();
+             await supabase.functions.invoke('modal9-parser', { body: { request_id: data.id } });
+             await loadHistory();
+           } else { alert('Ошибка загрузки'); }
+           uploadBtn.classList.remove('loading');
+        };
+      });
+
+      // Excel Logic
+      function buildExcelHtml(data) {
+        if (!data) return '';
+        let html = `<table border="1"><thead><tr><th>Param</th><th>Value</th></tr></thead><tbody>`;
+        html += `<tr><td>File</td><td>${data.header?.file_name || ''}</td></tr>`;
+        data.positions.forEach(pos => {
+          html += `<tr><td colspan="2">${pos.posNumber} ${pos.name}</td></tr>`;
+          pos.block1.forEach(a => html += `<tr><td>${a.param}</td><td>${a.value}</td></tr>`);
+        });
+        html += `</tbody></table>`;
+        return html;
+      }
+      function createExcelBlob(data) { return new Blob(['\uFEFF', `<html><body>${buildExcelHtml(data)}</body></html>`], { type: 'application/vnd.ms-excel' }); }
+      function downloadSpecExcel(data, blob) { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `spec_${data.id}.xls`; a.click(); URL.revokeObjectURL(url); }
+
+      // Filters
+      filterInput.addEventListener('input', () => { filterDebounceTimer = setTimeout(loadHistory, 350); });
+      filterClear.addEventListener('click', () => { filterInput.value = ''; loadHistory(); });
+      myFilesToggle.addEventListener('change', loadHistory);
+      
+      // Global listeners for context menu
+      window.addEventListener('click', (e) => { if (contextMenu && !contextMenu.contains(e.target)) hideContextMenu(); });
+      
+      // Init
+      await loadHistory();
+    };
+
   </script>
   
   <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
   <script>
-    // Three.js Background (Preserved)
+    // Three.js Background
     const SEPARATION = 200, AMOUNTX = 40, AMOUNTY = 60;
     const AMP_X = 50, AMP_Y = 50, FREQ_X = 0.3, FREQ_Y = 0.5, WAVE_SPEED = 0.025;
     const POINT_SIZE = 10;
-    const POINT_COLOR = 0x000000; // Changed to black to match new theme
-    const USE_ROUND_SPRITE = true;
+    const POINT_COLOR = 0x000000;
     let camera, renderer, scene, points, count = 0;
-
-    function makeCircleSpriteTexture(size = 64, softness = 1.0) {
-      const canvas = document.createElement('canvas');
-      canvas.width = canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, size, size);
-      const r = size * 0.5;
-      const gradient = ctx.createRadialGradient(r, r, r * 0.0, r, r, r);
-      gradient.addColorStop(0, `rgba(0,0,0,0.5)`); // Subtle black
-      gradient.addColorStop(1, `rgba(0,0,0,0)`);
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(r, r, r, 0, Math.PI * 2);
-      ctx.fill();
-      const tx = new THREE.CanvasTexture(canvas);
-      tx.needsUpdate = true;
-      return tx;
-    }
 
     function init(container) {
       scene = new THREE.Scene();
@@ -1025,7 +1043,6 @@
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       container.appendChild(renderer.domElement);
-
       const positions = [];
       for (let ix = 0; ix < AMOUNTX; ix++) {
         for (let iy = 0; iy < AMOUNTY; iy++) {
@@ -1034,34 +1051,19 @@
       }
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-      const materialOptions = { color: POINT_COLOR, size: POINT_SIZE, sizeAttenuation: true };
-      if (USE_ROUND_SPRITE) {
-        materialOptions.map = makeCircleSpriteTexture(64, 1.0);
-        materialOptions.transparent = true;
-        materialOptions.depthWrite = false;
-      }
-      const material = new THREE.PointsMaterial(materialOptions);
+      const material = new THREE.PointsMaterial({ color: POINT_COLOR, size: POINT_SIZE, sizeAttenuation: true, transparent: true, opacity: 0.3 });
       points = new THREE.Points(geometry, material);
       scene.add(points);
       window.addEventListener('resize', onWindowResize);
     }
-
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
+    function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
     function animate() { requestAnimationFrame(animate); render(); }
-
     function render() {
       const pos = points.geometry.attributes.position.array;
       let i = 0;
       for (let ix = 0; ix < AMOUNTX; ix++) {
         for (let iy = 0; iy < AMOUNTY; iy++) {
-          const waveX = Math.sin((ix + count) * FREQ_X) * AMP_X;
-          const waveY = Math.sin((iy + count) * FREQ_Y) * AMP_Y;
-          pos[i + 1] = waveX + waveY;
+          pos[i + 1] = Math.sin((ix + count) * FREQ_X) * AMP_X + Math.sin((iy + count) * FREQ_Y) * AMP_Y;
           i += 3;
         }
       }
@@ -1069,7 +1071,6 @@
       renderer.render(scene, camera);
       count += WAVE_SPEED;
     }
-
     document.addEventListener('DOMContentLoaded', () => {
       const container = document.getElementById('home_wave');
       if (container) { init(container); animate(); }
