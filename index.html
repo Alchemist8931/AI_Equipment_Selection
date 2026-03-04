@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>Relative Parallel — Redesigned</title>
+  <!-- Шрифты -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  
   <style>
     :root {
       --form-width: 900px;
       --form-height: 900px;
       --overlay-width: 385px;
-      --content-width: 1300px; /* Фиксированная ширина контента */
+      --content-width: 1300px; /* Фиксированная ширина контента из задания */
       
       --loader-line-color: #000000;
       --loader-line-width: 10px;
@@ -24,20 +26,14 @@
       --gray-medium: #e0e0e0;
       --content-color: #000000;
       
-      --accent: #000000; /* Черно-белая тема */
       --radius: 12px;
       --shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       font-family: 'Montserrat', sans-serif;
       background: var(--fon);
       color: var(--content-color);
@@ -46,21 +42,15 @@
 
     /* --- Прелоадер --- */
     #preloader {
-      position: fixed;
-      top: 50%; left: 50%;
+      position: fixed; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      display: flex; gap: 10px;
-      z-index: 9999;
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.5s;
+      display: flex; gap: 10px; z-index: 9999;
+      opacity: 0; visibility: hidden; transition: opacity 0.5s;
     }
     #preloader.visible { opacity: 1; visibility: visible; }
     #preloader .line {
-      width: var(--loader-line-width);
-      height: var(--loader-line-height);
-      background: var(--content-color);
-      animation: bounce 1.5s infinite ease-in-out;
-      border-radius: 4px;
+      width: var(--loader-line-width); height: var(--loader-line-height);
+      background: var(--content-color); animation: bounce 1.5s infinite ease-in-out; border-radius: 4px;
     }
     #preloader .line:nth-child(2) { animation-delay: 0.3s; }
     #preloader .line:nth-child(3) { animation-delay: 0.6s; }
@@ -75,190 +65,103 @@
     /* --- Меню --- */
     #side-menu { display: none; }
     .navigation {
-      position: fixed;
-      top: 20px; left: 20px;
-      height: calc(100vh - 40px);
-      width: 70px;
-      background: rgba(255,255,255,0.8);
-      backdrop-filter: blur(10px);
-      border: 1px solid #e0e0e0;
-      border-radius: var(--radius);
-      z-index: 1200;
-      box-shadow: var(--shadow);
+      position: fixed; top: 20px; left: 20px;
+      height: calc(100vh - 40px); width: 70px;
+      background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
+      border: 1px solid #e0e0e0; border-radius: var(--radius);
+      z-index: 1200; box-shadow: var(--shadow);
     }
-    .navigation ul {
-      position: relative;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      padding: 10px 0;
-    }
+    .navigation ul { position: relative; width: 100%; display: flex; flex-direction: column; padding: 10px 0; }
     .navigation ul li {
-      list-style: none;
-      width: 100%;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: 0.3s;
+      list-style: none; width: 100%; height: 60px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: 0.3s;
     }
     .navigation ul li:hover { background: var(--gray-light); }
     .navigation ul li.active { background: var(--black); }
     .navigation ul li.active .material-symbols-outlined { color: var(--fon); }
     
-    /* Подсказки */
     .navbar__item a .title {
-      position: absolute;
-      left: 70px;
-      background: var(--black);
-      color: var(--fon);
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 500;
-      white-space: nowrap;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-      z-index: 10;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      position: absolute; left: 70px;
+      background: var(--black); color: var(--fon);
+      padding: 6px 12px; border-radius: 4px;
+      font-size: 12px; font-weight: 500; white-space: nowrap;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      z-index: 10; text-transform: uppercase; letter-spacing: 1px;
     }
     .navigation ul li:hover a .title { opacity: 1; }
 
     /* --- Логин/Регистрация --- */
     #login-wrapper {
       width: 100%; height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      transition: opacity 0.5s;
+      display: flex; justify-content: center; align-items: center;
+      opacity: 0; transition: opacity 0.5s;
     }
     #login-wrapper.show { opacity: 1; }
     
     .container {
-      width: var(--form-width);
-      height: var(--form-height);
-      position: relative;
-      background: var(--fon);
-      border: 1px solid #e0e0e0;
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      display: flex;
+      width: var(--form-width); height: var(--form-height);
+      position: relative; background: var(--fon);
+      border: 1px solid #e0e0e0; border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow); display: flex;
     }
 
     .overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: var(--overlay-width);
-      height: 100%;
-      background: var(--black);
-      color: var(--fon);
-      z-index: 2;
-      transition: left 0.8s cubic-bezier(0.86, 0, 0.07, 1);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 40px;
+      position: absolute; top: 0; left: 0;
+      width: var(--overlay-width); height: 100%;
+      background: var(--black); color: var(--fon);
+      z-index: 2; transition: left 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+      display: flex; flex-direction: column; justify-content: center; padding: 40px;
     }
-    .overlay.open-sign-up {
-      left: calc(var(--form-width) - var(--overlay-width));
-    }
+    .overlay.open-sign-up { left: calc(var(--form-width) - var(--overlay-width)); }
 
     .form {
-      position: absolute;
-      top: 0; left: 0;
+      position: absolute; top: 0; left: 0;
       width: 100%; height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      display: flex; justify-content: center; align-items: center;
     }
     .form .sign-in, .form .sign-up {
-      width: 50%;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      width: 50%; padding: 40px;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
       transition: opacity 0.3s;
     }
-    .form .sign-up { display: none; opacity: 0; }
-    .form .sign-up.show { display: flex; opacity: 1; }
+    .form .sign-in { display: none; opacity: 0; }
+    .form .sign-in.show { display: flex; opacity: 1; }
+    .form .sign-up { display: flex; opacity: 1; } /* По умолчанию форма входа */
+    .form .sign-up.hide { display: none; opacity: 0; }
 
-    .modalFORM {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      width: 100%;
-      max-width: 380px;
-    }
-    .modalFORM h3 {
-      font-size: 18px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
+    .modalFORM { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 380px; }
+    .modalFORM h3 { font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; text-align: center; }
     
-    /* Modern Inputs */
     .inputField {
-      width: 100%;
-      padding: 15px;
-      border: 1px solid var(--gray-medium);
-      border-radius: 4px;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 14px;
-      transition: all 0.3s;
-      background: transparent;
+      width: 100%; padding: 15px;
+      border: 1px solid var(--gray-medium); border-radius: 4px;
+      font-family: 'Montserrat', sans-serif; font-size: 14px;
+      transition: all 0.3s; background: transparent;
     }
-    .inputField:focus {
-      outline: none;
-      border-color: var(--black);
-      box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
-    }
+    .inputField:focus { outline: none; border-color: var(--black); box-shadow: 0 0 0 2px rgba(0,0,0,0.05); }
 
     .button-submit {
-      width: 100%;
-      padding: 15px;
-      background: var(--black);
-      color: var(--fon);
-      border: none;
-      border-radius: 4px;
-      font-weight: 600;
-      font-size: 14px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%; padding: 15px;
+      background: var(--black); color: var(--fon);
+      border: none; border-radius: 4px;
+      font-weight: 600; font-size: 14px; text-transform: uppercase;
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
     }
-    .button-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
+    .button-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
     
     .button-submit2 {
-      background: transparent;
-      border: 1px solid var(--fon);
-      color: var(--fon);
-      padding: 12px 20px;
-      width: 100%;
-      border-radius: 4px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: 0.3s;
-      margin-top: 20px;
+      background: transparent; border: 1px solid var(--fon);
+      color: var(--fon); padding: 12px 20px; width: 100%;
+      border-radius: 4px; font-weight: 500; cursor: pointer;
+      transition: 0.3s; margin-top: 20px;
     }
-    .button-submit2:hover {
-      background: rgba(255,255,255,0.1);
-    }
+    .button-submit2:hover { background: rgba(255,255,255,0.1); }
 
     /* --- Модальное окно контента --- */
     .modal-window {
-      position: fixed;
-      top: 50%; left: 50%;
+      position: fixed; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       width: var(--content-width); /* 1300px */
       height: calc(100vh - 40px);
@@ -266,228 +169,52 @@
       border: 1px solid #e0e0e0;
       border-radius: var(--radius);
       z-index: 1100;
-      display: none;
-      flex-direction: column;
+      display: none; flex-direction: column;
       overflow: hidden;
       box-shadow: 0 20px 50px rgba(0,0,0,0.1);
     }
 
     .content-area {
-      width: 100%;
-      height: 100%;
-      padding: 40px;
-      overflow-y: auto;
-      opacity: 0;
-      transition: opacity 0.5s;
+      width: 100%; height: 100%;
+      padding: 40px; overflow-y: auto;
+      opacity: 0; transition: opacity 0.5s;
     }
     .content-area.visible { opacity: 1; }
 
-    /* --- Стили Нового Интерфейса Спецификации --- */
+    /* --- Оверлей потери соединения --- */
+    #db-disconnect-overlay {
+      position: fixed; inset: 0;
+      background: rgba(255,255,255,0.95);
+      display: none; justify-content: center; align-items: center;
+      z-index: 2000; flex-direction: column; gap: 20px;
+    }
+    #db-disconnect-overlay.show { display: flex; }
     
-    /* Заголовок списка */
-    .spec-header-row {
-      display: flex;
-      padding: 0 20px 20px 0;
-      border-bottom: 2px solid var(--black);
-      margin-bottom: 20px;
-      font-weight: 700;
-      text-transform: uppercase;
-      font-size: 12px;
-      letter-spacing: 1px;
-    }
-    
-    /* Контейнер строки */
-    .spec-row-item {
-      display: flex;
-      align-items: flex-start;
-      margin-bottom: 30px;
-      padding-bottom: 30px;
-      border-bottom: 1px solid var(--gray-medium);
-      gap: 30px;
-    }
-
-    /* Левая часть: Номер, Имя, Кол-во */
-    .spec-left-block {
-      width: 400px;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .spec-id-name-qty {
-      display: flex;
-      gap: 15px;
-      align-items: flex-end;
-    }
-    .spec-pos-num {
-      font-size: 48px;
-      font-weight: 800;
-      color: var(--black);
-      line-height: 1;
-      min-width: 60px;
-    }
-    .spec-main-info {
-      flex: 1;
-    }
-    .spec-name {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-    .spec-qty {
-      font-size: 14px;
-      color: #666;
-    }
-
-    /* Средняя часть: Параметры */
-    .spec-params-block {
-      width: 350px;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-size: 13px;
-      border-left: 1px solid var(--gray-medium);
-      padding-left: 30px;
-    }
-    .param-row {
-      display: flex;
-      gap: 10px;
-    }
-    .param-key {
-      color: #888;
-      min-width: 100px;
-    }
-    .param-val {
-      font-weight: 600;
-      color: var(--black);
-    }
-
-    /* Правая часть: Слайдер (Блоки) */
-    .spec-right-block {
-      flex: 1;
-      min-width: 400px;
-    }
-    
-    /* --- Слайдер (Интеграция из примера) --- */
-    .slideshow-container {
-      position: relative;
-      width: 100%;
-      height: 250px; /* Фиксированная высота для строки */
-      overflow: hidden;
-      border-radius: 8px;
-      background: #f0f0f0;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .slide {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 1s ease;
-    }
-    .slide.active {
-      opacity: 1;
-      pointer-events: auto;
-      z-index: 1;
-    }
-    .slide img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scale(1.1);
-      filter: grayscale(100%) contrast(1.1) brightness(0.9);
-      transition: transform 7s ease;
-    }
-    .slide.active img { transform: scale(1); }
-    
-    .overlay-slide {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-      z-index: 1;
-    }
-    .caption {
-      position: absolute;
-      bottom: 20px; left: 20px;
-      color: #fff;
-      font-size: 14px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 1s ease 0.5s;
-      z-index: 2;
-    }
-    .slide.active .caption {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .prev, .next {
-      cursor: pointer;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #fff;
-      font-size: 20px;
-      padding: 10px;
-      background: rgba(0,0,0,0.3);
-      backdrop-filter: blur(4px);
-      border-radius: 50%;
-      z-index: 3;
-      user-select: none;
-      transition: 0.3s;
-    }
-    .prev { left: 10px; }
-    .next { right: 10px; }
-    .prev:hover, .next:hover { background: rgba(0,0,0,0.7); }
-    
-    .dots-container {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 8px;
-      z-index: 3;
-    }
-    .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.4);
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .dot.active {
-      background: #fff;
-      transform: scale(1.3);
-    }
-
-    /* --- Утилиты --- */
-    .input-container { position: relative; width: 100%; margin-bottom: 15px; }
-    .lines-loader { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); gap: 10px; }
-    .lines-loader.visible { display: flex; }
-    #db-disconnect-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; }
+    /* Фон волны */
     #home_wave { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-
-    /* Кнопки действий */
-    .action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: transparent;
-      border: 1px solid var(--black);
-      color: var(--black);
-      font-size: 12px;
-      font-weight: 600;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: 0.3s;
-      text-transform: uppercase;
+    
+    /* Стили для динамически подгружаемого контента (modal9 и т.д.) */
+    /* Адаптация старых стилей под новую тему внутри .content-area */
+    .content-area .glass3d {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid #e0e0e0;
+      backdrop-filter: blur(3px);
+      box-shadow: var(--shadow);
     }
-    .action-btn:hover { background: var(--black); color: var(--fon); }
-    .actions-row { margin-bottom: 40px; display: flex; gap: 15px; }
+    .content-area .input-container { margin-bottom: 15px; }
+    .content-area .styled_input_bar {
+      width: 100%; padding: 12px;
+      border: 1px solid var(--gray-medium);
+      border-radius: 4px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      background: transparent;
+      transition: 0.3s;
+    }
+    .content-area .styled_input_bar:focus { border-color: var(--black); outline: none; }
+    .content-area .input-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #888;
+    }
 
   </style>
 </head>
@@ -500,7 +227,14 @@
   </div>
 
   <div id="db-disconnect-overlay">
-    <p style="font-weight: 600; text-transform: uppercase;">Потеря соединения...</p>
+    <div class="loading-wave">
+       <!-- Анимация из вашего кода -->
+      <div class="loading-bar" style="width:20px; height:40px; background:#000; animation: loading-wave-animation 1s ease-in-out infinite;"></div>
+      <div class="loading-bar" style="width:20px; height:40px; background:#000; animation: loading-wave-animation 1s ease-in-out infinite 0.1s;"></div>
+      <div class="loading-bar" style="width:20px; height:40px; background:#000; animation: loading-wave-animation 1s ease-in-out infinite 0.2s;"></div>
+      <div class="loading-bar" style="width:20px; height:40px; background:#000; animation: loading-wave-animation 1s ease-in-out infinite 0.3s;"></div>
+    </div>
+    <p style="font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Проверка соединения...</p>
   </div>
 
   <!-- Меню -->
@@ -516,7 +250,7 @@
         <li class="navbar__item" data-levels="PAGE10" data-modal="modal10">
           <a href="#"><span class="material-symbols-outlined">forum</span><span class="title">Support</span></a>
         </li>
-        <!-- Остальные пункты меню скрыты для краткости, но работают по тому же принципу -->
+        <!-- Остальные пункты меню можно добавить аналогично -->
         <div class="indicator" style="display:none;"></div>
       </ul>
     </div>
@@ -524,8 +258,10 @@
 
   <!-- Правое модальное окно -->
   <div id="right-modal" class="modal-window">
-    <div class="lines-loader" id="linesLoader">
-      <div class="line"></div><div class="line"></div><div class="line"></div>
+    <div class="lines-loader" id="linesLoader" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); display:none;">
+      <div class="line" style="width:10px; height:70px; background:#000; margin:2px; border-radius:4px;"></div>
+      <div class="line" style="width:10px; height:70px; background:#000; margin:2px; border-radius:4px;"></div>
+      <div class="line" style="width:10px; height:70px; background:#000; margin:2px; border-radius:4px;"></div>
     </div>
     <div class="content-area" id="modalContentArea"></div>
   </div>
@@ -535,22 +271,22 @@
     <div class="container">
       <div class="overlay" id="overlay">
         <div class="sign-in">
-          <h3>Добро пожаловать</h3>
-          <p style="font-size: 13px; opacity: 0.8; margin-bottom: 20px;">Нет аккаунта? Зарегистрируйтесь.</p>
+          <h3 style="font-size: 24px; font-weight: 300; margin-bottom: 10px;">Добро пожаловать</h3>
+          <p style="font-size: 13px; opacity: 0.8; margin-bottom: 30px;">Нет аккаунта? Зарегистрируйтесь.</p>
           <button class="button-submit2" id="slide-right-button">Создать аккаунт</button>
         </div>
         <div class="sign-up" style="display:none;">
-          <h3>С возвращением</h3>
-          <p style="font-size: 13px; opacity: 0.8; margin-bottom: 20px;">Уже зарегистрированы? Войдите.</p>
+          <h3 style="font-size: 24px; font-weight: 300; margin-bottom: 10px;">С возвращением</h3>
+          <p style="font-size: 13px; opacity: 0.8; margin-bottom: 30px;">Уже зарегистрированы? Войдите.</p>
           <button class="button-submit2" id="slide-left-button">Войти</button>
         </div>
       </div>
       
       <div class="form">
-        <!-- Регистрация -->
-        <div class="sign-in" id="sign-in-info" style="display:none; opacity:0;">
+        <!-- Регистрация (показывается при overlay.open-sign-up) -->
+        <div class="sign-in" id="sign-in-info">
           <form id="registration-form" class="modalFORM">
-            <h3>Регистрация</h3>
+            <h3 style="color: #000;">Регистрация</h3>
             <input class="inputField" placeholder="Фамилия" name="lastname"/>
             <input class="inputField" placeholder="Имя" name="firstname"/>
             <input class="inputField" placeholder="Email" name="email"/>
@@ -558,10 +294,10 @@
             <button type="button" class="button-submit" id="regBtn">Зарегистрироваться</button>
           </form>
         </div>
-        <!-- Вход -->
+        <!-- Вход (по умолчанию) -->
         <div class="sign-up show" id="sign-up-info">
           <form id="login-form" class="modalFORM">
-            <h3>Вход</h3>
+            <h3 style="color: #000;">Вход</h3>
             <input class="inputField" id="loginEmail" placeholder="Email" autocomplete="username"/>
             <input class="inputField" id="loginPassword" type="password" placeholder="Пароль" autocomplete="current-password"/>
             <button type="button" class="button-submit" id="loginBtn">Войти</button>
@@ -571,110 +307,209 @@
     </div>
   </div>
 
-  <!-- Шаблон Modal 9 (Встроен в файл) -->
-  <script type="text/template" id="tpl-modal9">
-    <div id="modal9-dynamic-root">
-      <div class="actions-row">
-        <button class="action-btn" id="btn-load-spec">
-          <span class="material-symbols-outlined" style="font-size:16px;">refresh</span>
-          Загрузить спецификации
-        </button>
-        <button class="action-btn" id="btn-add-dummy">
-          <span class="material-symbols-outlined" style="font-size:16px;">add</span>
-          Добавить демо-строку
-        </button>
-      </div>
-
-      <div class="spec-header-row">
-        <div style="width: 400px;">Позиция</div>
-        <div style="width: 350px; padding-left: 30px;">Параметры</div>
-        <div style="flex: 1;">Визуализация / Блоки</div>
-      </div>
-
-      <div id="specs-container"></div>
-    </div>
-  </script>
-
   <!-- Основной скрипт -->
   <script type="module">
-    import { createClient } from "https://jviswahajwmwibedxcll.supabase.co/functions/v1/vendor/supabase-client.js/index.js"; // Упрощенный импорт для примера, используйте свой путь
-    
-    // ВАЖНО: Если среда выполнения не поддерживает ES модули по ссылке, используйте ваш локальный путь.
-    // Для корректной работы в едином файле предположим, что supabase клиент доступен глобально или через импорт.
-    // В данном коде я использую заглушку для Supabase, чтобы код работал без реального бэкенда для демонстрации UI.
-    
-    // === Эмуляция Supabase для демонстрации UI (замените на ваш реальный код инициализации) ===
-    // window.supabase = createClient('URL', 'KEY'); 
-    
-    const mockData = [
-      { id: 1, name: 'Сервер HP ProLiant DL380', qty: 5, unit: 'шт.', params: [
-          {k:'CPU', v:'Intel Xeon Gold'}, {k:'RAM', v:'64GB DDR4'}, {k:'Storage', v:'4x 1.2TB SAS'}
-        ] 
-      },
-      { id: 2, name: 'Монитор Dell UltraSharp 27"', qty: 10, unit: 'шт.', params: [
-          {k:'Resolution', v:'4K UHD'}, {k:'Panel', v:'IPS'}, {k:'Brightness', v:'350 cd/m²'}
-        ]
-      }
-    ];
+    // === ИСПРАВЛЕННЫЙ ИМПОРТ ===
+    // Используем надежный CDN для Supabase v2
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-    // === Логика Приложения ===
-    
+    window.SUPABASE_URL = 'https://jviswahajwmwibedxcll.supabase.co';
+    window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2aXN3YWhhandtd2liZWR4Y2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMzU5NDcsImV4cCI6MjA2NDkxMTk0N30.Bkgknn8BAhlUp429fhyOErV-afbPkfcneTdVhKwgn7c';
+
+    const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    window.supabase = supabase;
+
+    // === DOM Элементы ===
     const preloader = document.getElementById('preloader');
     const loginWrapper = document.getElementById('login-wrapper');
     const sideMenu = document.getElementById('side-menu');
+    const overlay = document.getElementById('overlay');
+    const registrationForm = document.getElementById('sign-in-info');
+    const loginForm = document.getElementById('sign-up-info');
+    const slideRightBtn = document.getElementById('slide-right-button');
+    const slideLeftBtn = document.getElementById('slide-left-button');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginBtn = document.getElementById('loginBtn');
+    const regBtn = document.getElementById('regBtn');
     const rightModal = document.getElementById('right-modal');
+    const linesLoader = document.getElementById('linesLoader');
     const modalContentArea = document.getElementById('modalContentArea');
+    const dbOverlay = document.getElementById('db-disconnect-overlay');
 
-    // 1. Инициализация
+    // === Вспомогательные функции ===
+    async function hashPassword(str) {
+      const enc = new TextEncoder().encode(str);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    window.hashPassword = hashPassword;
+
+    // === Инициализация при загрузке ===
     document.addEventListener('DOMContentLoaded', () => {
       preloader.classList.add('visible');
       setTimeout(() => {
         preloader.classList.remove('visible');
         loginWrapper.classList.add('show');
+        document.body.style.overflow = 'auto';
+        // По умолчанию показываем форму ВХОДА
+        registrationForm.style.display = 'none';
+        loginForm.style.display = 'flex';
       }, 1500);
     });
 
-    // 2. Анимация входа
-    const overlay = document.getElementById('overlay');
-    const signInForm = document.getElementById('sign-in-info');
-    const signUpForm = document.getElementById('sign-up-info');
+    // === Переключение форм ===
+    function toggleOverlay(toSignUp) {
+      if (toSignUp) {
+        overlay.classList.add('open-sign-up');
+        overlay.querySelector('.sign-in').style.display = 'none';
+        overlay.querySelector('.sign-up').style.display = 'flex';
+        
+        loginForm.style.display = 'none';
+        registrationForm.style.display = 'flex';
+      } else {
+        overlay.classList.remove('open-sign-up');
+        overlay.querySelector('.sign-in').style.display = 'flex';
+        overlay.querySelector('.sign-up').style.display = 'none';
+        
+        registrationForm.style.display = 'none';
+        loginForm.style.display = 'flex';
+      }
+    }
+    slideRightBtn.addEventListener('click', () => toggleOverlay(true));
+    slideLeftBtn.addEventListener('click', () => toggleOverlay(false));
 
-    document.getElementById('slide-right-button').addEventListener('click', () => {
-      overlay.classList.add('open-sign-up');
-      overlay.querySelector('.sign-in').style.display = 'none';
-      overlay.querySelector('.sign-up').style.display = 'flex';
+    // === ЛОГИКА АВТОРИЗАЦИИ (Восстановлено из вашего кода) ===
+    loginBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = loginEmail.value.trim();
+      const pass = loginPassword.value.trim();
+      if (!email || !pass) {
+        alert('Пожалуйста, введите логин и пароль');
+        return;
+      }
       
-      signUpForm.classList.remove('show');
-      signUpForm.style.display = 'none';
-      signInForm.style.display = 'flex';
-      setTimeout(() => signInForm.style.opacity = 1, 50);
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = 'Загрузка...';
+
+      try {
+        const user = await checkLoginCustom(email, pass);
+        if (!user) {
+          alert('Неверный логин или пароль');
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = 'Войти';
+          return;
+        }
+        
+        const { data: ld, error: loginErr } = await supabase.auth.signInWithPassword({ email, password: pass });
+        if (loginErr) throw loginErr;
+
+        // Сохраняем данные
+        window.companyId = user.company_id;
+        window.companyName = user.company_name;
+        window.LOCAL_USER_ID = user.id;
+        window.AUTH_ID = ld?.user?.id || user.id;
+        window.USER_KEY = user.user_key || window.AUTH_ID || user.id || '';
+        window.IS_ADMIN = user.is_admin;
+        window.USER_LEVELS = user.menu_levels || '';
+        window.USER_LOGIN = user.login || user.email || user.last_name || '';
+
+        filterMenuByUserLevels(user.menu_levels || '');
+        
+        // Скрываем логин, показываем приложение
+        loginWrapper.classList.remove('show');
+        preloader.style.display = 'flex';
+        preloader.classList.add('visible');
+        
+        setTimeout(() => {
+          preloader.classList.remove('visible');
+          sideMenu.style.display = 'block';
+          initNavigation();
+        }, 1000);
+
+      } catch (err) {
+        console.error(err);
+        alert('Ошибка авторизации: ' + err.message);
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = 'Войти';
+      }
     });
 
-    document.getElementById('slide-left-button').addEventListener('click', () => {
-      overlay.classList.remove('open-sign-up');
-      overlay.querySelector('.sign-in').style.display = 'flex';
-      overlay.querySelector('.sign-up').style.display = 'none';
-      
-      signInForm.style.opacity = 0;
-      setTimeout(() => signInForm.style.display = 'none', 300);
-      signUpForm.style.display = 'flex';
-      setTimeout(() => signUpForm.classList.add('show'), 50);
-    });
+    async function checkLoginCustom(email, password) {
+      const pass_hash = await hashPassword(password);
+      try {
+        // Проверка админа
+        let { data: adminData } = await supabase.from('administrators').select('*').eq('email', email).single();
+        if (adminData && adminData.pass === pass_hash) return { ...adminData, is_admin: true };
+        
+        // Проверка сотрудника
+        let { data: empData } = await supabase.from('employees').select('*').eq('email', email).single();
+        if (empData && empData.pass === pass_hash) return { ...empData, is_admin: false };
+        
+        return null;
+      } catch (err) {
+        console.error(err);
+        return null;
+      }
+    }
 
-    // 3. Вход (Mock)
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      // Здесь должен быть ваш код авторизации Supabase
-      // Для демонстрации пропускаем проверку
-      loginWrapper.classList.remove('show');
-      sideMenu.style.display = 'block';
-      initNavigation();
-    });
+    function filterMenuByUserLevels(userLevels) {
+      const userKeys = userLevels.split(',').map(key => key.trim().toUpperCase());
+      const menuItems = document.querySelectorAll('.navbar__item');
+      menuItems.forEach(item => {
+        const levelsAttr = item.getAttribute('data-levels');
+        if (levelsAttr) {
+          const itemLevels = levelsAttr.split(',').map(key => key.trim().toUpperCase());
+          const hasAccess = itemLevels.every(level => userKeys.includes(level));
+          item.style.display = hasAccess ? '' : 'none';
+        }
+      });
+    }
 
-    document.getElementById('regBtn').addEventListener('click', () => {
-      alert('Форма регистрации отправлена (Mock)');
-    });
+    // === ЛОГИКА РЕГИСТРАЦИИ (Восстановлено) ===
+    if (regBtn) {
+      regBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        regBtn.disabled = true;
+        regBtn.innerHTML = 'Отправка...';
+        
+        const formData = new FormData(document.getElementById('registration-form'));
+        const data = {
+          lastname: formData.get('lastname'),
+          firstname: formData.get('firstname'),
+          email: formData.get('email'),
+          password: formData.get('password')
+        };
 
-    // 4. Навигация и загрузка страниц
+        try {
+          const companyId = crypto.randomUUID();
+          const companyName = 'Company NAME';
+          const pass_hash = await hashPassword(data.password);
+          
+          const { error } = await supabase.from('administrators').insert([{
+            last_name: data.lastname,
+            first_name: data.firstname,
+            email: data.email,
+            pass: pass_hash,
+            company_id: companyId,
+            company_name: companyName,
+            menu_levels: 'PAGE1,PAGE9'
+          }]);
+          
+          if (error) throw error;
+          
+          alert('Регистрация успешна! Пожалуйста, войдите.');
+          toggleOverlay(false); // Вернуться к форме входа
+        } catch (err) {
+          alert('Ошибка регистрации: ' + err.message);
+        } finally {
+          regBtn.disabled = false;
+          regBtn.innerHTML = 'Зарегистрироваться';
+        }
+      });
+    }
+
+    // === ЗАГРУЗКА СТРАНИЦ (МОДАЛЬНЫЕ ОКНА) ===
     function initNavigation() {
       const items = document.querySelectorAll('.navbar__item');
       items.forEach(item => {
@@ -683,256 +518,125 @@
           items.forEach(i => i.classList.remove('active'));
           item.classList.add('active');
           const modalId = item.getAttribute('data-modal');
-          showModal(modalId);
+          showRightModal(modalId);
         });
       });
     }
 
-    async function showModal(pageId) {
+    window.showRightModal = async function(pageId) {
       rightModal.style.display = 'flex';
       modalContentArea.classList.remove('visible');
-      document.getElementById('linesLoader').classList.add('visible');
       modalContentArea.innerHTML = '';
+      linesLoader.style.display = 'flex'; // Показываем лоадер
 
-      // Имитация загрузки
-      await new Promise(r => setTimeout(r, 500));
+      try {
+        // Загружаем внешний HTML файл (как в вашем оригинале)
+        const url = `${pageId}.html?t=${Date.now()}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Страница не найдена: ' + url);
+        
+        const html = await response.text();
+        modalContentArea.innerHTML = html;
+        
+        // Исполняем скрипты внутри загруженного контента
+        executeScripts(modalContentArea);
+        
+        // Плавно показываем
+        setTimeout(() => {
+          linesLoader.style.display = 'none';
+          modalContentArea.classList.add('visible');
+        }, 300);
 
-      if (pageId === 'modal9') {
-        const tpl = document.getElementById('tpl-modal9');
-        if (tpl) {
-          modalContentArea.innerHTML = tpl.innerHTML;
-          initModal9Logic();
-        } else {
-          modalContentArea.innerHTML = '<p>Шаблон не найден</p>';
-        }
-      } else {
-        modalContentArea.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%; flex-direction:column;">
-            <h2 style="font-weight:300; text-transform:uppercase; letter-spacing:5px;">Страница ${pageId}</h2>
-            <p style="color:#888; margin-top:10px;">Раздел находится в разработке</p>
+      } catch (err) {
+        modalContentArea.innerHTML = `<div style="padding:40px; color:red; text-align:center;">
+          <h3>Ошибка загрузки</h3>
+          <p>${err.message}</p>
+          <p>Убедитесь, что файл ${pageId}.html существует.</p>
         </div>`;
+        linesLoader.style.display = 'none';
+        modalContentArea.classList.add('visible');
       }
-
-      document.getElementById('linesLoader').classList.remove('visible');
-      modalContentArea.classList.add('visible');
     }
 
-    // === ЛОГИКА MODAL 9 (Новый дизайн) ===
-    function initModal9Logic() {
-      const container = document.getElementById('specs-container');
-      if (!container) return;
-
-      // Кнопка добавления демо-данных
-      document.getElementById('btn-add-dummy')?.addEventListener('click', () => {
-        addRow({
-          id: Math.floor(Math.random() * 100),
-          name: 'Новое оборудование ' + Math.floor(Math.random() * 100),
-          qty: Math.floor(Math.random() * 10) + 1,
-          unit: 'шт.',
-          params: [
-            {k: 'Модель', v: 'Series X'},
-            {k: 'Гарантия', v: '3 года'},
-            {k: 'Цвет', v: 'Черный'}
-          ]
-        });
+    function executeScripts(container) {
+      const scripts = container.querySelectorAll('script');
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        newScript.textContent = oldScript.textContent;
+        document.body.appendChild(newScript);
       });
-
-      // Загрузка демо при старте
-      mockData.forEach(addRow);
-      
-      // Инициализация слайдеров для существующих элементов
-      initializeAllSliders(container);
     }
 
-    function addRow(item) {
-      const container = document.getElementById('specs-container');
-      const row = document.createElement('div');
-      row.className = 'spec-row-item';
-      row.innerHTML = `
-        <!-- Левый блок -->
-        <div class="spec-left-block">
-          <div class="spec-id-name-qty">
-            <div class="spec-pos-num">${item.id}</div>
-            <div class="spec-main-info">
-              <div class="spec-name">${item.name}</div>
-              <div class="spec-qty">${item.qty} ${item.unit}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Средний блок (Параметры) -->
-        <div class="spec-params-block">
-          ${item.params.map(p => `
-            <div class="param-row">
-              <span class="param-key">${p.k}:</span>
-              <span class="param-val">${p.v}</span>
-            </div>
-          `).join('')}
-        </div>
-
-        <!-- Правый блок (Слайдер) -->
-        <div class="spec-right-block">
-          <div class="slideshow-container">
-            <div class="slide active">
-              <img src="https://iili.io/KkPp5kQ.jpg" alt="Slide 1">
-              <div class="overlay-slide"></div>
-              <div class="caption">Парсинг данных</div>
-            </div>
-            <div class="slide">
-              <img src="https://iili.io/KkPpA2j.jpg" alt="Slide 2">
-              <div class="overlay-slide"></div>
-              <div class="caption">Анализ цен</div>
-            </div>
-            <div class="slide">
-              <img src="https://iili.io/KkPpRYx.jpg" alt="Slide 3">
-              <div class="overlay-slide"></div>
-              <div class="caption">Результаты</div>
-            </div>
-
-            <a class="prev">&#10094;</a>
-            <a class="next">&#10095;</a>
-
-            <div class="dots-container">
-              <div class="dot active" data-index="0"></div>
-              <div class="dot" data-index="1"></div>
-              <div class="dot" data-index="2"></div>
-            </div>
-          </div>
-        </div>
-      `;
-      container.appendChild(row);
-      
-      // Инициализируем слайдер только что добавленного ряда
-      const slider = row.querySelector('.slideshow-container');
-      initSingleSlider(slider);
+    // === ПРОВЕРКА СОЕДИНЕНИЯ ===
+    async function pingDatabase() {
+      try {
+        const { error } = await supabase.from('administrators').select('id').limit(1);
+        return !error;
+      } catch { return false; }
     }
-
-    // === Логика Слайдера ===
-    function initializeAllSliders(scope) {
-      scope.querySelectorAll('.slideshow-container').forEach(initSingleSlider);
-    }
-
-    function initSingleSlider(container) {
-      if (!container || container.dataset.init) return;
-      container.dataset.init = 'true';
-
-      const slides = container.querySelectorAll('.slide');
-      const dots = container.querySelectorAll('.dot');
-      const prevBtn = container.querySelector('.prev');
-      const nextBtn = container.querySelector('.next');
-      let index = 0;
-      let autoPlayTimer = null;
-
-      function showSlide(n) {
-        // Сброс предыдущего
-        slides[index].classList.remove('active');
-        dots[index].classList.remove('active');
-        
-        // Расчет индекса
-        index = (n + slides.length) % slides.length;
-        
-        // Установка нового
-        slides[index].classList.add('active');
-        dots[index].classList.add('active');
-      }
-
-      function startAutoPlay() {
-        stopAutoPlay();
-        autoPlayTimer = setInterval(() => showSlide(index + 1), 6000);
-      }
-
-      function stopAutoPlay() {
-        if (autoPlayTimer) clearInterval(autoPlayTimer);
-      }
-
-      // События
-      prevBtn.addEventListener('click', () => {
-        showSlide(index - 1);
-        startAutoPlay(); // Сброс таймера
-      });
-
-      nextBtn.addEventListener('click', () => {
-        showSlide(index + 1);
-        startAutoPlay();
-      });
-
-      dots.forEach(dot => {
-        dot.addEventListener('click', () => {
-          showSlide(parseInt(dot.dataset.index));
-          startAutoPlay();
-        });
-      });
-
-      // Пауза при наведении
-      container.addEventListener('mouseenter', stopAutoPlay);
-      container.addEventListener('mouseleave', startAutoPlay);
-
-      startAutoPlay();
-    }
-
-    // === Three.js фон (Сохранен из оригинала) ===
-    // (Код инициализации фона вынесен в конец, сохранен как есть, просто переносим в script)
     
-    const THREE_SCRIPT = document.createElement('script');
-    THREE_SCRIPT.src = 'https://unpkg.com/three@0.130.1/build/three.min.js';
-    document.body.appendChild(THREE_SCRIPT);
+    setInterval(async () => {
+      const isOk = await pingDatabase();
+      if (isOk) dbOverlay.classList.remove('show');
+      else dbOverlay.classList.add('show');
+    }, 10000);
 
-    THREE_SCRIPT.onload = () => {
-      const SEPARATION = 200, AMOUNTX = 40, AMOUNTY = 60;
-      const AMP_X = 50, AMP_Y = 50;
-      const FREQ_X = 0.3, FREQ_Y = 0.5, WAVE_SPEED = 0.025;
-      const POINT_SIZE = 10, POINT_COLOR = 0x000000; // Черные точки для черно-белой темы
-      
-      let camera, scene, renderer, points, count = 0;
+  </script>
+  
+  <!-- Three.js Фон (Восстановлен) -->
+  <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
+  <script>
+    // Настройки волны
+    const SEPARATION = 200, AMOUNTX = 40, AMOUNTY = 60;
+    const AMP_X = 50, AMP_Y = 50, FREQ_X = 0.3, FREQ_Y = 0.5, WAVE_SPEED = 0.025;
+    const POINT_SIZE = 10, POINT_COLOR = 0x000000; // Черный цвет точек
+    let camera, scene, renderer, points, count = 0;
 
-      function initWave() {
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 10000);
-        camera.position.set(0, 355, 122);
+    function initWave() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 10000);
+      camera.position.set(0, 355, 122);
+      renderer = new THREE.WebGLRenderer({ alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.getElementById('home_wave').appendChild(renderer.domElement);
 
-        renderer = new THREE.WebGLRenderer({ alpha: true });
+      const positions = [];
+      for (let ix = 0; ix < AMOUNTX; ix++) {
+        for (let iy = 0; iy < AMOUNTY; iy++) {
+          positions.push(ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2), 0, iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2));
+        }
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      const material = new THREE.PointsMaterial({ color: POINT_COLOR, size: POINT_SIZE, sizeAttenuation: true });
+      points = new THREE.Points(geometry, material);
+      scene.add(points);
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('home_wave').appendChild(renderer.domElement);
+      });
+      animateWave();
+    }
 
-        const positions = [];
-        for (let ix = 0; ix < AMOUNTX; ix++) {
-          for (let iy = 0; iy < AMOUNTY; iy++) {
-            positions.push(ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2), 0, iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2));
-          }
+    function animateWave() {
+      requestAnimationFrame(animateWave);
+      const pos = points.geometry.attributes.position.array;
+      let i = 0;
+      for (let ix = 0; ix < AMOUNTX; ix++) {
+        for (let iy = 0; iy < AMOUNTY; iy++) {
+          pos[i + 1] = (Math.sin((ix + count) * FREQ_X) * AMP_X) + (Math.sin((iy + count) * FREQ_Y) * AMP_Y);
+          i += 3;
         }
-
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-
-        const material = new THREE.PointsMaterial({ color: POINT_COLOR, size: POINT_SIZE, sizeAttenuation: true });
-        points = new THREE.Points(geometry, material);
-        scene.add(points);
-
-        window.addEventListener('resize', () => {
-          camera.aspect = window.innerWidth / window.innerHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-        animateWave();
       }
-
-      function animateWave() {
-        requestAnimationFrame(animateWave);
-        const pos = points.geometry.attributes.position.array;
-        let i = 0;
-        for (let ix = 0; ix < AMOUNTX; ix++) {
-          for (let iy = 0; iy < AMOUNTY; iy++) {
-            pos[i + 1] = (Math.sin((ix + count) * FREQ_X) * AMP_X) + (Math.sin((iy + count) * FREQ_Y) * AMP_Y);
-            i += 3;
-          }
-        }
-        points.geometry.attributes.position.needsUpdate = true;
-        renderer.render(scene, camera);
-        count += WAVE_SPEED;
-      }
-      
-      initWave();
-    };
-
+      points.geometry.attributes.position.needsUpdate = true;
+      renderer.render(scene, camera);
+      count += WAVE_SPEED;
+    }
+    
+    document.addEventListener('DOMContentLoaded', initWave);
   </script>
 </body>
 </html>
