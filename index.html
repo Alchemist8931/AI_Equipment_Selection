@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
   
-    <style>
+  <style>
     :root {
       --bg-primary: #f8f9fa;
       --bg-card: #ffffff;
@@ -23,8 +23,6 @@
       --error: #ef4444;
       --tab-bg: #e8e8e8;
       --tab-active: #ffffff;
-      
-      /* Keep existing structural vars */
       --form-width: 900px;
       --form-height: 900px;
       --overlay-width: 385px;
@@ -42,7 +40,6 @@
       font-family: 'SN Pro', sans-serif;
     }
 
-    /* Main Containers */
     .glass3d {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -100,7 +97,7 @@
     .spec-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease; z-index: 10; }
     .spec-modal.visible { opacity: 1; visibility: visible; }
 
-    /* Top Window - Layout: Top 20px, Padding 10px */
+    /* Top Window - Single Row Layout */
     .modal9-top-window { 
       color: var(--text-primary); 
       position: fixed; 
@@ -108,18 +105,23 @@
       left: 50%; 
       transform: translateX(-50%); 
       width: calc(100% - 40px); 
-      height: 140px; 
-      padding: 10px; 
+      height: 60px; /* Reduced height */
+      padding: 10px 15px; 
       box-sizing: border-box; 
       z-index: 30; 
     }
-    .modal9-top-body { display: flex; flex-direction: column; gap: 12px; height: 100%; }
     
-    /* Tabs */
-    nav.nav_copy { display:flex; gap:2px; position:relative; background: var(--tab-bg); border-radius:6px; overflow:hidden; width: 300px; height: 32px; border: 1px solid var(--border-color); }
-    nav.nav_copy .slider { position:absolute; top:0; left:0; width:49%; height:100%; background: var(--tab-active); border-radius:4px; transition:left 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    nav.nav_copy .tab { flex:1; text-align:center; color: var(--text-secondary); z-index:1; padding:6px 12px; cursor:pointer; transition:color 0.3s; user-select:none; font-size: 13px; font-weight: 500; }
-    nav.nav_copy .tab.active { color: var(--text-primary); }
+    /* Flex container for single row */
+    .modal9-top-body { 
+      display: flex; 
+      flex-direction: row; 
+      align-items: center; 
+      gap: 15px; 
+      height: 100%; 
+    }
+
+    /* Tabs (Hidden via CSS but kept in DOM if needed, or remove if not used. Assuming used for page switching) */
+    nav.nav_copy { display: none; } /* Hidden as per request to unify top bar, or can be shown if part of the row. Assuming hidden for cleaner look based on 'single line' request. */
     
     .spec-history-list { width: 100%; margin-top: 0; overflow-x: auto; overflow-y: hidden; height: 100%; }
     .spec-history-item { display:flex; justify-content:space-between; padding:4px 8px; transition: background 0.2s; border-radius: 4px; }
@@ -128,7 +130,7 @@
     .history-controls { width:100%; display:flex; justify-content:center; margin-top:8px; }
     .history-load-more { min-width:200px; display:inline-flex; align-items:center; justify-content:center; }
 
-    .input-container { position: relative; width: auto; }
+    .input-container { position: relative; width: auto; flex-shrink: 0; }
     .status-field-wrapper { display: inline-flex; align-items: center; gap: 6px; }
     .status-icon { font-family: 'Material Symbols Outlined'; font-size: 20px; line-height: 1; color: var(--text-muted); transition: color 0.3s ease; user-select: none; }
     .input-container.overflow::after { content: ''; position: absolute; top: 0; right: 0; width: 20px; height: 100%; pointer-events: none; background: linear-gradient(to left, var(--bg-card), transparent); }
@@ -161,11 +163,11 @@
     .fade-in { animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* Bottom Window - Layout: Top 180px (20+140+20), Bottom 20px, Padding 10px */
+    /* Bottom Window */
     .modal9-window { 
       color: var(--text-primary); 
       position: fixed; 
-      top: 180px; 
+      top: 100px; /* Adjusted for smaller top window (20 + 60 + 20) */
       bottom: 20px; 
       left: 50%; 
       transform: translateX(-50%); 
@@ -196,11 +198,12 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      white-space: nowrap; /* Prevent text wrap */
     }
     .upload-btn-main:hover { background: var(--accent-hover); }
     .upload-btn-main:disabled { opacity: 0.6; cursor: default; }
     
-    .upload-status-wrapper { display:flex; flex-direction:column; align-items:flex-start; margin-left:15px; color: var(--text-secondary); font-size: 12px; min-width: 200px; }
+    .upload-status-wrapper { display:flex; flex-direction:column; align-items:flex-start; color: var(--text-secondary); font-size: 12px; min-width: 150px; }
     
     .darkmatter-btn { background: var(--accent); border:none; color: #fff; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:background 0.2s; font-weight: 500; }
     .darkmatter-btn:hover { background: var(--accent-hover); }
@@ -210,7 +213,7 @@
     .darkmatter-btn.loading .button-text { visibility:hidden; }
     @keyframes spin { from{transform:rotate(0);} to{transform:rotate(360deg);} }
 
-    .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+    .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .toggle-slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--border-color); transition: .4s; border-radius: 20px; }
     .toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: #fff; transition: .4s; border-radius: 50%; }
@@ -243,55 +246,100 @@
     .spec-action-btn--excel { border-color: var(--success); color: var(--success); background: rgba(16, 185, 129, 0.05); }
     .spec-action-btn--excel:hover { background: var(--success); color: #fff; }
 
-    /* Updates Panel - Light Theme */
-    .modal9-updates { position: absolute; top: 10px; right: 10px; width: 300px; max-height: 40px; padding: 8px 12px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; overflow: hidden; cursor: pointer; transition: max-height 0.3s ease, box-shadow 0.3s; z-index: 5; }
-    .modal9-updates.is-expanded { max-height: 400px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-    .modal9-updates-header { display: flex; justify-content: space-between; align-items: center; }
-    .modal9-updates-title { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
-    .modal9-updates-toggle { font-size: 10px; color: var(--accent); background: none; border: none; padding: 0; cursor: pointer; font-weight: 500; }
-    .modal9-updates-body { display: none; margin-top: 8px; border-top: 1px solid var(--border-color); padding-top: 8px; }
-    .modal9-updates.is-expanded .modal9-updates-body { display: block; }
-    .modal9-update-card { padding: 8px; border-radius: 6px; background: var(--bg-primary); margin-bottom: 6px; }
-    .modal9-update-title { font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
-    .modal9-update-body { font-size: 11px; color: var(--text-secondary); line-height: 1.4; }
-
-    /* === SLIDESHOW STYLES === */
+    /* === SLIDESHOW STYLES (Dynamic Height) === */
     .slideshow-container {
       position: relative;
       width: 100%;
       min-width: 700px;
-      height: auto;
-      min-height: 250px;
-      overflow: hidden;
+      height: auto; /* Dynamic height */
+      min-height: 0; /* Reset min-height */
+      overflow: visible; /* Disable scrolls */
       border-radius: 8px;
       background: var(--bg-primary);
       border: 1px solid var(--border-color);
     }
 
-    .slide { position: relative; width: 100%; opacity: 0; pointer-events: none; transition: opacity 0.8s ease; display: none; }
-    .slide.active { opacity: 1; pointer-events: auto; display: block; }
-    .slide-content { padding: 15px; height: 100%; overflow-y: auto; max-height: 400px; }
-    .caption { padding: 8px 15px; font-size: 11px; letter-spacing: 0.5px; background: var(--bg-primary); border-top: 1px solid var(--border-color); text-align: right; color: var(--text-secondary); font-weight: 500; }
+    .slide {
+      position: relative;
+      width: 100%;
+      height: auto; /* Dynamic height */
+      opacity: 1;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      display: none; /* Hidden by default */
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      display: block; /* Show active */
+    }
+
+    .slide-content {
+      padding: 15px;
+      height: auto;
+      overflow: visible; /* Disable scrolls */
+    }
+
+    .caption {
+      padding: 8px 15px;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border-color);
+      text-align: right;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
 
     /* Navigation */
     .prev, .next {
-      cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); color: var(--text-muted);
-      font-size: 18px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
-      border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color);
-      transition: all 0.2s ease; opacity: 0.8; z-index: 3; user-select: none; font-weight: bold;
+      cursor: pointer;
+      position: absolute;
+      top: 20px; /* Fixed position at top to avoid moving with content height */
+      transform: translateY(0); 
+      color: var(--text-muted);
+      font-size: 18px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+      opacity: 0.8;
+      z-index: 3;
+      user-select: none;
+      font-weight: bold;
     }
     .prev:hover, .next:hover { opacity: 1; background: var(--accent); color: #fff; border-color: var(--accent); }
-    .prev { left: 8px; } .next { right: 8px; }
+    .prev { left: 8px; }
+    .next { right: 8px; }
 
     /* Dots */
-    .dots-container { position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 3; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-color); cursor: pointer; transition: all 0.3s ease; }
-    .dot.active { background: var(--accent); transform: scale(1.2); }
-    
-    /* Custom Scrollbar for Slides */
-    .slide-content::-webkit-scrollbar { width: 4px; }
-    .slide-content::-webkit-scrollbar-track { background: transparent; }
-    .slide-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+    .dots-container {
+      position: absolute;
+      bottom: 45px; /* Above caption */
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 3;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border-color);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .dot.active {
+      background: var(--accent);
+      transform: scale(1.2);
+    }
   </style>
 </head>
 <body>
@@ -317,27 +365,37 @@
   <div id="modal9-container" class="spec-modal">
     <div class="spec-context-menu" aria-hidden="true"><button type="button" data-action="copy">Скопировать спецификацию</button><button type="button" data-action="excel">Скачать спецификацию Excel</button></div>
     
-    <!-- Top Window -->
+    <!-- Top Window: Single Row -->
     <div class="modal9-top-window glass3d">
      <div class="modal9-top-body">
-      <div class="file-upload__modal">
-         <!-- Simplified Upload Button -->
-         <button type="button" class="upload-btn-main">
-            <span class="button-text">загрузить техническое задание</span>
-            <span class="loader"></span>
-         </button>
-         <input type="file" class="js-file__input" style="display:none" />
-         <div class="upload-status-wrapper">
-            <progress class="upload-progress spec-upload-progress" value="0" max="100" style="width:100%;display:none;"></progress>
-            <div class="upload-status"></div>
-         </div>
-      </div>
-      <div class="button-group" style="margin-top: 0; display:flex; align-items:center; gap:10px;">
-        <div class="file-filter-container input-container" style="position: relative; width: 200px;"><input id="file-filter-input" class="styled_input_bar" style="width: 100%;" /><label class="input-label">поиск</label><button class="group-close ans5-close file-filter-clear" style="display:none;">×</button></div>
-        <label class="switch"><input type="checkbox" id="my-files-toggle"><span class="toggle-slider"></span></label><span class="toggle-text" style="color: var(--text-secondary); font-size: 12px;">демонстрация файлов компании</span>
-      </div>
+        <!-- Upload Button -->
+        <button type="button" class="upload-btn-main">
+           <span class="button-text">загрузить техническое задание</span>
+           <span class="loader"></span>
+        </button>
+        <input type="file" class="js-file__input" style="display:none" />
+        
+        <!-- Status Wrapper (Flex item) -->
+        <div class="upload-status-wrapper">
+           <progress class="upload-progress spec-upload-progress" value="0" max="100" style="width:100%;display:none;"></progress>
+           <div class="upload-status"></div>
+        </div>
+
+        <!-- Spacer -->
+        <div style="flex-grow: 1;"></div>
+
+        <!-- Search -->
+        <div class="file-filter-container input-container" style="width: 200px;">
+          <input id="file-filter-input" class="styled_input_bar" style="width: 100%;" />
+          <label class="input-label">поиск</label>
+          <button class="group-close ans5-close file-filter-clear" style="display:none;">×</button>
+        </div>
+        
+        <!-- Toggle -->
+        <label class="switch"><input type="checkbox" id="my-files-toggle"><span class="toggle-slider"></span></label>
+        <span class="toggle-text" style="color: var(--text-secondary); font-size: 12px;">только мои</span>
      </div>
-     <section class="modal9-updates" aria-label="Последние обновления"><div class="modal9-updates-header"><h2 class="modal9-updates-title">обновления</h2><button type="button" class="modal9-updates-toggle" aria-expanded="false">+</button></div><div class="modal9-updates-body"><article class="modal9-update-card"><h3 class="modal9-update-title">Обновление</h3><p class="modal9-update-body">Исправления</p></article></div></section>
+     <!-- Updates Panel Removed -->
     </div>
     
     <!-- Bottom Window -->
@@ -352,7 +410,6 @@
         <div class="page spec-page" data-page="2">
           <div class="block1-wrapper"></div>
           <template id="spec-template"><div class="spec-container"><div class="spec-header"><div class="spec-title"></div><button class="group-close ans5-close" style="display:none;">×</button></div><div class="spec-content"></div></div></template>
-          <!-- Removed "Create Request" button below -->
           <template id="button-group-spec"><div class="modalRow spec-action-row"><button type="button" class="spec-action-btn spec-action-btn--excel" data-action="excel"><span class="label">скачать excel</span></button><button type="button" class="spec-action-btn spec-action-btn--copy" data-action="copy"><span class="label">скопировать</span></button></div></template>
           <template id="spec-progress-template"><div class="spec-progress multistep" style="margin-bottom: 10px;"><div class="step" data-step="1"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 1</div><button class="darkmatter-btn refresh" title="Перезапустить парсер"><span class="button-text">запуск</span><span class="loader"></span></button></div></div><div class="step" data-step="2"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 2</div><button class="darkmatter-btn refresh" title="Перезапустить селектор"><span class="button-text">запуск</span><span class="loader"></span></button></div></div><div class="step" data-step="3"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 3</div><button class="darkmatter-btn refresh" disabled><span class="button-text">запуск</span><span class="loader"></span></button></div></div></div></template>
           
@@ -427,7 +484,7 @@
     </div>
   </div>
 
-    <script type="module">
+  <script type="module">
     import { createClient } from "./vendor/supabase-client.js";
     window.SUPABASE_URL = 'https://jviswahajwmwibedxcll.supabase.co';
     window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2aXN3YWhhandtd2liZWR4Y2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMzU5NDcsImV4cCI6MjA2NDkxMTk0N30.Bkgknn8BAhlUp429fhyOErV-afbPkfcneTdVhKwgn7c';
@@ -597,11 +654,7 @@
       const block2Template = root.querySelector('#spec-block2-template');
       const block21Template = root.querySelector('#spec-block21-template');
       const attrPairTemplate = root.querySelector('#spec-attr-template');
-      const updatesPanel = root.querySelector('.modal9-updates');
-      const updatesToggle = root.querySelector('.modal9-updates-toggle');
       const contextMenu = root.querySelector('.spec-context-menu');
-      
-      // New simplified upload button
       const mainUploadBtn = root.querySelector('.upload-btn-main');
 
       const STATUS_FIELDS = new Set(['status_parser', 'status_selector', 'status_pricer']);
@@ -669,90 +722,34 @@
       function updateStatus(el, status) { if (!el) return; const s = String(status || ''); const match = s.match(/^BLOCK\s*2\s*\(\s*(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)\s*\)$/i); const display = match ? `${match[1]} / ${match[2]} / ${match[3]}` : s; if ('value' in el) el.value = display; el.textContent = display; const field = el.dataset?.field; if (field && STATUS_FIELDS.has(field)) { const rowEl = el.closest('.history-item'); if (rowEl) { applyStatusIcon(rowEl, field, display); const specId = rowEl.dataset?.specId; if (specId) updateSpecProgress(specId); } } if (display.trim().endsWith('!!!')) el.classList.add('error'); else el.classList.remove('error'); }
       function animateStatus(el, newStatus) { if (!el) return; el.classList.add('fade'); setTimeout(() => { updateStatus(el, newStatus); el.classList.remove('fade'); }, 1000); }
 
-      // Updates Panel
-      if (updatesPanel && !updatesPanel.dataset.bound) {
-        const toggleUpdatesHeight = expanded => { const next = typeof expanded === 'boolean' ? expanded : !updatesPanel.classList.contains('is-expanded'); updatesPanel.classList.toggle('is-expanded', next); if (updatesToggle) { updatesToggle.textContent = next ? '–' : '+'; } };
-        updatesPanel.addEventListener('click', event => { if (!updatesPanel.classList.contains('is-expanded')) toggleUpdatesHeight(true); });
-        if (updatesToggle) updatesToggle.addEventListener('click', event => { event.stopPropagation(); toggleUpdatesHeight(); });
-        document.addEventListener('click', event => { if (!updatesPanel.contains(event.target)) toggleUpdatesHeight(false); }, { capture: true });
-        updatesPanel.dataset.bound = 'true';
-      }
-      
       // Tabs
       tabs.forEach(tab => { tab.addEventListener('click', () => { if (tab.classList.contains('active')) return; tabs.forEach(t => t.classList.remove('active')); pages.forEach(p => p.classList.remove('active')); tab.classList.add('active'); root.querySelector(`.page[data-page="${tab.dataset.page}"]`).classList.add('active'); if (navSlider) navSlider.style.left = tab.dataset.page === '1' ? '0%' : '50%'; if (tab.dataset.page === '2') loadBlock1(); }); });
 
-      // === SIMPLIFIED FILE UPLOAD LOGIC ===
-      // Click the main button -> open file dialog
-      mainUploadBtn.addEventListener('click', () => {
-         if (mainUploadBtn.classList.contains('loading')) return;
-         fileInput.click();
-      });
-
-      // On file select -> upload immediately
+      // File Upload
+      mainUploadBtn.addEventListener('click', () => { if (mainUploadBtn.classList.contains('loading')) return; fileInput.click(); });
       fileInput.addEventListener('change', async () => {
          selectedFile = fileInput.files[0];
          if (!selectedFile) return;
-         
-         mainUploadBtn.classList.add('loading');
-         mainUploadBtn.disabled = true;
-         
+         mainUploadBtn.classList.add('loading'); mainUploadBtn.disabled = true;
          const { data: { session } } = await supabase.auth.getSession();
-         if (!session) { 
-             uploadStatus.textContent = 'Необходим вход'; 
-             mainUploadBtn.classList.remove('loading'); 
-             mainUploadBtn.disabled = false; 
-             selectedFile = null; fileInput.value = ''; 
-             return; 
-         }
-         
+         if (!session) { uploadStatus.textContent = 'Необходим вход'; mainUploadBtn.classList.remove('loading'); mainUploadBtn.disabled = false; selectedFile = null; fileInput.value = ''; return; }
          const ext = selectedFile.name.split('.').pop().toLowerCase();
-         if (!ALLOWED_EXTS.includes(ext)) { 
-             uploadStatus.textContent = 'Недопустимый тип файла'; 
-             mainUploadBtn.classList.remove('loading'); 
-             mainUploadBtn.disabled = false; 
-             selectedFile = null; fileInput.value = ''; 
-             return; 
-         }
-         
-         const safeName = sanitize(selectedFile.name); 
-         const safeFolder = sanitize(session.user.id); 
-         const filePath = `${safeFolder}/${Date.now()}_${safeName}`;
-         
-         uploadProgress.style.display = 'block'; 
-         uploadProgress.value = 0; 
-         uploadStatus.textContent = '0%';
-         
+         if (!ALLOWED_EXTS.includes(ext)) { uploadStatus.textContent = 'Недопустимый тип файла'; mainUploadBtn.classList.remove('loading'); mainUploadBtn.disabled = false; selectedFile = null; fileInput.value = ''; return; }
+         const safeName = sanitize(selectedFile.name); const safeFolder = sanitize(session.user.id); const filePath = `${safeFolder}/${Date.now()}_${safeName}`;
+         uploadProgress.style.display = 'block'; uploadProgress.value = 0; uploadStatus.textContent = '0%';
          const xhr = new XMLHttpRequest();
          xhr.open('POST', `${window.SUPABASE_URL}/storage/v1/object/${BUCKET}/${filePath}`);
          xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
          xhr.setRequestHeader('apikey', window.SUPABASE_ANON_KEY);
          xhr.setRequestHeader('x-upsert', 'true');
-         
-         xhr.upload.onprogress = e => { 
-             if (e.lengthComputable) { 
-                 const percent = Math.round((e.loaded / e.total) * 100); 
-                 uploadProgress.value = percent; 
-                 uploadStatus.textContent = percent + '%'; 
-             } 
-         };
-         
+         xhr.upload.onprogress = e => { if (e.lengthComputable) { const percent = Math.round((e.loaded / e.total) * 100); uploadProgress.value = percent; uploadStatus.textContent = percent + '%'; } };
          xhr.onload = async () => {
-             mainUploadBtn.classList.remove('loading');
-             mainUploadBtn.disabled = false;
-             selectedFile = null; 
-             fileInput.value = '';
-             
+             mainUploadBtn.classList.remove('loading'); mainUploadBtn.disabled = false; selectedFile = null; fileInput.value = '';
              if (xhr.status >= 200 && xhr.status < 300) {
                  uploadStatus.textContent = 'Загрузка завершена...';
-                 try { 
-                     const { data: insertedRow, error: regErr } = await supabase.from(TABLE).insert({ user_login: window.USER_LOGIN || '', file_path: filePath, file_name: selectedFile.name, file_ext: ext }).select('*').single(); 
-                     if (regErr) throw regErr; 
-                     uploadStatus.textContent = `Файл поставлен в очередь: ${insertedRow.file_number}`; 
-                     loadHistory(); 
-                 } catch (err) { uploadStatus.textContent = 'Ошибка записи в БД'; console.error(err); }
-             } else { 
-                 uploadStatus.textContent = 'Ошибка загрузки файла'; 
-             }
+                 try { const { data: insertedRow, error: regErr } = await supabase.from(TABLE).insert({ user_login: window.USER_LOGIN || '', file_path: filePath, file_name: selectedFile.name, file_ext: ext }).select('*').single(); if (regErr) throw regErr; uploadStatus.textContent = `Файл поставлен в очередь: ${insertedRow.file_number}`; loadHistory(); }
+                 catch (err) { uploadStatus.textContent = 'Ошибка записи в БД'; console.error(err); }
+             } else { uploadStatus.textContent = 'Ошибка загрузки файла'; }
          };
          xhr.send(selectedFile);
       });
@@ -760,7 +757,7 @@
       // Filters & Toggles
       filterInput.addEventListener('input', () => { const hasValue = !!filterInput.value.trim(); filterClear.style.display = hasValue ? 'block' : 'none'; applySecondFilter(); historyLimit = HISTORY_LIMIT_DEFAULT; if (filterDebounceTimer) clearTimeout(filterDebounceTimer); filterDebounceTimer = setTimeout(() => loadHistory(), 350); });
       filterClear.addEventListener('click', () => { filterInput.value = ''; filterClear.style.display = 'none'; applySecondFilter(); if (filterDebounceTimer) { clearTimeout(filterDebounceTimer); filterDebounceTimer = null; } historyLimit = HISTORY_LIMIT_DEFAULT; loadHistory({ resetLimit: true }); });
-      myFilesToggle.addEventListener('change', async () => { toggleText.textContent = myFilesToggle.checked ? 'демонстрация только моих файлов' : 'демонстрация файлов компании'; if (filterDebounceTimer) { clearTimeout(filterDebounceTimer); filterDebounceTimer = null; } historyLimit = HISTORY_LIMIT_DEFAULT; await loadHistory({ resetLimit: true }); });
+      myFilesToggle.addEventListener('change', async () => { toggleText.textContent = myFilesToggle.checked ? 'только мои файлы' : 'все файлы'; if (filterDebounceTimer) { clearTimeout(filterDebounceTimer); filterDebounceTimer = null; } historyLimit = HISTORY_LIMIT_DEFAULT; await loadHistory({ resetLimit: true }); });
       if (loadMoreBtn) { loadMoreBtn.addEventListener('click', async () => { historyLimit += HISTORY_LIMIT_STEP; loadMoreBtn.disabled = true; loadMoreBtn.classList.add('loading'); loadMoreBtn.textContent = 'загрузка...'; try { await loadHistory(); } finally { loadMoreBtn.disabled = false; loadMoreBtn.classList.remove('loading'); loadMoreBtn.textContent = 'показать ещё'; } }); }
       
       // DB Logic
@@ -854,9 +851,7 @@
 
        async function loadBlock1(options = {}) {
         const { fromHistory = false } = options;
-        // FIX: Added missing closing parenthesis
         const specIds = Array.from(new Set((history || []).map(h => h?.id).filter(id => id !== null && id !== undefined)));
-        
         if (!specIds.length) { block1Rows = []; specGroups = {}; selectionMap = {}; renderBlock1(); return; }
         const { data, error } = await supabase.from(POS_TABLE).select('file_number, user_login, file_name, id, spec_id, pos_number, pos_number_int, name, qty, unit, attrs, attrs_json').in('spec_id', specIds).order('spec_id', { ascending: false }).order('pos_number_int', { ascending: true });
         if (error) { console.error(error); return; }
@@ -1050,8 +1045,8 @@
       async function refreshParser(specId, progress) { try { await supabase.from(SELECT_TABLE).delete().eq('spec_id', specId); await supabase.from(POS_TABLE).delete().eq('spec_id', specId); await supabase.from(TABLE).update({ status: 'BLOCK 1 ( в работе )' }).eq('id', specId); await supabase.functions.invoke('modal9-parser', { body: { request_id: specId } }); await loadHistory(); } catch (err) { console.error('refreshParser error:', err); } }
       async function refreshSelector(specId, progress) { try { await supabase.from(TABLE).update({ status: 'подготовка' }).eq('id', specId); const { error } = await supabase.functions.invoke('modal9-selector', { body: { spec_id: specId } }); if (error) throw error; await loadHistory(); } catch (err) { console.error('refreshSelector error:', err); } }
 
-      function openGroup(id, saved) { /* ... same logic ... */ }
-      function closeGroup(id) { /* ... same logic ... */ }
+      function openGroup(id, saved) { }
+      function closeGroup(id) { }
       
       function openRowGroup(id, blockClass) {
         if (openedSpecId && openedSpecId !== id) closeRowGroup(openedSpecId);
@@ -1059,10 +1054,7 @@
         const cont = historyList.querySelector(`.spec-content[data-spec-id="${id}"]`);
         const prog = historyList.querySelector(`.spec-progress[data-spec-id="${id}"]`);
         const actions = historyList.querySelector(`.spec-container[data-spec-id="${id}"] .spec-action-row`);
-        if (cont) {
-          const oldT = hideTimers.get(cont); if (oldT) { clearTimeout(oldT); hideTimers.delete(cont); }
-          cont.style.display = 'block'; requestAnimationFrame(() => cont.classList.remove('hidden'));
-        }
+        if (cont) { const oldT = hideTimers.get(cont); if (oldT) { clearTimeout(oldT); hideTimers.delete(cont); } cont.style.display = 'block'; requestAnimationFrame(() => cont.classList.remove('hidden')); }
         if (actions) { const oldT = hideTimers.get(actions); if (oldT) { clearTimeout(oldT); hideTimers.delete(actions); } actions.style.display = 'flex'; requestAnimationFrame(() => actions.classList.remove('hidden')); }
         if (prog) { const oldT = hideTimers.get(prog); if (oldT) { clearTimeout(oldT); hideTimers.delete(prog); } prog.style.display = 'flex'; requestAnimationFrame(() => prog.classList.remove('hidden')); }
         historyList.querySelectorAll('.spec-progress').forEach(p => { if (p.dataset.specId !== String(id)) { p.classList.add('hidden'); const t = setTimeout(() => { p.style.display = 'none'; hideTimers.delete(p); }, 500); hideTimers.set(p, t); } });
@@ -1086,7 +1078,7 @@
         if (extra) extra.remove();
       }
 
-      // NEW Slideshow Logic
+      // Slideshow Logic
       function setupSlideshows(scope) {
         scope.querySelectorAll('.slideshow-container').forEach(container => {
           const slides = container.querySelectorAll(".slide");
