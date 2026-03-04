@@ -687,6 +687,7 @@
       const HISTORY_LIMIT_DEFAULT = 30;
       const HISTORY_LIMIT_STEP = 30;
       const TOKEN_RATE = 0.00000517;
+      const REALTIME_ROW_LIMIT = 8; // Лимит для отслеживания в реальном времени
 
       const root = document.getElementById('modal9-container');
       const tabs = root.querySelectorAll('.tab');
@@ -737,6 +738,24 @@
       const hideTimers = new WeakMap();
       let openedSpecId = null;
       let contextSpecContent = null;
+
+      // Функция для обновления списка отслеживаемых ID
+  function recomputeWatchedSpecIds() {
+    watchedSpecIds.clear();
+
+    // База — верхние REALTIME_ROW_LIMIT из текущей истории (самые новые)
+    const base = (history || [])
+      .slice(0, REALTIME_ROW_LIMIT)
+      .map(item => String(item.id))
+      .filter(Boolean);
+
+    base.forEach(id => watchedSpecIds.add(id));
+
+    // Плюс все открытые в истории (если пользователь раскрыл старую спецификацию)
+    Object.keys(historyOpenBlocks || {}).forEach(id => {
+      watchedSpecIds.add(String(id));
+    });
+  }
 
       // Helpers
       const sanitize = (s) => s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9._-]/gi, '_');
@@ -862,6 +881,8 @@
           historyTotalCount = typeof count === 'number' ? count : history.length;
           lastHistoryStatus = {};
           history.forEach(h => { if (h?.id !== undefined) lastHistoryStatus[h.id] = { status_parser: h.status_parser, status_selector: h.status_selector, status_pricer: h.status_pricer }; });
+          // Обновляем список ID для подписки Realtime
+          recomputeWatchedSpecIds();
           renderHistory(oldMap);
           applySecondFilter();
           updateLoadMoreVisibility();
