@@ -1,0 +1,3846 @@
+<!-- ========= modal9.html (Проект 9) ========= -->
+<div id="modal9-container" class="spec-modal">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  <style>
+    /* --- базовые стили из modal5 --- */
+    .spec-modal {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      position: relative;
+      height: 100vh;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    .modal9-top-window {
+      color: var(--black-color, var(--content-color));
+      width: 1930px;
+      height: 180px;
+      padding: 20px;
+      padding-top: 15px;
+      padding-bottom: 15px;
+      box-sizing: border-box;
+      position: relative;
+      overflow: visible;
+      padding-right: 360px;
+      z-index: 30;
+    }
+    .modal9-top-body {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .spec-tabs,
+    nav.nav_copy { display:flex; gap:8px; margin-bottom:10px; }
+    .spec-tab,
+    nav.nav_copy .tab { padding:6px 12px; border:1px solid #ccc; border-radius:4px; cursor:pointer; transition:background-color 0.3s; user-select:none; }
+    .spec-page { width:100%; }
+    .spec-page:not(.active) { display:none; }
+    .spec-history-list {
+      width: 100%;
+      margin-top: 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      height: 100%;
+    }
+    .spec-history-item { display:flex; justify-content:space-between; padding:4px 8px;}
+    .spec-history-item .status { margin-left:8px; color:#6c757d; }
+    .spec-history-item .time   { margin-left:8px; color:#b5b5b5; font-size:0.9em; }
+    .spec-info-icon { margin-left:8px; cursor:pointer; color:#007bff; }
+    .spec-info-icon.disabled { color:#6c757d; pointer-events:none; }
+    .spec-done-icon { margin-left:8px; color:#28a745; }
+    .history-controls { width:100%; display:flex; justify-content:center; margin:12px 0 0; }
+    .history-load-more {
+      min-width:200px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .history-load-more.loading { opacity:0.7; pointer-events:none; }
+    .spec-row { width:100%; max-width:600px; margin-bottom:10px; }
+    .spec-input-group { display:flex; gap:8px; }
+    .spec-upload-progress { width:100%; margin-top:6px; }
+      .spec-upload-progress.running::-webkit-progress-value { transition: width 0.4s ease; background:#007bff; }
+    .spec-upload-progress.done::-webkit-progress-value { background:#28a745; }
+    .fade-out { opacity:0; transition: opacity 1s; }
+    /* ------- новые стили для полей истории ------- */
+    .input-container {
+      position: relative;
+      width: auto;
+    }
+    .status-field-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-icon {
+      font-family: 'Material Symbols Outlined';
+      font-size: 24px;
+      line-height: 1;
+      color: #878787;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+      user-select: none;
+    }
+    .input-container.overflow::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 20px;
+      height: 100%;
+      pointer-events: none;
+      background: linear-gradient(to left, var(--fon, #f5f5f5), rgba(245,245,245,0));
+    }
+    .styled_input_bar {
+      width: auto;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid var(--content-color);
+      border-radius: 8px;
+      background-color: transparent;
+      color: var(--content-color);
+      outline: none;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .styled_input_bar::placeholder { color: grey; transition: all 0.3s ease; }
+    .styled_input_bar:hover { border-color: grey; }
+    .styled_input_bar:hover::placeholder { color: transparent; }
+    .input-label {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      transform: translateY(-50%);
+      font-size: 10px;
+      background-color: var(--fon, #f5f5f5);
+      color: var(--content-color);
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    .styled_input_bar:hover + .input-label,
+    .styled_input_bar:not(:placeholder-shown) + .input-label {
+      top: -2px;
+      left: 10px;
+      font-size: 13px;
+      color: var(--content-color);
+      background-color: var(--fon, #f5f5f5);
+      padding: 0 8px;
+    }
+    .styled_input_bar:not(:hover):not(:placeholder-shown) + .input-label { color: grey; }
+    .spec-history-item.input-row {
+      gap: 10px;
+      flex-wrap: nowrap;
+      width: max-content;
+    }
+    .copy-tooltip {
+      position: fixed;
+      background: #333;
+      color: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 11000;
+    }
+    .spec-context-menu {
+      position: absolute;
+      display: none;
+      min-width: 220px;
+      background: #f5f5f5;
+      color: var(--black-color, #1f1f1f);
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+      padding: 6px 0;
+      z-index: 4000;
+    }
+    .spec-context-menu.visible {
+      display: block;
+    }
+    .spec-context-menu button {
+      width: 100%;
+      padding: 8px 16px;
+      border: none;
+      background: none;
+      font-size: 14px;
+      text-align: left;
+      color: inherit;
+      cursor: pointer;
+    }
+    .spec-context-menu button:hover,
+    .spec-context-menu button:focus {
+      background: rgba(0, 0, 0, 0.05);
+      outline: none;
+    }
+    .tooltip-overlay { position:fixed; inset:0; background:var(--content-color); opacity:1; display:flex; align-items:center; justify-content:center; z-index:10000; }
+    .tooltip-modal { position:relative; background:#f5f5f5; border:1px solid rgba(0,0,0,0.10); border-radius:10px; padding:10px; width:1320px; max-width:90vw; max-height:90vh; overflow-y:auto; margin:30px; display:inline-block; }
+    .tooltip-modal::-webkit-scrollbar { width:6px; }
+    .tooltip-modal::-webkit-scrollbar-track { background:#e0e0e0; }
+    .tooltip-modal::-webkit-scrollbar-thumb { background:var(--content-color); border-radius:10px; }
+    .ans5-close { position:absolute; top:4px; right:8px; font-size:24px; background:none; border:none; cursor:pointer; }
+
+    .modalRow { display:flex; gap:10px; margin-top:10px; }
+    .modalColumn { display:flex; flex-direction:column; gap:10px; }
+    .modalCollumn { display:flex; flex-direction:column; gap:10px; }
+    .registry-checkboxes { display:flex; flex-direction:column; margin-top:10px; }
+    .registry-checkboxes .checkbox-item { display:flex; align-items:center; gap:6px; }
+    .modalCONTEINERpost {
+      display: flex;
+      border-radius: 6px;
+      background: transparent;
+      border: none;
+    }
+    .iconTYPE1 { font-size:18px; cursor:pointer; color:#007bff; }
+    .card-container {
+      background-color: #f5f5f5;
+      border-radius: 10px;
+      padding: 0;
+      margin: 10px;
+      display: flex;
+      flex-direction: column;
+      width: auto;
+      height: auto;
+    }
+    .card-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .messages_container-content {
+      margin: 0;
+      padding: 1px;
+      color: var(--black-color);
+      font-size: 12px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      width: 100%;
+      border: none;
+    }
+    .messages_container-content::-webkit-scrollbar {
+      width: 2.5px;
+      background-color: var(--scrollbar-color);
+      height: 90%;
+    }
+    .messages_container-content::-webkit-scrollbar-thumb {
+      background-color: var(--black-color);
+      border-radius: 30px;
+    }
+    .messages_container-content::-webkit-scrollbar-track {
+      background-color: var(--scrollbar-color);
+    }
+    .status-display {
+      width: auto;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid var(--content-color);
+      border-radius: 8px;
+      background-color: transparent;
+      color: var(--content-color);
+      box-sizing: border-box;
+      text-align: left;
+      transition: opacity 1s, filter 1s;
+      text-transform: uppercase;
+      text-align: center;
+    }
+   .status-display.error {
+      border-color: red;
+    }
+    .status-display.fade {
+      opacity: 0;
+      filter: blur(2px);
+    }
+    .fade-toggle {
+      transition: opacity 0.5s, filter 0.5s;
+    }
+    .fade-toggle.hidden {
+      opacity: 0;
+      filter: blur(2px);
+      pointer-events: none;
+    }
+    .status-display + .input-label {
+      top: -2px;
+      left: 10px;
+      font-size: 13px;
+      color: grey;
+      background-color: #f5f5f5;
+      padding: 0 8px;
+    }
+    .input-container:hover .status-display + .input-label {
+      color: var(--content-color);
+    }
+     .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* ---- окно модалки ---- */
+    .modal9-scroll-wrapper {
+      width:1950px;
+      max-width:90vw;
+      flex:1;
+      padding-bottom:20px;
+      overflow-x: visible;
+    }
+
+    .modal9-window {
+      color:var(--black-color, var(--content-color));
+      width: 1930px;
+      padding-left:20px;
+      padding-top:20px;
+      padding-bottom:20px;      
+      padding-right:10px;
+      
+      margin-right:0;
+      box-sizing:border-box;
+      margin-bottom:0;
+      max-height:calc(100vh - 220px);
+      position:fixed;
+      top:200px;
+      bottom:0px;
+      left:50%;
+      transform:translateX(-50%);
+      overflow-x: visible;
+      z-index: 10;
+    }
+
+    .modal9-content {
+      /* width:100%; */
+      width: 1930px;
+      height:100%;
+      box-sizing:border-box;
+      overflow-y:auto;
+      padding-right:10px;
+      margin-right:-10px;
+     /* padding-bottom:10px; */
+      /* margin-bottom:-10px; */
+    }
+    .modal9-content::-webkit-scrollbar{width:6px;}
+    .modal9-content::-webkit-scrollbar-track{background:transparent;}
+    .modal9-content::-webkit-scrollbar-thumb{background:var(--content-color);border-radius:10px;}
+
+      /* ---- навигация nav_copy ---- */
+    nav.nav_copy { position:relative; background:#333; border-radius:6px; overflow:hidden; width: 400px; }
+    nav.nav_copy .slider { position:absolute; top:0; left:0; width:49%; height:100%; background:#f5f5f5; border-radius:6px; transition:left 0.3s; }
+    nav.nav_copy .tab { flex:1; text-align:center; color:#f5f5f5; z-index:1; }
+    nav.nav_copy .tab.active { color:var(--content-color); }
+
+       /* ---- загрузка файлов ---- */
+    .file-upload__modal { display:flex; align-items:flex-start; }
+    .file-upload-form { width:fit-content; height:fit-content; display:flex; align-items:center; justify-content:center; }
+    .file-upload-label input { display:none; }
+    .file-upload-label { cursor:pointer; background-color:#ddd; padding:10px 20px; border-radius:8px; border:1px dashed rgb(82,82,82); }
+    .file-upload-design { display:flex; flex-direction:column; align-items:center; justify-content:space-between; height:100%; }
+    .file-upload-design .darkmatter-btn { width:100%; }
+    .browse-button { width:100%; }
+    .drag-text { margin:0; }
+    .upload-status-wrapper { display:flex; flex-direction:column; align-items:flex-start; margin-left:10px; }
+    .js-dropzone.drag { background: rgba(255,255,255,0.1); }
+
+    .darkmatter-btn {
+      background:var(--content-color);
+      border:1px solid #333;
+      color: #ddd;
+      padding:5px 5px;
+      width: 245px;
+      border-radius:8px;
+      font-size:16px;
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      transition:all 0.3s ease;
+      z-index:1;
+    }
+    .darkmatter-btn:hover { color:#fff; }
+    .darkmatter-btn:active { transform:scale(0.95); }
+    .darkmatter-btn::before {
+      content:"";
+      position:absolute;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:radial-gradient(circle at center, rgba(181,106,255,0.1) 0%, transparent 70%);
+      transform:scale(0);
+      transition:transform 0.6s ease;
+      z-index:-1;
+    }
+    .darkmatter-btn:hover::before { transform:scale(1.5); }
+    .darkmatter-particle {
+      position:absolute;
+      width:3px; height:3px;
+      border-radius:50%;
+      background:#b56aff;
+      opacity:0; z-index:-1;
+    }
+    .darkmatter-btn:hover .darkmatter-particle { animation:darkmatter-float 2s forwards; }
+    @keyframes darkmatter-float {
+      0% { transform:translate(0,0) scale(0); opacity:0; }
+      20% { opacity:0.8; }
+      100% { transform:translate(var(--tx), var(--ty)) scale(1); opacity:0; }
+    }
+    .darkmatter-btn .loader { display:none; position:absolute; inset:0; margin:auto; width:16px; height:16px; border:2px solid #b56aff; border-top-color:transparent; border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { from{transform:rotate(0);} to{transform:rotate(360deg);} }
+    .darkmatter-btn.loading .loader { display:block; }
+    .darkmatter-btn.loading .button-text { visibility:hidden; }
+
+     /* --- переключатель истории --- */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #fff;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .toggle-slider {
+      background-color: var(--content-color);
+    }
+    input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+    }
+
+     /* --- блок результатов --- */
+    .block1-wrapper{
+      height:100%;
+      overflow-y:auto;
+      overflow-x:hidden;
+    }
+    .block1-wrapper::-webkit-scrollbar{ width:2.5px; background-color:var(--scrollbar-color); height:90%; }
+    .block1-wrapper::-webkit-scrollbar-thumb{ background-color:var(--black-color); border-radius:30px; }
+    .block1-wrapper::-webkit-scrollbar-track{ background-color:var(--scrollbar-color);}
+    .spec-container { margin-bottom:10px; margin-right:50px; padding-top:10px;}
+    .spec-progress.multistep {
+      display:flex;
+      gap:10px;
+      margin:0 10px;
+      width:calc(100% - 20px);
+    }
+    .spec-progress.multistep .step {
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:2px;
+    }
+    .spec-progress.multistep .step-body {
+      display:flex;
+      gap:8px;
+      margin-left:20px;
+    }
+    .spec-progress.multistep .step-body .darkmatter-btn {
+      height:auto;
+      padding:0 5px;
+      width:245px;
+    }
+    .spec-progress.multistep .step-body .darkmatter-btn:disabled,
+    .spec-progress.multistep .step-body .darkmatter-btn.disabled {
+      opacity:0.5;
+      cursor:default;
+      pointer-events:none;
+    }
+    .spec-progress.multistep .bar {
+      width:100%;
+      height:6px;
+      background:#000;
+      opacity:0.25;
+      border-radius:2px;
+      transition:opacity 0.3s, box-shadow 0.3s;
+    }
+    .spec-progress.multistep .step.active .bar {
+      opacity:1;
+      box-shadow:0 0 4px var(--content-color);
+    }
+    .spec-progress.multistep .label {
+      font-size:12px;
+      text-align:center;
+    }
+    .spec-progress.multistep .icons {
+      display:flex;
+      gap:4px;
+      align-items:center;
+    }
+    .spec-progress.multistep .icons .material-symbols-outlined {
+      font-size:18px;
+      color:var(--content-color);
+    }
+    .spec-header { background:transparent; cursor:pointer; font-weight:700; }
+    .spec-content { }
+    .group-close { float:right; background:none; border:none; cursor:pointer; }
+
+    .dynamic-modals {
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      width:max-content;
+      user-select:none;
+      margin-left:0px;
+      margin-top:0px;
+      --block1-height:auto;
+    }
+    .modal-block {
+      position:relative;
+      width:50px;
+      height:var(--block1-height, auto);
+      border:1px solid var(--content-color);
+      border-radius:6px;
+      background: var(--fon);
+      overflow:hidden;
+      transition:width 0.3s;
+      box-sizing:border-box;
+      display:flex;
+      flex-direction:column;
+    }
+    .modal-title {
+      position:absolute;
+      top:8px;
+      left:50%;
+      transform:translateX(-50%) rotate(180deg);
+      writing-mode:vertical-rl;
+      text-orientation:mixed;
+      font:600 14px/1 Arial, sans-serif;
+      color:#333;
+      pointer-events:none;
+      transition:0.3s;
+    }
+    .modal-content {
+      opacity:0;
+      padding:0;
+      transition:0.5s;
+      box-sizing:border-box;
+      height:100%;
+      overflow-y:auto;
+    }
+    .modal-block.open {
+      width:max-content;
+      border:none;
+      height:var(--block1-height, auto);
+    }
+    .modal-block.open .modal-content {
+      opacity:1;
+    }
+        /* --- миниатюры для BLOCK 2 / 2.1 / 3 / 3.1 --- */
+    .dynamic-modals .block2 .modal-content,
+    .dynamic-modals .block21 .modal-content,
+    .dynamic-modals .block3 .modal-content,
+    .dynamic-modals .block31 .modal-content {
+      display: none;           /* в свернутом состоянии контента не видно вообще */
+    }
+
+    .dynamic-modals .block2.open .modal-content,
+    .dynamic-modals .block21.open .modal-content,
+    .dynamic-modals .block3.open .modal-content,
+    .dynamic-modals .block31.open .modal-content {
+      display: block;          /* показываем только когда блок раскрыт (есть .open) */
+    }
+
+    .modal-block.open .modal-title { opacity:0.15; }
+    .block21-entry {
+      display:flex;
+      align-items:flex-end;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .block21-meta {
+      font-size:12px;
+      color:var(--content-color);
+      padding:4px 0;
+      min-width:160px;
+      font-weight:500;
+      white-space:nowrap;
+    }
+    .dynamic-modals .modal-block { width:50px; }
+    .dynamic-modals .modal-block.open { width:max-content; border:none; }
+    /* раскрытие блоков только по двойному клику, убираем ховер-эффекты */
+    /*
+    .dynamic-modals:hover .modal-block { width:50px; }
+    .dynamic-modals:hover .modal-block:hover {
+      width:100%;
+      border:none;
+    }
+    .dynamic-modals:hover .modal-block:hover .modal-content { opacity:1; }
+    .dynamic-modals:hover .modal-block:hover .modal-title { opacity:0.15; }
+    */
+
+    #modal9-container .glass3d {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--content-color);
+      backdrop-filter: blur(3px); 
+      -webkit-backdrop-filter: blur(3px); 
+      box-shadow:  
+    0 0 0.75px hsl(205 20% 10% / 0.2), 
+    0.7px 0.8px 1.2px -0.4px hsl(205 20% 10% / 0.1), 
+    1.3px 1.5px 2.2px -0.8px hsl(205 20% 10% / 0.1), 
+    2.3px 2.6px 3.9px -1.2px hsl(205 20% 10% / 0.1), 
+    3.9px 4.4px 6.6px -1.7px hsl(205 20% 10% / 0.1), 
+    6.5px 7.2px 10.9px -2.1px hsl(205 20% 10% / 0.1), 
+    8px 9px 14px -2.5px hsl(205 20% 10% / 0.2);
+    }
+
+   .spec-action-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .spec-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      min-width: 174px;
+      height: 30px;
+      padding: 0 24px;
+      border: none;
+      border-radius: 8px;
+      background-color: #307750;
+      color: #fff;
+      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 4px 8px 10px -3px rgba(0, 0, 0, 0.356);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      z-index: 0;
+    }
+    .spec-action-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background-color: rgba(255, 255, 255, 0.08);
+      z-index: -1;
+      transition: width 0.35s ease;
+    }
+    .spec-action-btn:hover::before {
+      width: 100%;
+    }
+    .spec-action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 6px 10px 14px -5px rgba(0, 0, 0, 0.35);
+    }
+    .spec-action-btn:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.6);
+      outline-offset: 2px;
+    }
+    .spec-action-btn svg,
+    .spec-action-btn .material-symbols-outlined {
+      margin-right: 12px;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .spec-action-btn .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    }
+    .spec-action-btn span.label {
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .spec-action-btn--excel {
+      background-color: #307750;
+    }
+    .spec-action-btn--excel::before {
+      background-color: #469b61;
+    }
+    .spec-action-btn--copy {
+      background-color: #30333c;
+    }
+    .spec-action-btn--copy::before {
+      background-color: #4c4f58;
+    }
+    .spec-action-btn--help {
+      background-color: #6a5b4a;
+    }
+    .spec-action-btn--help::before {
+      background-color: #d3bda7;
+    }
+
+    /* --- блок обновлений --- */
+    .modal9-updates {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      width: 800px;
+      max-height: 54px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(48, 119, 80, 0.45);
+      box-shadow: 0 18px 26px -16px rgba(0, 0, 0, 0.85);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+      cursor: pointer;
+      transition: max-height 0.35s ease, box-shadow 0.35s ease;
+      z-index: 10000;
+    }
+    .modal9-updates.is-expanded {
+      max-height: 800px;
+      box-shadow: 0 24px 42px -10px rgba(0, 0, 0, 0.75);
+    }
+    .modal9-updates::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(48, 119, 80, 0.3), transparent 65%);
+      pointer-events: none;
+      opacity: 0.3;
+    }
+    .modal9-updates-header {
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 10px;
+      margin-bottom: 6px;
+      background: none;
+      z-index: 1;
+    }
+    .modal9-updates-title {
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--content-color);
+    }
+    .modal9-updates-toggle {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(48, 119, 80, 0.6);
+      background: rgba(48, 119, 80, 0.25);
+      color: var(--content-color);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+    .modal9-updates-toggle:hover,
+    .modal9-updates-toggle:focus-visible {
+      background: rgba(48, 119, 80, 0.4);
+      border-color: rgba(48, 119, 80, 0.9);
+      outline: none;
+    }
+    .modal9-updates-body {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal9-update-card {
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(48, 119, 80, 0.3);
+      box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .modal9-update-title {
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--content-color);
+    }
+    .modal9-update-body {
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--black-color, var(--content-color));
+      opacity: 0.9;
+    }
+    
+  </style>
+  <div class="spec-context-menu" aria-hidden="true">
+    <button type="button" data-action="copy">Скопировать спецификацию</button>
+    <button type="button" data-action="excel">Скачать спецификацию Excel</button>
+  </div>
+  <div id="modal9-ticket-modal" class="tooltip-overlay" style="display:none;">
+   <div class="tooltip-modal">
+     <button class="ans5-close modal9-ticket-close" style="position:absolute; top:4px; right:8px;">×</button>
+     <div class="modalRow" style="margin-top:0;">
+       <div class="input-container">
+         <input type="text" id="modal9-ticket-spec-id" class="styled_input_bar" style="width: 90px; text-transform: uppercase; text-align: center;" inputmode="numeric" placeholder="">
+         <label class="input-label">spec #</label>
+       </div>
+       <div class="input-container">
+         <input type="text" id="modal9-ticket-subject" class="styled_input_bar" style="width: 700px;" maxlength="70" placeholder="">
+         <label class="input-label">тема обращения</label>
+       </div>
+     </div>
+     <div class="modalRow">
+       <div class="input-container" style="width:100%;">
+         <textarea id="modal9-ticket-message" class="styled_input_bar" style="width: 800px; height: 500px;"></textarea>
+         <label class="input-label">текст обращения</label>
+       </div>
+     </div>
+     <div class="modalRow">
+       <button type="button" class="darkmatter-btn modal9-submit-ticket-btn" style="height:40px;">отправить обращение</button>
+     </div>
+   </div>
+  </div>
+  <div class="modal9-top-window glass3d">
+   <div class="modal9-top-body">
+    <div class="file-upload__modal">
+     <form class="file-upload-form js-dropzone">
+       <label class="file-upload-label">
+         <div class="file-upload-design" style="width: 200px; height: 74px;">
+           <button type="button" class="darkmatter-btn browse-button">выбрать файл</button>
+           <button type="button" class="darkmatter-btn upload-btn">
+             <span class="button-text">загрузить</span>
+             <span class="loader"></span>
+             <div class="darkmatter-particle" style="--tx: -20px; --ty: -15px; left: 25%; top: 25%;"></div>
+             <div class="darkmatter-particle" style="--tx: 15px; --ty: -20px; left: 75%; top: 25%; animation-delay: 0.2s;"></div>
+             <div class="darkmatter-particle" style="--tx: -15px; --ty: 15px; left: 25%; top: 75%; animation-delay: 0.4s;"></div>
+             <div class="darkmatter-particle" style="--tx: 20px; --ty: 15px; left: 75%; top: 75%; animation-delay: 0.6s;"></div>
+           </button>
+         </div>
+         <input type="file" class="js-file__input" />
+       </label>
+     </form>
+     <div class="upload-status-wrapper">
+       <progress class="upload-progress spec-upload-progress" value="0" max="100" style="width:100%;display:none;"></progress>
+       <div class="upload-status"></div>
+     </div>
+      </div>
+    <div class="button-group" style="margin-top: 15px; display:flex; align-items:center; gap:10px;">
+      <div class="file-filter-container input-container" style="position: relative; margin-top: -10px; width: 300px;">
+        <input id="file-filter-input" class="styled_input_bar" style="width: 100%;" />
+        <label class="input-label">поиск совпадений</label>
+        <button class="group-close ans5-close file-filter-clear" style="display:none;">×</button>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="my-files-toggle">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-text">демонстрация файлов компании</span>
+    </div>
+    <ul class="file-upload__list"></ul>
+   </div>
+   <section class="modal9-updates" aria-label="Последние обновления">
+     <div class="modal9-updates-header">
+       <h2 class="modal9-updates-title">информация об обновлениях сервиса</h2>
+       <button type="button" class="modal9-updates-toggle" aria-expanded="false">развернуть</button>
+     </div>
+      <div class="modal9-updates-body">
+        <article class="modal9-update-card">
+         <h3 class="modal9-update-title">25 ноября 2025 — публикация новой версии</h3>
+         <p class="modal9-update-body">Добавлены инструкции для модели OpenAI исключающие попытки диалога с пользователем в виде ответа</p>
+         <p class="modal9-update-body">Исключен формат вывода ответа модели OpenAI в виде CSV таблицы, что повышает устойчивость и точность в формировании структуры ответов на стороне сервера</p>
+       </article>
+         <article class="modal9-update-card">
+         <h3 class="modal9-update-title">14 ноября 2025 — публикация новой версии</h3>
+         <p class="modal9-update-body">Исправлена ошибка: некорректное вычисление высоты блоков 1/2/3 (высота рассчитывалась с избытком относительно самого большого блока по умолчанию BLOCK 1)</p>
+         <p class="modal9-update-body">Исправлена ошибка: контент блоков 1/2/3 кликабелен до раскрытия (при раскрытии к примеру блока 2/1 случайно прожималась ссылка одного из ценовых источников, хотя должен был только раскрыться активируемый блок)</p>
+         <p class="modal9-update-body">Исправлена ошибка: сброс раскрытого блока на БЛОК 1 (улучшенная RealTime подписка на баз данных позволила исключить автообновление и ручное вытягивание добавленных данных при выполнении этапов, теперь обновление происходит только во время работы какого либо из этапов, когда выполнены все три шага парсинг / подбор / проценка сброса раскрытых блоков внутри спецификации не будет происходить)</p>
+         <p class="modal9-update-body">Добавлены инструкции на новые категории товаров:</p>
+         <p class="modal9-update-body">- Источники бесперебойного питания</p>
+         <p class="modal9-update-body">- Интерактивные панели</p>
+         <p class="modal9-update-body">- Проекционное оборудвоание</p>
+         <p class="modal9-update-body">- Телевизоры и ЖК панели</p>
+         <p class="modal9-update-body">- Коммутационное оборудование</p>
+       </article>
+        <article class="modal9-update-card">
+         <h3 class="modal9-update-title">10 ноября 2025 — публикация новой версии</h3>
+         <p class="modal9-update-body">Оптимизирована нагрузка на ПК конечного пользователя</p>
+         <p class="modal9-update-body">Добавлены более очевидные индикаторы этапов обработки технического задания</p>
+         <p class="modal9-update-body">Добавлен расход токенов в $ на каждый отдельный обрабатываемый файл технического задания</p>
+       </article>
+      <article class="modal9-update-card">
+         <h3 class="modal9-update-title">07 ноября 2025 — публикация новой версии</h3>
+         <p class="modal9-update-body">На данный момент в настройках инструмента описаны следующие категории товаров:</p>
+         <p class="modal9-update-body">- Системный блок (всегда сборка из комплектующих)</p>
+         <p class="modal9-update-body">- Моноблок (всегда сборка из комплектующих на базе AIO платформ линейки PowerCool</p>
+         <p class="modal9-update-body">- Сервер (всегда сборка из комплектующих)</p>
+         <p class="modal9-update-body">- Система хранения данных (всегда сборка из комплектующих)</p>
+         <p class="modal9-update-body">- Ноутбуки (готовые решения в сборе)</p>
+         <p class="modal9-update-body">- Десктоп / Неттоп SFF (всегда сборка из комплектующих)</p>
+       </article>
+       <article class="modal9-update-card">
+         <h3 class="modal9-update-title">07 ноября 2025 — публикация новой версии</h3>
+         <p class="modal9-update-body">Статус каждой спецификации (файла) теперь разбит на очевидные этапы: ПАРСИНГ / ПОДБОР / ПРОЦЕНКА</p>
+         <p class="modal9-update-body">В рамках каждого статуса присутствует информация о прогрессе в формате 0 / 0 / 0</p>
+         <p class="modal9-update-body">первое значение: сколько заданий ушло в адрес OpenAI</p>
+         <p class="modal9-update-body">второе значение: сколько заданий получено от OpenAI</p>
+         <p class="modal9-update-body">третье значение: сколько всего заданий редусмотрено в рамках этапа ПАРСИНГ / ПОДБОР / ПРОЦЕНКА конкретно для этой спецификации</p>
+       </article>
+       <article class="modal9-update-card">
+         <h3 class="modal9-update-title">07 ноября 2025 — TEST</h3>
+         <p class="modal9-update-body">test</p>
+       </article>
+     </div>
+   </section>
+    
+  </div>
+  
+ <div class="modal9-scroll-wrapper">
+ <div class="modal9-window glass3d">
+   <div class="modal9-content">
+    <div class="page spec-page active" data-page="1">
+      <div class="history-list spec-history-list"></div>
+
+      <div class="history-controls">
+        <button type="button" class="darkmatter-btn history-load-more" style="display:none;">показать ещё</button>
+      </div>
+      
+      <template id="history-row-template">
+        <div class="history-item spec-history-item input-row" style="display: flex; flex-direction: row; padding-top: 5px;">
+          <div class="input-container" style="margin-left: -6px;">
+            <input type="text" class="styled_input_bar" data-field="file_number" readonly style="width: 100px;" placeholder="AK-000001">
+            <label class="input-label">номер</label>
+          </div>
+          <div class="input-container">
+            <input type="text" class="styled_input_bar" data-field="user_login" readonly style="width: 240px;" placeholder="rosatomicalchemist@gmail.com">
+            <label class="input-label">login</label>
+          </div>
+          <div class="input-container">
+            <input type="text" class="styled_input_bar" data-field="created_at" readonly style="width: 160px; text-align: center;" placeholder="15.07.2025, 14:23:47">
+            <label class="input-label">дата</label>
+          </div>
+          <div class="input-container">
+            <input type="text" class="styled_input_bar" data-field="file_name" readonly style="width: 580px;" placeholder="Техническое задание на поставку оборудования.docx">
+            <label class="input-label">файл</label>
+          </div>
+          <div class="input-container">
+            <input type="text" class="styled_input_bar" data-field="file_ext" style="width: 120px; text-transform: uppercase; text-align: center;" readonly placeholder="docx">
+            <label class="input-label">ext</label>
+          </div>
+          <div class="status-field-wrapper">
+            <div class="input-container">
+              <input type="text" class="styled_input_bar" data-field="status_parser" style="width: 100px; text-transform: uppercase; text-align: center;" readonly placeholder="парсинг">
+              <label class="input-label">парсинг</label>
+            </div>
+            <span class="material-symbols-outlined status-icon" data-status-icon="status_parser" aria-hidden="true">clear_all</span>
+          </div>
+          <div class="status-field-wrapper">
+            <div class="input-container">
+              <input type="text" class="styled_input_bar" data-field="status_selector" style="width: 100px; text-transform: uppercase; text-align: center;" readonly placeholder="подбор">
+              <label class="input-label">подбор</label>
+            </div>
+            <span class="material-symbols-outlined status-icon" data-status-icon="status_selector" aria-hidden="true">clear_all</span>
+          </div>
+          <div class="status-field-wrapper">
+            <div class="input-container">
+              <input type="text" class="styled_input_bar" data-field="status_pricer" style="width: 100px; text-transform: uppercase; text-align: center;" readonly placeholder="проценка">
+              <label class="input-label">проценка</label>
+            </div>
+            <span class="material-symbols-outlined status-icon" data-status-icon="status_pricer" aria-hidden="true">clear_all</span>
+          </div>
+          <div class="input-container">
+            <input type="text" class="styled_input_bar" data-field="-" style="width: 90px; text-transform: uppercase; text-align: center;" readonly placeholder="0.00$">
+            <label class="input-label">tokens</label>
+          </div>
+          <div class="input-container">
+            <input type="text" class="styled_input_bar" data-field="id" style="width: 80px; text-transform: uppercase; text-align: center;" readonly placeholder="1">
+            <label class="input-label">spec #</label>
+          </div>
+        </div>
+      </template>
+      
+    </div>
+
+    <div class="page spec-page" data-page="2">
+      <div class="block1-wrapper"></div>
+
+      <template id="spec-template">
+        <div class="spec-container">
+          <div class="spec-header">
+            <div class="spec-title"></div>
+            <button class="group-close ans5-close" style="display:none;">×</button>
+          </div>
+          <div class="spec-content"></div>
+        </div>
+      </template>
+
+<template id="button-group-spec">
+ <div class="modalRow spec-action-row">
+    <button type="button" class="spec-action-btn spec-action-btn--excel" data-action="excel">
+      <svg fill="#fff" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 50 50" aria-hidden="true">
+        <path d="M28.8125 .03125L.8125 5.34375C.339844 5.433594 0 5.863281 0 6.34375L0 43.65625C0 44.136719 .339844 44.566406 .8125 44.65625L28.8125 49.96875C28.875 49.980469 28.9375 50 29 50C29.230469 50 29.445313 49.929688 29.625 49.78125C29.855469 49.589844 30 49.296875 30 49L30 1C30 .703125 29.855469 .410156 29.625 .21875C29.394531 .0273438 29.105469 -.0234375 28.8125 .03125ZM32 6L32 13L34 13L34 15L32 15L32 20L34 20L34 22L32 22L32 27L34 27L34 29L32 29L32 35L34 35L34 37L32 37L32 44L47 44C48.101563 44 49 43.101563 49 42L49 8C49 6.898438 48.101563 6 47 6ZM36 13L44 13L44 15L36 15ZM6.6875 15.6875L11.8125 15.6875L14.5 21.28125C14.710938 21.722656 14.898438 22.265625 15.0625 22.875L15.09375 22.875C15.199219 22.511719 15.402344 21.941406 15.6875 21.21875L18.65625 15.6875L23.34375 15.6875L17.75 24.9375L23.5 34.375L18.53125 34.375L15.28125 28.28125C15.160156 28.054688 15.035156 27.636719 14.90625 27.03125L14.875 27.03125C14.8125 27.316406 14.664063 27.761719 14.4375 28.34375L11.1875 34.375L6.1875 34.375L12.15625 25.03125ZM36 20L44 20L44 22L36 22ZM36 27L44 27L44 29L36 29ZM36 35L44 35L44 37L36 37Z"></path>
+      </svg>
+      <span class="label">скачать excel</span>
+    </button>
+    <button type="button" class="spec-action-btn spec-action-btn--copy" data-action="copy">
+      <span class="material-symbols-outlined" aria-hidden="true">content_copy</span>
+      <span class="label">скопировать</span>
+    </button>
+   <button type="button" class="spec-action-btn spec-action-btn--help" data-action="support">
+      <span class="material-symbols-outlined" aria-hidden="true">person_raised_hand</span>
+      <span class="label">создать обращение</span>
+    </button>
+  </div>
+</template>
+      
+<template id="spec-progress-template">
+  <div class="spec-progress multistep" style="margin-bottom: 16px;">
+  
+    <!-- BLOCK 1 -->
+    <div class="step" data-step="1">
+      <div class="bar"></div>
+      <div class="step-body" style="margin-top: 16px;">
+        <div class="label" style="margin-top: 4px; font-size: 14px;">BLOCK 1</div>
+        <div class="icons">
+          <span class="material-symbols-outlined status" style="font-size: 14px;">indeterminate_check_box</span>
+        </div>
+        <button class="darkmatter-btn refresh" title="Перезапустить парсер" style="border-radius: 4px;">
+          <span class="button-text">запуск шага</span>
+          <span class="loader"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- BLOCK 2 / 2.1 -->
+    <div class="step" data-step="2">
+      <div class="bar"></div>
+      <div class="step-body" style="margin-top: 16px;">
+        <div class="label" style="margin-top: 4px; font-size: 14px;">BLOCK 2 / 2.1</div>
+        <div class="icons">
+          <span class="material-symbols-outlined status" style="font-size: 14px;">indeterminate_check_box</span>
+        </div>
+        <button class="darkmatter-btn refresh" title="Перезапустить селектор" style="border-radius: 4px;">
+          <span class="button-text">запуск шага</span>
+          <span class="loader"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- BLOCK 3 / 3.1 (пока без действий) -->
+    <div class="step" data-step="3">
+      <div class="bar"></div>
+      <div class="step-body" style="margin-top: 16px;">
+        <div class="label" style="margin-top: 4px; font-size: 14px;">BLOCK 3 / 3.1</div>
+        <div class="icons">
+          <span class="material-symbols-outlined status" style="font-size: 14px;">indeterminate_check_box</span>
+        </div>
+        <button class="darkmatter-btn refresh" title="Недоступно" style="border-radius: 4px;" disabled>
+          <span class="button-text">запуск шага</span>
+          <span class="loader"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+      <template id="spec-row-template">
+        <div class="modalCONTEINERpost modalRow">
+          <div class="modalColumn">
+            <div class="modalRow">
+              <div class="input-container" style="margin-top: 0px;">
+                <input type="text" style="width: 100px; text-align: center;" class="styled_input_bar" data-field="pos_number" readonly>
+                <label class="input-label">№ в ТЗ</label>
+              </div>
+              <div class="input-container" style="margin-top: 0px;">
+                <input type="text" style="width: 400px; text-align: left;" class="styled_input_bar" data-field="name" readonly>
+                <label class="input-label">наименование</label>
+              </div>
+              <div class="input-container" style="margin-top: 0px;">
+                <input type="text" style="width: 100px; text-align: center;" class="styled_input_bar" data-field="qty" readonly>
+                <label class="input-label">кол-во</label>
+              </div>
+              <div class="input-container" style="margin-top: 0px;">
+                <input type="text" style="width: 100px; text-align: center;" class="styled_input_bar" data-field="unit" readonly>
+                <label class="input-label">ед. изм.</label>
+              </div>
+            </div>
+            <div class="registry-checkboxes">
+              <label class="checkbox-item"><input type="checkbox" data-field="rpp_878"> присутствие в реестре РПП 878</label>
+              <label class="checkbox-item"><input type="checkbox" data-field="torp"> присутствие в реестре ТОРП</label>
+              <label class="checkbox-item"><input type="checkbox" data-field="rrpo_1875"> присутствие в реестре РРПО 1875</label>
+            </div>
+          </div>
+          
+          <div class="dynamic-modals">
+            <div class="modal-block block1">
+              <div class="modal-title">1 BLOCK</div>
+              <div class="modal-content"></div>
+            </div>
+            <div class="modal-block block2">
+              <div class="modal-title">2 BLOCK</div>
+              <div class="modal-content"></div>
+            </div>
+            <div class="modal-block block21">
+              <div class="modal-title">2/1 BLOCK</div>
+              <div class="modal-content"></div>
+            </div>
+            <div class="modal-block block3">
+              <div class="modal-title">3 BLOCK</div>
+              <div class="modal-content"></div>
+            </div>
+            <div class="modal-block block31">
+              <div class="modal-title">3/1 BLOCK</div>
+              <div class="modal-content"></div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <template id="spec-block2-template">
+        <div class="modalRow">
+          <div class="input-container">
+            <input type="text" style="width: 140px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
+            <label class="input-label">артикул</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 300px;" class="styled_input_bar value-input" placeholder="наименование" readonly>
+            <label class="input-label">наименование</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 80px; text-align: center;" class="styled_input_bar value-input" placeholder="кол-во" readonly>
+            <label class="input-label">кол-во</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 80px; text-align: center;" class="styled_input_bar value-input" placeholder="ед. изм." readonly>
+            <label class="input-label">ед. изм.</label>
+          </div>
+          <div class="input-container">
+             <input type="text" style="width: 110px; text-align: right;" class="styled_input_bar value-input" placeholder="000 000 000" readonly>
+            <label class="input-label">цена</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 110px; text-align: right;" class="styled_input_bar value-input" placeholder="000 000 000" readonly>
+            <label class="input-label">сумма</label>
+          </div>
+         </div>
+      </template>
+      
+      <!-- //фронтенд: шаблон BLOCK 2/1 под 3 оффера -->
+<template id="spec-block21-template">
+  <div class="modalRow">
+    <!-- offer #1 -->
+    <div class="input-container">
+      <input type="text" style="width: 110px; text-align: right;" class="styled_input_bar" data-offer="1-price" placeholder="0" readonly>
+      <label class="input-label">цена 1</label>
+    </div>
+    <div class="input-container">
+      <input type="text" style="width: 120px;" class="styled_input_bar" data-offer="1-store" placeholder="магазин" readonly>
+      <label class="input-label">магазин</label>
+    </div>
+    <a class="icons" data-offer="1-url" target="_blank" rel="noopener">
+      <span class="material-symbols-outlined status">link</span>
+    </a>
+
+    <!-- offer #2 -->
+    <div class="input-container">
+      <input type="text" style="width: 110px; text-align: right;" class="styled_input_bar" data-offer="2-price" placeholder="0" readonly>
+      <label class="input-label">цена 2</label>
+    </div>
+    <div class="input-container">
+      <input type="text" style="width: 120px;" class="styled_input_bar" data-offer="2-store" placeholder="магазин" readonly>
+      <label class="input-label">магазин</label>
+    </div>
+    <a class="icons" data-offer="2-url" target="_blank" rel="noopener">
+      <span class="material-symbols-outlined status">link</span>
+    </a>
+
+    <!-- offer #3 -->
+    <div class="input-container">
+      <input type="text" style="width: 110px; text-align: right;" class="styled_input_bar" data-offer="3-price" placeholder="0" readonly>
+      <label class="input-label">цена 3</label>
+    </div>
+    <div class="input-container">
+      <input type="text" style="width: 120px;" class="styled_input_bar" data-offer="3-store" placeholder="магазин" readonly>
+      <label class="input-label">магазин</label>
+    </div>
+    <a class="icons" data-offer="3-url" target="_blank" rel="noopener">
+      <span class="material-symbols-outlined status">link</span>
+    </a>
+  </div>
+</template>
+
+
+      <template id="spec-block3-template">
+        <div class="modalRow">
+          <div class="input-container">
+            <input type="text" style="width: 140px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
+            <label class="input-label">артикул</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 300px;" class="styled_input_bar value-input" placeholder="наименование" readonly>
+            <label class="input-label">наименование</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 80px; text-align: center;" class="styled_input_bar value-input" placeholder="кол-во" readonly>
+            <label class="input-label">кол-во</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 80px; text-align: center;" class="styled_input_bar value-input" placeholder="ед. изм." readonly>
+            <label class="input-label">ед. изм.</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 110px; text-align: center;" class="styled_input_bar value-input" placeholder="000 000 000" readonly>
+            <label class="input-label">цена</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 110px; text-align: center;" class="styled_input_bar value-input" placeholder="000 000 000" readonly>
+            <label class="input-label">сумма</label>
+          </div>
+         </div>
+      </template>
+      
+      <template id="spec-block31-template">
+        <div class="modalRow">
+          <div class="input-container">
+            <input type="text" style="width: 146px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
+            <label class="input-label">артикул</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 90px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
+            <label class="input-label">магазин</label>
+          </div>
+          <div class="icons">
+              <span class="material-symbols-outlined status">link</span>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 146px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
+            <label class="input-label">артикул</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 90px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
+            <label class="input-label">магазин</label>
+          </div>
+          <div class="icons">
+              <span class="material-symbols-outlined status">link</span>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 146px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
+            <label class="input-label">артикул</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 90px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
+            <label class="input-label">магазин</label>
+          </div>
+          <div class="icons">
+              <span class="material-symbols-outlined status">link</span>
+          </div>
+       </div>
+      </template>
+      
+      <template id="spec-attr-template">
+        <div class="modalRow">
+          <div class="input-container">
+            <input type="text" style="width: 580px;" class="styled_input_bar param-input" placeholder="параметр" readonly>
+            <label class="input-label">параметр</label>
+          </div>
+          <div class="input-container">
+            <input type="text" style="width: 280px;" class="styled_input_bar value-input" placeholder="значение" readonly>
+            <label class="input-label">значение</label>
+          </div>
+        </div>
+      </template>
+
+      
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<script type="module">
+export async function initModal9() {
+  console.log('[modal9.html] PAGE 9 активирован');
+  
+  const supabase = window.supabase;
+  const BUCKET = 'modal9-page1-uploads';
+  const TABLE = 'modal9_page1_uploads_registry';
+  const POS_TABLE = 'modal9_page1_positions';
+  const SELECT_TABLE = 'modal9_page1_positions_select';
+  // URLs функций не используются напрямую; оставлены для совместимости
+  const STATUS_TABLE = 'modal9_selector_status';
+  const PARSER_URL = 'https://jviswahajwmwibedxcll.supabase.co/functions/v1/modal9-parser';
+  const SELECTOR_URL = 'https://jviswahajwmwibedxcll.supabase.co/functions/v1/modal9-selector';
+  const ALLOWED_EXTS = ['doc', 'docx', 'txt', 'xls', 'rtf', 'pdf', 'ods', 'csv', 'xlsx'];
+  const HISTORY_LIMIT_DEFAULT = 30;
+  const HISTORY_LIMIT_STEP = 30;
+  const AUTO_REFRESH_INTERVAL = 5000;
+
+  const root = document.getElementById('modal9-container');
+  const tabs = root.querySelectorAll('.tab');
+  const navSlider = root.querySelector('nav.nav_copy .slider');
+  const pages = root.querySelectorAll('.page');
+  const loadMoreBtn = root.querySelector('.history-load-more');
+  const historyList = root.querySelector('.history-list');
+  const dropzone = root.querySelector('.js-dropzone');
+  const rowTemplate = root.querySelector('#history-row-template');
+  const fileInput = root.querySelector('.js-file__input');
+  const fileList = root.querySelector('.file-upload__list');
+  const uploadBtn = root.querySelector('.upload-btn');
+  const browseBtn = root.querySelector('.browse-button');
+  const uploadProgress = root.querySelector('.upload-progress');
+  const uploadStatus = root.querySelector('.upload-status');
+  const myFilesToggle = root.querySelector('#my-files-toggle');
+  const toggleText = root.querySelector('.toggle-text');
+  const filterInput = root.querySelector('#file-filter-input');
+  const filterClear = root.querySelector('.file-filter-clear');
+  const block1List = root.querySelector('.block1-wrapper');
+  const specTemplate = root.querySelector('#spec-template');
+  const specProgressTemplate = root.querySelector('#spec-progress-template');
+  const buttonGroupSpec = root.querySelector('#button-group-spec');
+  const specRowTemplate = root.querySelector('#spec-row-template');
+  const block2Template = root.querySelector('#spec-block2-template');
+  const block21Template = root.querySelector('#spec-block21-template');
+  const block3Template = root.querySelector('#spec-block3-template');
+  const block31Template = root.querySelector('#spec-block31-template');
+  const attrPairTemplate = root.querySelector('#spec-attr-template');
+  const contextMenu = root.querySelector('.spec-context-menu');
+  const ticketModal = root.querySelector('#modal9-ticket-modal');
+  const ticketCloseBtn = ticketModal ? ticketModal.querySelector('.modal9-ticket-close') : null;
+  const ticketSpecInput = root.querySelector('#modal9-ticket-spec-id');
+  const ticketSubjectInput = root.querySelector('#modal9-ticket-subject');
+  const ticketMessageInput = root.querySelector('#modal9-ticket-message');
+  const ticketSubmitBtn = root.querySelector('.modal9-submit-ticket-btn');
+  const updatesPanel = root.querySelector('.modal9-updates');
+  const updatesToggle = root.querySelector('.modal9-updates-toggle');
+  const BLOCK2_COLUMNS = ['артикул', 'наименование', 'кол-во', 'ед. изм.', 'цена', 'сумма'];
+  const BLOCK3_COLUMNS = ['артикул', 'наименование', 'кол-во', 'ед. изм.', 'цена', 'сумма'];
+  const TOKEN_RATE = 0.00000517;
+  let realtimeSub = null;
+  let autoRefreshTimer = null;
+  const block1OpenBlocks = {};
+  const historyOpenBlocks = {};
+  const hideTimers = new WeakMap();
+  let openedSpecId = null;
+  let contextSpecContent = null;
+  let currentUserEmail = null;
+  let lastSupportSpecId = null;
+  let historyLimit = HISTORY_LIMIT_DEFAULT;
+  let historyTotalCount = 0;
+    // Сколько последних записей держим в realtime
+  const REALTIME_ROW_LIMIT = 6;
+
+  // Набор spec_id, для которых реально слушаем обновления
+  const watchedSpecIds = new Set();
+
+  // Дебаунс на подгрузку одной спецификации
+  const reloadTimers = new Map();
+
+    function ensureSpecWatched(specId) {
+    if (specId === null || specId === undefined) return;
+    watchedSpecIds.add(String(specId));
+  }
+
+  function recomputeWatchedSpecIds() {
+    watchedSpecIds.clear();
+
+    // база — верхние REALTIME_ROW_LIMIT из текущей истории
+    const base = (history || [])
+      .slice(0, REALTIME_ROW_LIMIT)
+      .map(item => String(item.id))
+      .filter(Boolean);
+
+    base.forEach(id => watchedSpecIds.add(id));
+
+    // плюс все открытые в блоке 1 (page 2)
+    Object.keys(block1OpenBlocks || {}).forEach(id => {
+      watchedSpecIds.add(String(id));
+    });
+
+    // плюс все открытые в истории (page 1)
+    Object.keys(historyOpenBlocks || {}).forEach(id => {
+      watchedSpecIds.add(String(id));
+    });
+  }
+
+
+  if (updatesPanel && !updatesPanel.dataset.bound) {
+    const toggleUpdatesHeight = expanded => {
+      const next = typeof expanded === 'boolean' ? expanded : !updatesPanel.classList.contains('is-expanded');
+      updatesPanel.classList.toggle('is-expanded', next);
+      if (updatesToggle) {
+        updatesToggle.setAttribute('aria-expanded', String(next));
+        updatesToggle.textContent = next ? 'свернуть' : 'развернуть';
+      }
+    };
+
+    const handleOutsideClick = event => {
+      if (!updatesPanel.contains(event.target)) {
+        toggleUpdatesHeight(false);
+      }
+    };
+
+    updatesPanel.addEventListener('click', event => {
+      if (updatesToggle && event.target === updatesToggle) return;
+      if (!updatesPanel.classList.contains('is-expanded')) {
+        toggleUpdatesHeight(true);
+      }
+    });
+
+    if (updatesToggle) {
+      updatesToggle.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleUpdatesHeight();
+      });
+    }
+
+    document.addEventListener('click', handleOutsideClick, { capture: true });
+    updatesPanel.dataset.bound = 'true';
+  }
+
+  let isLoadingHistory = false;
+  let queuedHistoryOptions = null;
+  let filterDebounceTimer = null;
+
+  if (supabase?.auth?.getUser) {
+    try {
+      supabase.auth.getUser()
+        .then(({ data: { user } = {}, error }) => {
+          if (error) {
+            console.error('[modal9] getUser error:', error);
+            return;
+          }
+          currentUserEmail = user?.email || null;
+        })
+        .catch(err => {
+          console.error('[modal9] getUser rejected:', err);
+        });
+    } catch (err) {
+      console.error('[modal9] getUser exception:', err);
+    }
+  }
+
+  if (supabase?.auth?.getSession && !currentUserEmail) {
+    supabase.auth.getSession()
+      .then(({ data: { session } = {}, error }) => {
+        if (error) {
+          console.error('[modal9] getSession error:', error);
+          return;
+        }
+        currentUserEmail = session?.user?.email || currentUserEmail;
+      })
+      .catch(err => {
+        console.error('[modal9] getSession rejected:', err);
+      });
+  }
+
+  if (ticketCloseBtn) {
+    ticketCloseBtn.addEventListener('click', () => {
+      closeSupportTicketModal({ preserveSpec: false });
+    });
+  }
+  if (ticketModal) {
+    ticketModal.addEventListener('click', event => {
+      if (event.target === ticketModal) {
+        closeSupportTicketModal({ preserveSpec: true });
+      }
+    });
+  }
+  if (ticketSpecInput) {
+    ticketSpecInput.addEventListener('input', () => {
+      ticketSpecInput.value = ticketSpecInput.value.replace(/\D/g, '');
+    });
+  }
+  if (ticketSubmitBtn) {
+    ticketSubmitBtn.addEventListener('click', async () => {
+      if (!supabase) return;
+      const specId = (ticketSpecInput?.value || '').trim();
+      const subject = (ticketSubjectInput?.value || '').trim();
+      const message = (ticketMessageInput?.value || '').trim();
+      if (!specId || !subject || !message) {
+        alert('Заполните все поля');
+        return;
+      }
+      let specExists = false;
+      try {
+        const { data } = await supabase
+          .from(TABLE)
+          .select('id')
+          .eq('id', specId)
+          .single();
+        if (data?.id) {
+          specExists = true;
+        }
+      } catch (err) {
+        console.error('[modal9] ticket spec lookup error:', err);
+      }
+      if (!specExists) {
+        alert('spec # не существует');
+        return;
+      }
+      if (!currentUserEmail) {
+        alert('Не удалось получить email пользователя');
+        return;
+      }
+      try {
+        const { error } = await supabase
+          .from('support_tickets')
+          .insert({ spec_id: specId, subject, message, user_login: currentUserEmail });
+        if (error) throw error;
+        closeSupportTicketModal({ preserveSpec: false });
+      } catch (err) {
+        console.error('[modal9] support ticket insert error:', err);
+        alert('Ошибка отправки');
+      }
+    });
+  }
+
+  let block1ReloadTimer = null;
+  function scheduleLoadBlock1() {
+    if (block1ReloadTimer) return;
+    block1ReloadTimer = setTimeout(async () => {
+      block1ReloadTimer = null;
+      await loadBlock1();
+    }, 500);
+  }
+
+    function scheduleReloadSpec(specId) {
+    if (specId === null || specId === undefined) return;
+    const key = String(specId);
+    if (reloadTimers.has(key)) return;
+
+    const timer = setTimeout(async () => {
+      reloadTimers.delete(key);
+      try {
+        await reloadSingleSpec(specId);
+      } catch (err) {
+        console.error('[modal9] reloadSingleSpec error:', err);
+      }
+    }, 400); // немного ждём, чтобы склеить пачку событий по одной спеки
+
+    reloadTimers.set(key, timer);
+  }
+
+  async function reloadSingleSpec(specId) {
+    const idStr = String(specId);
+
+    // старые строки для этой спеки
+    const prevRowsForSpec = block1Rows.filter(row => String(row.spec_id) === idStr);
+
+    // тянем позиции только этой спецификации
+    const { data, error } = await supabase
+      .from(POS_TABLE)
+      .select(
+        'file_number, user_login, file_name, id, spec_id,' +
+        'pos_number, pos_number_int, name, qty, unit, attrs, attrs_json'
+      )
+      .eq('spec_id', specId)
+      .order('pos_number_int', { ascending: true });
+
+    if (error) {
+      console.error('[modal9] reloadSingleSpec POS_TABLE error:', error);
+      return;
+    }
+
+    const newRows = (data || []).map(r => ({
+      file_number:    r.file_number,
+      user_login:     r.user_login,
+      file_name:      r.file_name,
+      id:             r.id,
+      spec_id:        r.spec_id,
+      pos_number:     r.pos_number,
+      pos_number_int: toPosNum(r.pos_number_int ?? r.pos_number),
+      name:           r.name,
+      qty:            r.qty,
+      unit:           r.unit,
+      attrs:          r.attrs,
+      attrs_json:     r.attrs_json,
+    }));
+
+    // обновляем общий массив позиций
+    block1Rows = block1Rows
+      .filter(row => String(row.spec_id) !== idStr)
+      .concat(newRows);
+
+    // чистим старые селекты для старых позиций этой спеки
+    prevRowsForSpec.forEach(row => {
+      delete selectionMap[row.id];
+    });
+
+    // подтягиваем новые селекты только по текущим pos_id
+    const posIds = newRows.map(r => r.id);
+    if (posIds.length) {
+      const { data: sels, error: selErr } = await supabase
+        .from(SELECT_TABLE)
+        .select(
+          'pos_id, article, model_name, qty, unit, price, sum, ' +
+          'price1_amount, price1_currency, price1_store, price1_url, ' +
+          'price2_amount, price2_currency, price2_store, price2_url, ' +
+          'price3_amount, price3_currency, price3_store, price3_url, ' +
+          'prices_json, pricer_status'
+        )
+        .in('pos_id', posIds);
+
+      if (selErr) {
+        console.error('[modal9] reloadSingleSpec SELECT_TABLE error:', selErr);
+      } else if (Array.isArray(sels)) {
+        sels.forEach(s => {
+          const key = s.pos_id;
+          if (key === null || key === undefined) return;
+          const list = selectionMap[key] || [];
+          list.push(s);
+          selectionMap[key] = list;
+        });
+      }
+    }
+
+    // обновляем сгруппированные данные по спекам
+    specGroups[idStr] = newRows;
+
+    // хэш и ререндер только этой спеки
+    specRenderCache.set(idStr, computeSpecHash(specId));
+    const changedIds = new Set([idStr]);
+    updateBlock1SpecContainers({ changedIds });
+    updateHistorySpecContainers({ changedIds });
+  }
+
+
+  function startAutoRefresh() {
+    if (autoRefreshTimer) return;
+    autoRefreshTimer = setInterval(() => {
+      loadHistory();
+    }, AUTO_REFRESH_INTERVAL);
+  }
+
+  function stopAutoRefresh() {
+    if (!autoRefreshTimer) return;
+    clearInterval(autoRefreshTimer);
+    autoRefreshTimer = null;
+  }
+
+  const DELIM = window.__DELIM || "###";
+
+  function openSupportTicketModal(specId) {
+    if (!ticketModal) return;
+    const normalizedSpec = specId != null ? String(specId).replace(/[^0-9]/g, '') : '';
+    lastSupportSpecId = normalizedSpec || null;
+    if (ticketSpecInput) {
+      ticketSpecInput.value = normalizedSpec;
+    }
+    if (ticketSubjectInput) {
+      ticketSubjectInput.value = '';
+    }
+    if (ticketMessageInput) {
+      ticketMessageInput.value = '';
+    }
+    ticketModal.style.display = 'flex';
+    requestAnimationFrame(() => {
+      ticketSubjectInput?.focus();
+    });
+  }
+
+  function closeSupportTicketModal(options = {}) {
+    if (!ticketModal) return;
+    const { preserveSpec = false } = options;
+    ticketModal.style.display = 'none';
+    if (ticketSubjectInput) {
+      ticketSubjectInput.value = '';
+    }
+    if (ticketMessageInput) {
+      ticketMessageInput.value = '';
+    }
+    if (ticketSpecInput) {
+      if (preserveSpec && lastSupportSpecId) {
+        ticketSpecInput.value = lastSupportSpecId;
+      } else {
+        ticketSpecInput.value = '';
+        lastSupportSpecId = null;
+      }
+    }
+  }
+
+  function insertActionButtons(container, specId) {
+    if (!container || !buttonGroupSpec) return null;
+    const specContent = container.querySelector('.spec-content');
+    if (!specContent) return null;
+    const fragment = buttonGroupSpec.content.cloneNode(true);
+    const row = fragment.querySelector('.spec-action-row');
+    if (!row) return null;
+    row.dataset.specId = String(specId);
+    row.classList.add('fade-toggle', 'hidden');
+    row.style.display = 'none';
+    row.querySelectorAll('.spec-action-btn').forEach(button => {
+      const action = button.dataset.action;
+      if (!action) return;
+      button.addEventListener('click', async event => {
+        event.preventDefault();
+        event.stopPropagation();
+        await runSpecAction(action, specId, specContent, button);
+      });
+    });
+    container.insertBefore(fragment, specContent);
+    return row;
+  }
+  
+  const formatNumericValue = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+    if (typeof value === 'number') {
+      if (!Number.isFinite(value)) return String(value);
+      return value.toLocaleString('ru-RU');
+    }
+    const raw = String(value).trim();
+    const normalized = raw
+      .replace(/\u00a0/g, ' ')
+      .replace(/[^0-9,.-]/g, '')
+      .replace(/\s+/g, '')
+      .replace(',', '.');
+    const parsed = Number(normalized);
+    if (!Number.isFinite(parsed)) {
+      const digitsOnly = raw.replace(/[^0-9,.-]/g, '').replace(/\s+/g, '');
+      return digitsOnly || raw;
+    }
+    return parsed.toLocaleString('ru-RU');
+  };
+
+  const formatOfferPrice = (amount) => formatNumericValue(amount);
+
+ const toPosNum = (val) => {
+  if (typeof val === 'number' && Number.isFinite(val)) return val;
+  const s = String(val ?? '').trim();
+  const m = s.match(/\d+/);            // берём первое число в строке "1", "01", "1а", "1.2" -> 1
+  return m ? parseInt(m[0], 10) : Number.MAX_SAFE_INTEGER; // нечисловые — в конец
+};
+
+
+  function appendBlock21Content(target, selections = []) {
+    if (!target || !block21Template) return;
+    target.innerHTML = '';
+    const records = Array.isArray(selections) ? selections.filter(Boolean) : [];
+    if (!records.length) {
+      target.appendChild(block21Template.content.cloneNode(true));
+      return;
+    }
+
+    records.forEach((record, index) => {
+      const frag = block21Template.content.cloneNode(true);
+      const row = frag.firstElementChild;
+      if (row) {
+        row.classList.add('block21-entry');
+        row.dataset.selectionIndex = String(index + 1);
+        if (record?.article) row.dataset.article = record.article;
+        if (record?.pos_id) row.dataset.posId = String(record.pos_id);
+      }
+      const setOffer = (n, amount, curr, store, url) => {
+        const priceEl = frag.querySelector(`[data-offer="${n}-price"]`);
+        const storeEl = frag.querySelector(`[data-offer="${n}-store"]`);
+        const urlEl = frag.querySelector(`[data-offer="${n}-url"]`);
+        if (priceEl) {
+  priceEl.value = (amount ?? '') === ''
+    ? ''
+    : `${formatOfferPrice(amount)}${curr ? ' ' + curr : ''}`;
+}
+        if (storeEl) storeEl.value = store || '';
+        if (urlEl) {
+          const href = url || '';
+          if (href) {
+            urlEl.setAttribute('href', href);
+            urlEl.removeAttribute('aria-disabled');
+            urlEl.removeAttribute('tabindex');
+            urlEl.classList.remove('disabled');
+            urlEl.style.pointerEvents = '';
+            urlEl.style.opacity = '';
+            urlEl.setAttribute('title', href);
+          } else {
+            urlEl.setAttribute('href', '#');
+            urlEl.setAttribute('aria-disabled', 'true');
+            urlEl.setAttribute('tabindex', '-1');
+            urlEl.classList.add('disabled');
+            urlEl.style.pointerEvents = 'none';
+            urlEl.style.opacity = '0.5';
+            urlEl.removeAttribute('title');
+          }
+        }
+      };
+
+      setOffer(1, record?.price1_amount, record?.price1_currency, record?.price1_store, record?.price1_url);
+      setOffer(2, record?.price2_amount, record?.price2_currency, record?.price2_store, record?.price2_url);
+      setOffer(3, record?.price3_amount, record?.price3_currency, record?.price3_store, record?.price3_url);
+
+      target.appendChild(frag);
+    });
+  }
+
+  let selectedFile = null;
+  filterInput.addEventListener('input', () => {
+    const hasValue = !!filterInput.value.trim();
+    filterClear.style.display = hasValue ? 'block' : 'none';
+    applySecondFilter();
+    historyLimit = HISTORY_LIMIT_DEFAULT;
+    if (filterDebounceTimer) clearTimeout(filterDebounceTimer);
+    filterDebounceTimer = setTimeout(() => {
+      loadHistory();
+    }, 350);
+  });
+
+  filterClear.addEventListener('click', () => {
+    filterInput.value = '';
+    filterClear.style.display = 'none';
+    applySecondFilter();
+    if (filterDebounceTimer) {
+      clearTimeout(filterDebounceTimer);
+      filterDebounceTimer = null;
+    }
+    historyLimit = HISTORY_LIMIT_DEFAULT;
+    loadHistory({ resetLimit: true });
+  });
+  myFilesToggle.addEventListener('change', async () => {
+    toggleText.textContent = myFilesToggle.checked ? 'демонстрация только моих файлов' : 'демонстрация файлов компании';
+    if (filterDebounceTimer) {
+      clearTimeout(filterDebounceTimer);
+      filterDebounceTimer = null;
+    }
+    historyLimit = HISTORY_LIMIT_DEFAULT;
+    await loadHistory({ resetLimit: true });
+  });
+  if (loadMoreBtn) {
+    const loadMoreDefaultText = loadMoreBtn.textContent.trim() || 'показать ещё';
+    loadMoreBtn.addEventListener('click', async () => {
+      historyLimit += HISTORY_LIMIT_STEP;
+      loadMoreBtn.disabled = true;
+      loadMoreBtn.classList.add('loading');
+      loadMoreBtn.textContent = 'загрузка...';
+      try {
+        await loadHistory();
+      } finally {
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.classList.remove('loading');
+        loadMoreBtn.textContent = loadMoreDefaultText;
+      }
+    });
+  }
+  fileInput.addEventListener('change', () => {
+    selectedFile = fileInput.files[0] || null;
+    renderFileList();
+  });
+
+  browseBtn.addEventListener('click', () => fileInput.click());
+
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('drag');
+  });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('drag');
+    selectedFile = e.dataTransfer.files[0];
+    renderFileList();
+  });
+
+  function renderFileList() {
+    fileList.innerHTML = '';
+    uploadStatus.textContent = selectedFile ? `Выбран: ${selectedFile.name}` : '';
+    if (selectedFile) {
+      const li = document.createElement('li');
+      li.textContent = selectedFile.name;
+      fileList.appendChild(li);
+    }
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      if (tab.classList.contains('active')) return;
+      tabs.forEach(t => t.classList.remove('active'));
+      pages.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      root.querySelector(`.page[data-page="${tab.dataset.page}"]`).classList.add('active');
+      if (navSlider) navSlider.style.left = tab.dataset.page === '1' ? '0%' : '50%';
+      if (tab.dataset.page === '2') loadBlock1();
+    });
+  });
+
+  const sanitize = (s) => s
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9._-]/gi, '_');
+
+  const STATUS_FIELDS = new Set(['status_parser', 'status_selector', 'status_pricer']);
+
+  function getStatusIconState(rawValue) {
+    const value = String(rawValue ?? '').trim();
+    if (!value || value === '-') {
+      return { icon: 'clear_all', color: '#878787', glow: false };
+    }
+    const normalized = value.replace(/\s+/g, ' ');
+    const parts = normalized.split('/').map(part => part.trim());
+    if (parts.length === 3 && parts.every(part => part && part === parts[0])) {
+      return { icon: 'done_all', color: '#337418', glow: true };
+    }
+    return { icon: 'text_fields_alt', color: '#262626', glow: false };
+  }
+
+  function applyStatusIcon(scope, field, value) {
+    if (!STATUS_FIELDS.has(field)) return;
+    if (!scope || typeof scope.querySelector !== 'function') return;
+    const icon = scope.querySelector(`[data-status-icon="${field}"]`);
+    if (!icon) return;
+    const state = getStatusIconState(value);
+    if (icon.textContent !== state.icon) {
+      icon.textContent = state.icon;
+    }
+    icon.style.color = state.color;
+    icon.style.textShadow = state.glow ? '0 0 8px #5dd62c' : 'none';
+  }
+
+  function showCopyTip(el) {
+    const tip = document.createElement('div');
+    tip.className = 'copy-tooltip';
+    tip.textContent = 'скопировано';
+    document.body.appendChild(tip);
+    const r = el.getBoundingClientRect();
+    tip.style.left = r.left + r.width / 2 - tip.offsetWidth / 2 + 'px';
+    tip.style.top = r.top - tip.offsetHeight - 6 + 'px';
+    setTimeout(() => tip.remove(), 1000);
+  }
+
+  function updateStatus(el, status) {
+    if (!el) return;
+    const s = String(status || '');
+    const match = s.match(/^BLOCK\s*2\s*\(\s*(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)\s*\)$/i);
+    const display = match ? `${match[1]} / ${match[2]} / ${match[3]}` : s;
+    if ('value' in el) {
+      el.value = display;
+    }
+    el.textContent = display;
+    const field = el.dataset?.field;
+    if (field && STATUS_FIELDS.has(field)) {
+      const rowEl = el.closest('.history-item');
+      if (rowEl) {
+        applyStatusIcon(rowEl, field, display);
+        const specId = rowEl.dataset?.specId;
+        if (specId) updateSpecProgress(specId);
+      }
+    }
+    if (display.trim().endsWith('!!!')) {
+      el.classList.add('error');
+    } else {
+      el.classList.remove('error');
+    }
+  }
+
+  function animateStatus(el, newStatus) {
+    if (!el) return;
+    el.classList.add('fade');
+    setTimeout(() => {
+      updateStatus(el, newStatus);
+      el.classList.remove('fade');
+    }, 1000);
+  }
+
+  function startBtnLoad() {
+    uploadBtn.classList.add('loading');
+    uploadBtn.disabled = true;
+  }
+
+  function stopBtnLoad() {
+    uploadBtn.classList.remove('loading');
+    uploadBtn.disabled = false;
+  }
+
+  function applyRealtimeRegistryUpdate(newRow) {
+    if (!newRow || !newRow.id) return;
+    const specId = String(newRow.id);
+
+    // realtime ТОЛЬКО по наблюдаемым
+    if (!watchedSpecIds.has(specId)) return;
+
+    // обновляем кэш history
+    const idx = history.findIndex(h => String(h.id) === specId);
+    if (idx === -1) {
+      // этой строки нет в текущей выборке — просто игнорируем
+      return;
+    }
+
+    const prev = history[idx];
+    history[idx] = { ...prev, ...newRow };
+
+    lastHistoryStatus[newRow.id] = {
+      status_parser:   newRow.status_parser,
+      status_selector: newRow.status_selector,
+      status_pricer:   newRow.status_pricer,
+    };
+
+    const rowEl = historyList.querySelector(`.history-item[data-spec-id="${specId}"]`);
+    if (!rowEl) return;
+
+    const updateField = (fieldName, dbValue, { animate = false, isTokens = false } = {}) => {
+      let selector = `[data-field="${fieldName}"]`;
+      if (isTokens) selector = '[data-field="-"]';
+
+      const el = rowEl.querySelector(selector);
+      if (!el) return;
+
+      let displayValue = '';
+
+      if (isTokens) {
+        displayValue = formatTokenCost(dbValue);
+      } else {
+        displayValue = dbValue ?? '';
+      }
+
+      const prevValue = 'value' in el ? el.value : el.textContent;
+      if (prevValue === displayValue) return;
+
+      if (STATUS_FIELDS.has(fieldName) || animate) {
+        animateStatus(el, displayValue);
+      } else {
+        if ('value' in el) el.value = displayValue;
+        else el.textContent = displayValue;
+      }
+    };
+
+    // статусы (ПАРСИНГ / ПОДБОР / ПРОЦЕНКА)
+    updateField('status_parser',   newRow.status_parser,   { animate: true });
+    updateField('status_selector', newRow.status_selector, { animate: true });
+    updateField('status_pricer',   newRow.status_pricer,   { animate: true });
+
+    // стоимость токенов (минимальная нагрузка)
+    updateField('tokens', newRow.tokens, { isTokens: true });
+
+    // пересчитать прогресс по трём статусам для всех прогресс-баров этой спеки
+    updateSpecProgress(specId);
+  }
+
+
+
+  uploadBtn.addEventListener('click', async () => {
+    if (!selectedFile || uploadBtn.classList.contains('loading')) return;
+    startBtnLoad();
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { uploadStatus.textContent = 'Необходим вход'; stopBtnLoad(); return; }
+
+    const ext = selectedFile.name.split('.').pop().toLowerCase();
+
+    if (!ALLOWED_EXTS.includes(ext)) {
+      uploadStatus.textContent = 'Недопустимый тип файла';
+      stopBtnLoad();
+      return;
+    }
+
+    const safeName = sanitize(selectedFile.name);
+    const safeFolder = sanitize(session.user.id);
+    const filePath = `${safeFolder}/${Date.now()}_${safeName}`;
+
+    uploadProgress.style.display = 'block';
+    uploadProgress.value = 0;
+    uploadProgress.classList.remove('done', 'fade-out');
+    uploadProgress.classList.add('running');
+    uploadStatus.textContent = '0%';
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${window.SUPABASE_URL}/storage/v1/object/${BUCKET}/${filePath}`);
+    xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+    xhr.setRequestHeader('apikey', window.SUPABASE_ANON_KEY);
+    xhr.setRequestHeader('x-upsert', 'true');
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        uploadProgress.value = percent;
+        uploadStatus.textContent = percent + '%';
+      }
+    };
+    const uploadPromise = new Promise((resolve, reject) => {
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) resolve();
+        else reject(new Error(xhr.statusText));
+      };
+      xhr.onerror = () => reject(new Error('Network error'));
+    });
+    xhr.send(selectedFile);
+
+    try {
+      await uploadPromise;
+    } catch (e) {
+      uploadStatus.textContent = 'Ошибка upload: ' + e.message;
+      stopBtnLoad();
+      return;
+    }
+    uploadProgress.value = 100;
+
+    const { data: insertedRow, error: regErr } = await supabase
+      .from(TABLE)
+      .insert({
+        user_login: window.USER_LOGIN || '',
+        file_path: filePath,
+        file_name: selectedFile.name,
+        file_ext: ext
+      })
+      .select('*')
+      .single();
+
+    if (regErr) {
+      uploadStatus.textContent = 'Ошибка записи в реестр';
+      stopBtnLoad();
+      return;
+    }
+
+    uploadStatus.textContent = `Файл поставлен в очередь: ${insertedRow.file_number}`;
+    uploadProgress.classList.remove('running');
+    uploadProgress.classList.add('done', 'fade-out');
+    setTimeout(() => {
+      uploadProgress.style.display = 'none';
+      uploadProgress.classList.remove('done', 'fade-out');
+    }, 1000);
+    stopBtnLoad();
+
+    try {
+      // автозапуск modal9-parser
+      await supabase.functions.invoke('modal9-parser', {
+        body: { request_id: insertedRow.id },
+      });
+      await loadHistory();
+    } catch (err) {
+      console.error('modal9-parser error:', err);
+    }
+
+    selectedFile = null;
+    fileInput.value = '';
+    renderFileList();
+  });
+
+  let history = [];
+  let lastHistoryStatus = {};
+  function escapeSearchValue(value) {
+    return value.replace(/[\\%_]/g, '\\$&');
+  }
+  function updateLoadMoreVisibility() {
+    if (!loadMoreBtn) return;
+    const hasMore = history.length > 0 && history.length < historyTotalCount;
+    loadMoreBtn.style.display = hasMore ? 'inline-flex' : 'none';
+  }
+  function formatTokenCost(tokens) {
+    const numericTokens = Number(tokens);
+    if (!Number.isFinite(numericTokens)) return '0.00$';
+    const usdValue = Math.round(numericTokens * TOKEN_RATE * 100) / 100;
+    return `${usdValue.toFixed(2)}$`;
+  }
+  async function loadHistory(options = {}) {
+    const { resetLimit = false } = options;
+    if (resetLimit) {
+      historyLimit = HISTORY_LIMIT_DEFAULT;
+    }
+    if (isLoadingHistory) {
+      queuedHistoryOptions = {
+        resetLimit: queuedHistoryOptions?.resetLimit || resetLimit,
+      };
+      return;
+    }
+    isLoadingHistory = true;
+    try {
+      const oldMap = { ...lastHistoryStatus };
+      let query = supabase
+        .from(TABLE)
+        .select('id, file_number, user_login, created_at, file_name, file_ext, status_parser, status_selector, status_pricer, tokens', { count: 'exact' })
+        .order('created_at', { ascending: false });
+
+      try {
+        const { data: { session } = {} } = await supabase.auth.getSession();
+        const sessionEmail = session?.user?.email || null;
+        if (sessionEmail && !currentUserEmail) currentUserEmail = sessionEmail;
+        if (myFilesToggle.checked && sessionEmail) {
+          query = query.eq('user_login', sessionEmail);
+        }
+      } catch (err) {
+        console.error('[modal9] loadHistory session error:', err);
+      }
+
+      const searchValue = filterInput.value.trim();
+      if (searchValue) {
+        const escaped = escapeSearchValue(searchValue);
+        const pattern = `%${escaped}%`;
+        query = query.or([
+          `file_number.ilike.${pattern}`,
+          `user_login.ilike.${pattern}`,
+          `file_name.ilike.${pattern}`,
+          `file_ext.ilike.${pattern}`,
+          `id::text.ilike.${pattern}`,
+          `created_at::text.ilike.${pattern}`,
+          `status_parser.ilike.${pattern}`,
+          `status_selector.ilike.${pattern}`,
+          `status_pricer.ilike.${pattern}`,
+        ].join(','));
+      }
+
+      query = query.limit(historyLimit);
+
+      const { data, error, count } = await query;
+
+      if (error) {
+        console.error(error);
+        updateLoadMoreVisibility();
+        return;
+      }
+      history = data || [];
+      historyTotalCount = typeof count === 'number' ? count : history.length;
+      lastHistoryStatus = {};
+      history.forEach(h => {
+        if (h?.id !== undefined) {
+          lastHistoryStatus[h.id] = {
+            status_parser:   h.status_parser,
+            status_selector: h.status_selector,
+            status_pricer:   h.status_pricer,
+          };
+        }
+      });
+            // пересчитываем набор spec_id, по которым реально слушаем realtime
+      recomputeWatchedSpecIds();
+
+      renderHistory(oldMap);
+      applySecondFilter();
+      updateLoadMoreVisibility();
+      if (history.length) {
+        await loadBlock1({ fromHistory: true });
+      } else {
+        block1Rows = [];
+        specGroups = {};
+        selectionMap = {};
+        renderBlock1();
+      }
+    } finally {
+      isLoadingHistory = false;
+      if (queuedHistoryOptions) {
+        const next = { ...queuedHistoryOptions };
+        queuedHistoryOptions = null;
+        await loadHistory(next);
+      }
+    }
+  }
+
+  function renderHistory(oldMap = {}, options = {}) {
+    const { updateOnly = false } = options;
+    if (updateOnly) {
+      updateHistorySpecContainers({ forceAll: true });
+      setupOverflowTooltips(historyList);
+      applySecondFilter();
+      return;
+    }
+    const existingRows = new Map();
+    historyList.querySelectorAll('.history-item').forEach(row => {
+      existingRows.set(row.dataset.specId, row);
+    });
+    const processed = new Set();
+    let anchor = historyList.firstChild;
+    history.forEach(item => {
+      const idStr = String(item.id);
+      processed.add(idStr);
+      let rowEl = existingRows.get(idStr);
+      if (!rowEl) {
+        const fragment = rowTemplate.content.cloneNode(true);
+        rowEl = fragment.querySelector('.history-item');
+        if (!rowEl) return;
+        rowEl.dataset.specId = idStr;
+        rowEl.classList.add('fade-in');
+        rowEl.addEventListener('click', () => openRowGroup(item.id, historyOpenBlocks[item.id]));
+        fragment.querySelectorAll('[data-field]').forEach(el => {
+          const field = el.dataset.field;
+          if (!field) return;
+          if (field === 'id') {
+            el.addEventListener('click', e => {
+              e.stopPropagation();
+              openRowGroup(item.id, historyOpenBlocks[item.id]);
+            });
+          } else {
+            el.addEventListener('click', e => {
+              e.stopPropagation();
+              navigator.clipboard.writeText(el.value || el.textContent || '');
+              showCopyTip(el);
+            });
+          }
+        });
+        historyList.insertBefore(fragment, anchor);
+        rowEl = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`);
+      }
+      if (!rowEl) return;
+      const fields = rowEl.querySelectorAll('[data-field]');
+      fields.forEach(el => {
+        const field = el.dataset.field;
+        if (!field) return;
+        if (field === '-') {
+          const tokenValue = formatTokenCost(item.tokens);
+          if (el.value !== tokenValue) el.value = tokenValue;
+          return;
+        }
+        let val = item[field];
+        if (field === 'created_at') val = item.created_at ? new Date(item.created_at).toLocaleString() : '';
+        if (el.tagName === 'INPUT') {
+          if (el.value !== (val || '')) el.value = val || '';
+        } else if (el.textContent !== (val || '')) {
+          el.textContent = val || '';
+        }
+        if (STATUS_FIELDS.has(field)) {
+          applyStatusIcon(rowEl, field, val);
+          if (oldMap[item.id] && oldMap[item.id][field] !== val) {
+            animateStatus(el, val);
+          }
+          updateSpecProgress(item.id); // пересчёт прогресса на базе трёх полей
+        }
+      });
+      if (anchor && rowEl !== anchor) {
+        historyList.insertBefore(rowEl, anchor);
+      }
+      const specContainer = historyList.querySelector(`.spec-container[data-spec-id="${idStr}"]`);
+      if (specContainer && specContainer.previousSibling !== rowEl) {
+        historyList.insertBefore(specContainer, rowEl.nextSibling);
+      }
+      anchor = specContainer ? specContainer.nextSibling : rowEl.nextSibling;
+    });
+    existingRows.forEach((rowEl, id) => {
+      if (!processed.has(id)) {
+        rowEl.remove();
+        const specContainer = historyList.querySelector(`.spec-container[data-spec-id="${id}"]`);
+        if (specContainer) specContainer.remove();
+        delete historyOpenBlocks[id];
+      }
+    });
+    setupOverflowTooltips(historyList);
+    applySecondFilter();
+  }
+
+  function applySecondFilter() {
+    const q = filterInput.value.trim().toLowerCase();
+    filterClear.style.display = q ? 'block' : 'none';
+    historyList.querySelectorAll('.history-item').forEach(item => {
+      let visible = true;
+      if (q) {
+        visible = ['file_number','user_login','created_at','file_name','file_ext','status_parser','status_selector','status_pricer','id'].some(field => {
+          const el = item.querySelector(`[data-field="${field}"]`);
+          if (!el) return false;
+          const val = (el.value || el.textContent || '').toString().toLowerCase();
+          return val.includes(q);
+        });
+      }
+      item.style.display = visible ? '' : 'none';
+      const spec = historyList.querySelector(`.spec-container[data-spec-id="${item.dataset.specId}"]`);
+      if (spec) spec.style.display = visible ? '' : 'none';
+    });
+  }
+
+  let block1Rows = [];
+  let specGroups = {};
+  let selectionMap = {};
+  const specRenderCache = new Map();
+  let loadingBlock1 = false;
+  let pendingLoad = null;
+
+  function computeSpecHash(specId) {
+    const rows = (specGroups[String(specId)] || []).slice().sort(
+   (a, b) => toPosNum(a.pos_number_int ?? a.pos_number) - toPosNum(b.pos_number_int ?? b.pos_number)
+ );
+    const summary = rows.map(row => {
+      const selections = (selectionMap[row.id] || []).map(sel => ({
+        article: sel.article ?? '',
+        model_name: sel.model_name ?? '',
+        qty: sel.qty ?? '',
+        unit: sel.unit ?? '',
+        price: sel.price ?? '',
+        sum: sel.sum ?? '',
+        price1_amount: sel.price1_amount ?? '',
+        price1_currency: sel.price1_currency ?? '',
+        price1_store: sel.price1_store ?? '',
+        price1_url: sel.price1_url ?? '',
+        price2_amount: sel.price2_amount ?? '',
+        price2_currency: sel.price2_currency ?? '',
+        price2_store: sel.price2_store ?? '',
+        price2_url: sel.price2_url ?? '',
+        price3_amount: sel.price3_amount ?? '',
+        price3_currency: sel.price3_currency ?? '',
+        price3_store: sel.price3_store ?? '',
+        price3_url: sel.price3_url ?? '',
+        pricer_status: sel.pricer_status ?? '',
+        prices_json: sel.prices_json ?? '',
+      }));
+
+      return {
+        id: row.id,
+        pos_number: row.pos_number ?? '',
+        pos_number_int: toPosNum(row.pos_number_int ?? row.pos_number),
+        name: row.name ?? '',
+        qty: row.qty ?? '',
+        unit: row.unit ?? '',
+        attrs: row.attrs ?? '',
+        attrs_json: Array.isArray(row.attrs_json) ? row.attrs_json : null,
+        selections,
+      };
+    });
+    return JSON.stringify(summary);
+  }
+
+  function createSpecContainer(specId, options = {}) {
+    const { mode = 'history' } = options;
+    if (!specTemplate) return {};
+    const fragment = specTemplate.content.cloneNode(true);
+    const container = fragment.querySelector('.spec-container');
+    if (!container) return {};
+    const idStr = String(specId);
+    container.dataset.specId = idStr;
+    const header = container.querySelector('.spec-header');
+    const closeBtn = container.querySelector('.group-close');
+    const content = container.querySelector('.spec-content');
+    if (content) {
+      content.dataset.specId = idStr;
+      content.classList.add('fade-toggle', 'hidden');
+      content.style.display = 'none';
+    }
+    let progress = null;
+    if (specProgressTemplate && content) {
+      const progressFrag = specProgressTemplate.content.cloneNode(true);
+      progress = progressFrag.querySelector('.spec-progress');
+      if (progress) {
+        progress.dataset.specId = idStr;
+        progress.classList.add('fade-toggle', 'hidden');
+        progress.style.display = 'none';
+      }
+      container.insertBefore(progressFrag, content);
+      if (progress) {
+        initProgressHandlers(progress, specId);
+        // Прогресс вычисляем по ТРЁМ полям статусов
+        updateSpecProgress(idStr);
+      }
+    }
+    const actions = insertActionButtons(container, specId);
+    if (actions) actions.dataset.mode = mode;
+    if (mode === 'history') {
+      if (closeBtn) closeBtn.remove();
+    } else {
+      if (closeBtn) {
+        closeBtn.classList.add('fade-toggle', 'hidden');
+        closeBtn.style.display = 'none';
+        closeBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          closeGroup(specId);
+        });
+      }
+      if (header) header.addEventListener('click', () => openGroup(specId, block1OpenBlocks[specId]));
+    }
+    return { fragment, container, progress, content };
+  }
+
+  function restoreHistoryBlockState(specId, content) {
+    if (!content) return;
+    const saved = historyOpenBlocks[specId];
+    if (!saved) {
+      const first = content.querySelector('.modal-block');
+      if (first) first.classList.add('open');
+      return;
+    }
+    const targets = content.querySelectorAll(`.modal-block.${saved}`);
+    if (targets.length) {
+      content.querySelectorAll('.modal-block').forEach(b => b.classList.remove('open'));
+      targets.forEach(t => t.classList.add('open'));
+    }
+  }
+
+  function restoreBlock1State(specId, content) {
+    if (!content) return;
+    const saved = block1OpenBlocks[specId];
+    let row = null;
+    if (saved?.pos) {
+      row = Array.from(content.querySelectorAll('.modalCONTEINERpost')).find(node => {
+        const input = node.querySelector('[data-field="pos_number"]');
+        return input && input.value === saved.pos;
+      }) || null;
+    }
+    if (!row) row = content.querySelector('.modalCONTEINERpost');
+    if (!row) return;
+    const blockToOpen = saved?.block ? row.querySelector(`.${saved.block}`) : null;
+    row.querySelectorAll('.modal-block').forEach(block => block.classList.remove('open'));
+    (blockToOpen || row.querySelector('.modal-block') || row)?.classList.add('open');
+  }
+
+  function parseAttrsString(s) {
+    return (s || '')
+      .split('|')
+      .map(pair => {
+        const t = (pair || '').trim();
+        if (!t) return null;
+        const amp = t.indexOf('&');
+        if (amp >= 0) {
+          return { param: t.slice(0, amp).trim(), value: t.slice(amp + 1).trim() };
+        }
+        const i = t.search(/[:=]/);
+        if (i >= 0) {
+          const param = t.slice(0, i).trim();
+          const value = t.slice(i + 1).trim();
+          return { param, value };
+        }
+        return { param: t, value: '' };
+      })
+      .filter(Boolean);
+  }
+
+  function updateSpecContent(content, specId, options = {}) {
+    if (!content || !specRowTemplate) return;
+    const { mode = 'history' } = options;
+    const idStr = String(specId);
+    const rows = (specGroups[idStr] || []).slice().sort(
+   (a, b) => toPosNum(a.pos_number_int ?? a.pos_number) - toPosNum(b.pos_number_int ?? b.pos_number)
+ );
+    if (!rows.length) {
+      content.innerHTML = '';
+      content.dataset.renderHash = '';
+      return;
+    }
+    const hash = computeSpecHash(specId);
+    if (content.dataset.renderHash === hash) return;
+    const fragment = document.createDocumentFragment();
+    rows.forEach(row => {
+      const rf = specRowTemplate.content.cloneNode(true);
+      const posInput = rf.querySelector('[data-field="pos_number"]');
+      if (posInput) posInput.value = row.pos_number || '';
+      const nameInput = rf.querySelector('[data-field="name"]');
+      if (nameInput) nameInput.value = row.name || '';
+      const qtyInput = rf.querySelector('[data-field="qty"]');
+      if (qtyInput) qtyInput.value = row.qty || '';
+      const unitInput = rf.querySelector('[data-field="unit"]');
+      if (unitInput) unitInput.value = row.unit || '';
+      const attrsWrap = rf.querySelector('.block1 .modal-content');
+      if (attrsWrap) {
+        attrsWrap.innerHTML = '';
+        const pairs = (Array.isArray(row.attrs_json) && row.attrs_json.length)
+          ? row.attrs_json
+          : parseAttrsString(row.attrs);
+        pairs.forEach(({ param, value }) => {
+          const attrFrag = attrPairTemplate?.content.cloneNode(true);
+          if (!attrFrag) return;
+          const pInp = attrFrag.querySelector('.param-input');
+          const vInp = attrFrag.querySelector('.value-input');
+          if (pInp) { pInp.value = (param || ''); pInp.readOnly = true; }
+          if (vInp) { vInp.value = (value || ''); vInp.readOnly = true; }
+          attrsWrap.appendChild(attrFrag);
+        });
+      }
+
+      const sels = selectionMap[row.id] || [];
+      const block2 = rf.querySelector('.block2 .modal-content');
+      if (block2) {
+        block2.innerHTML = '';
+        if (sels.length) {
+          sels.forEach(sel => {
+            const frag = block2Template?.content.cloneNode(true);
+            if (!frag) return;
+            const inputs = frag.querySelectorAll('input');
+            if (inputs[0]) inputs[0].value = sel.article || '';
+            if (inputs[1]) inputs[1].value = sel.model_name || '';
+            if (inputs[2]) inputs[2].value = sel.qty || '';
+            if (inputs[3]) inputs[3].value = sel.unit || '';
+            if (inputs[4]) inputs[4].value = formatNumericValue(sel.price);
+            if (inputs[5]) inputs[5].value = formatNumericValue(sel.sum);
+            const rowEl = frag.firstElementChild;
+            if (rowEl) rowEl.classList.add('fade-in');
+            block2.appendChild(frag);
+          });
+        } else {
+          const frag = block2Template?.content.cloneNode(true);
+          if (frag) {
+            const rowEl = frag.firstElementChild;
+            if (rowEl) rowEl.classList.add('fade-in');
+            block2.appendChild(frag);
+          }
+        }
+      }
+      const block21 = rf.querySelector('.block21 .modal-content');
+      if (block21) appendBlock21Content(block21, sels);
+      const block1 = rf.querySelector('.block1');
+      if (block1) block1.classList.add('open');
+      fragment.appendChild(rf);
+    });
+    content.innerHTML = '';
+    content.appendChild(fragment);
+    content.dataset.renderHash = hash;
+    if (mode === 'history') restoreHistoryBlockState(specId, content);
+    else restoreBlock1State(specId, content);
+    setupDynamicBlocks(content);
+    setupOverflowTooltips(content);
+  }
+
+  function updateSpecProgress(specId, info) {
+    const idStr = String(specId);
+    // если info не передали — читаем три поля из строки истории
+    let statuses = info;
+    if (!statuses || (typeof statuses === 'object' && !('parser' in statuses) && !('selector' in statuses) && !('pricer' in statuses))) {
+      const row = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`);
+      const parser = row?.querySelector('[data-field="status_parser"]')?.value || row?.querySelector('[data-field="status_parser"]')?.textContent || '';
+      const selector = row?.querySelector('[data-field="status_selector"]')?.value || row?.querySelector('[data-field="status_selector"]')?.textContent || '';
+      const pricer = row?.querySelector('[data-field="status_pricer"]')?.value || row?.querySelector('[data-field="status_pricer"]')?.textContent || '';
+      statuses = { parser, selector, pricer };
+    }
+    root.querySelectorAll(`.spec-progress[data-spec-id="${idStr}"]`).forEach(el => setProgress(el, statuses));
+  }
+
+  function updateHistorySpecContainers(options = {}) {
+    const { changedIds = new Set(), removedIds = [], forceAll = false } = options;
+    if (!historyList) return;
+    removedIds.forEach(id => {
+      const idStr = String(id);
+      const container = historyList.querySelector(`.spec-container[data-spec-id="${idStr}"]`);
+      if (container) container.remove();
+      delete historyOpenBlocks[idStr];
+    });
+    const idsForUpdate = forceAll ? new Set(history.map(item => String(item.id))) : new Set(Array.from(changedIds, id => String(id)));
+    if (!idsForUpdate.size) return;
+    history.forEach(item => {
+      const idStr = String(item.id);
+      if (!idsForUpdate.has(idStr)) return;
+      const rows = specGroups[idStr];
+      let container = historyList.querySelector(`.spec-container[data-spec-id="${idStr}"]`);
+      if (!rows || !rows.length) {
+        if (container) container.remove();
+        return;
+      }
+      if (!container) {
+        const { fragment, container: newContainer } = createSpecContainer(item.id, { mode: 'history' });
+        const rowEl = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`);
+        const anchor = rowEl ? rowEl.nextSibling : null;
+        historyList.insertBefore(fragment, anchor);
+        container = newContainer;
+      }
+      if (!container) return;
+      const progress = container.querySelector('.spec-progress');
+      if (progress) updateSpecProgress(idStr);
+      const content = container.querySelector('.spec-content');
+      updateSpecContent(content, idStr, { mode: 'history' });
+    });
+    setupOverflowTooltips(historyList);
+    setupDynamicBlocks(historyList);
+  }
+
+  function updateBlock1SpecContainers(options = {}) {
+    let { changedIds = new Set(), removedIds = [], forceAll = false } = options;
+    if (!block1List) return;
+    removedIds.forEach(id => {
+      const idStr = String(id);
+      const container = block1List.querySelector(`.spec-container[data-spec-id="${idStr}"]`);
+      if (container) container.remove();
+      delete block1OpenBlocks[idStr];
+    });
+    if (forceAll) {
+      changedIds = new Set(Object.keys(specGroups));
+    }
+    const orderedIds = Object.keys(specGroups).sort((a, b) => Number(b) - Number(a));
+    let anchor = block1List.firstChild;
+    orderedIds.forEach(id => {
+      const idStr = String(id);
+      let container = block1List.querySelector(`.spec-container[data-spec-id="${idStr}"]`);
+      if (!container) {
+        const { fragment, container: newContainer } = createSpecContainer(id, { mode: 'block1' });
+        block1List.insertBefore(fragment, anchor);
+        container = newContainer;
+      } else if (anchor && container !== anchor) {
+        block1List.insertBefore(container, anchor);
+      }
+      if (container) {
+        const progress = container.querySelector('.spec-progress');
+        if (progress) updateSpecProgress(idStr);
+        if (changedIds.has(idStr)) {
+          const content = container.querySelector('.spec-content');
+          updateSpecContent(content, idStr, { mode: 'block1' });
+        }
+      }
+      anchor = container ? container.nextSibling : anchor;
+    });
+    setupOverflowTooltips(block1List);
+    setupDynamicBlocks(block1List);
+  }
+  
+  async function loadBlock1(options = {}) {
+    const { fromHistory = false } = options;
+    if (loadingBlock1) {
+      pendingLoad = fromHistory ? 'history' : 'default';
+      return;
+    }
+    loadingBlock1 = true;
+    const prevCache = new Map(specRenderCache);
+    const specIds = Array.from(new Set((history || []).map(h => h?.id).filter(id => id !== null && id !== undefined)));
+    if (!specIds.length) {
+      block1Rows = [];
+      specGroups = {};
+      selectionMap = {};
+      const removedIds = Array.from(specRenderCache.keys());
+      specRenderCache.clear();
+      updateBlock1SpecContainers({ removedIds });
+      updateHistorySpecContainers({ removedIds });
+      loadingBlock1 = false;
+      pendingLoad = null;
+      return;
+    }
+    const { data, error } = await supabase
+      .from(POS_TABLE)
+      .select(
+        'file_number, user_login, file_name, id, spec_id,' +
+        'pos_number, pos_number_int, name, qty, unit, attrs, attrs_json'
+      )
+      .in('spec_id', specIds)
+      .order('spec_id', { ascending: false })
+      .order('pos_number_int', { ascending: true });
+
+    if (error) {
+      console.error(error);
+      loadingBlock1 = false;
+      const next = pendingLoad;
+      pendingLoad = null;
+      if (next) loadBlock1({ fromHistory: next === 'history' });
+      return;
+    }
+    block1Rows = (data || []).map(r => ({
+  file_number:   r.file_number,
+  user_login:    r.user_login,
+  file_name:     r.file_name,
+  id:            r.id,
+  spec_id:       r.spec_id,
+  pos_number:    r.pos_number,
+  pos_number_int: toPosNum(r.pos_number_int ?? r.pos_number),
+  name:          r.name,
+  qty:           r.qty,
+  unit:          r.unit,
+  attrs:         r.attrs,
+  attrs_json:    r.attrs_json
+}));
+
+const posIds = block1Rows.map(r => r.id);
+    selectionMap = {};
+    if (posIds.length) {
+      const { data: sels, error: selErr } = await supabase
+        .from(SELECT_TABLE)
+        .select('pos_id, article, model_name, qty, unit, price, sum, \
+          price1_amount, price1_currency, price1_store, price1_url, \
+          price2_amount, price2_currency, price2_store, price2_url, \
+          price3_amount, price3_currency, price3_store, price3_url, \
+          prices_json, pricer_status')
+        .in('pos_id', posIds);
+      if (selErr) console.error(selErr);
+      (sels || []).forEach(s => {
+        (selectionMap[s.pos_id] = selectionMap[s.pos_id] || []).push(s);
+      });
+    }
+    specGroups = {};
+    block1Rows.forEach(r => {
+      const key = String(r.spec_id);
+      (specGroups[key] = specGroups[key] || []).push(r);
+    });
+    const nextCache = new Map();
+    Object.keys(specGroups).forEach(id => {
+      nextCache.set(String(id), computeSpecHash(id));
+    });
+    const changedIds = new Set();
+    nextCache.forEach((hash, id) => {
+      if (prevCache.get(id) !== hash) changedIds.add(id);
+    });
+    const removedIds = [];
+    prevCache.forEach((_, id) => {
+      if (!nextCache.has(id)) removedIds.push(id);
+    });
+    specRenderCache.clear();
+    nextCache.forEach((hash, id) => specRenderCache.set(id, hash));
+    updateBlock1SpecContainers({ changedIds, removedIds, forceAll: fromHistory });
+    updateHistorySpecContainers({ changedIds, removedIds });
+    if (!fromHistory && history.length) {
+      applySecondFilter();
+    }
+    loadingBlock1 = false;
+    const next = pendingLoad;
+    pendingLoad = null;
+    if (next) loadBlock1({ fromHistory: next === 'history' });
+  }
+
+  function renderBlock1() {
+    updateBlock1SpecContainers({ forceAll: true });
+  }
+
+  function openGroup(id, saved) {
+    ensureSpecWatched(id);
+    block1List.querySelectorAll('.spec-content').forEach(c => {
+      if (c.dataset.specId !== String(id)) {
+        c.classList.add('hidden');
+        c.addEventListener('transitionend', () => { c.style.display = 'none'; }, { once: true });
+      }
+    });
+    block1List.querySelectorAll('.group-close').forEach(b => {
+      const sid = b.closest('.spec-container')?.dataset.specId;
+      if (sid !== String(id)) {
+        b.classList.add('hidden');
+        b.addEventListener('transitionend', () => { b.style.display = 'none'; }, { once: true });
+      }
+    });
+    block1List.querySelectorAll('.spec-progress').forEach(p => {
+      if (p.dataset.specId !== String(id)) {
+        p.classList.add('hidden');
+        p.addEventListener('transitionend', () => { p.style.display = 'none'; }, { once: true });
+      }
+    });
+    block1List.querySelectorAll('.spec-action-row').forEach(row => {
+      const sid = row.closest('.spec-container')?.dataset.specId;
+      if (sid !== String(id)) {
+        row.classList.add('hidden');
+        row.addEventListener('transitionend', () => { row.style.display = 'none'; }, { once: true });
+      }
+    });
+    const cont = block1List.querySelector(`.spec-content[data-spec-id="${id}"]`);
+    const btn = block1List.querySelector(`.spec-container[data-spec-id="${id}"] .group-close`);
+    const prog = block1List.querySelector(`.spec-progress[data-spec-id="${id}"]`);
+    const actions = block1List.querySelector(`.spec-container[data-spec-id="${id}"] .spec-action-row`);
+    if (cont) {
+      resetDynamicBlocks(cont);
+      cont.style.display = 'block';
+      requestAnimationFrame(() => cont.classList.remove('hidden'));
+      let current = null;
+      let posInput = null;
+      if (saved && saved.pos) {
+        const rowInput = cont.querySelector(`[data-field="pos_number"][value="${saved.pos}"]`);
+        const row = rowInput ? rowInput.closest('.modalCONTEINERpost') : null;
+        if (row) {
+          posInput = rowInput;
+          if (saved.block) {
+            row.querySelectorAll('.modal-block').forEach(b => b.classList.remove('open'));
+            const target = row.querySelector(`.modal-block.${saved.block}`);
+            if (target) target.classList.add('open');
+          }
+          current = row.querySelector('.modal-block.open');
+        } else {
+          current = cont.querySelector('.modal-block.open');
+          posInput = current?.closest('.modalCONTEINERpost')?.querySelector('[data-field="pos_number"]');
+        }
+      } else {
+        current = cont.querySelector('.modal-block.open');
+        posInput = current?.closest('.modalCONTEINERpost')?.querySelector('[data-field="pos_number"]');
+      }
+      if (current && (posInput || saved?.pos)) {
+        const cls = Array.from(current.classList).find(c => c.startsWith('block'));
+        const pos = posInput ? posInput.value : saved.pos;
+        if (cls && pos) block1OpenBlocks[id] = { block: cls, pos };
+      }
+    }
+    if (btn) {
+      btn.style.display = 'inline';
+      requestAnimationFrame(() => btn.classList.remove('hidden'));
+    }
+    if (prog) {
+      prog.style.display = 'flex';
+      requestAnimationFrame(() => prog.classList.remove('hidden'));
+    }
+    if (actions) {
+      actions.style.display = 'flex';
+      requestAnimationFrame(() => actions.classList.remove('hidden'));
+    }
+  }
+
+  function closeGroup(id) {
+    const cont = block1List.querySelector(`.spec-content[data-spec-id="${id}"]`);
+    const btn = block1List.querySelector(`.spec-container[data-spec-id="${id}"] .group-close`);
+    const prog = block1List.querySelector(`.spec-progress[data-spec-id="${id}"]`);
+    const actions = block1List.querySelector(`.spec-container[data-spec-id="${id}"] .spec-action-row`);
+    if (cont) {
+      cont.classList.add('hidden');
+      cont.addEventListener('transitionend', () => { cont.style.display = 'none'; }, { once: true });
+      resetDynamicBlocks(cont);
+    }
+    if (btn) {
+      btn.classList.add('hidden');
+      btn.addEventListener('transitionend', () => { btn.style.display = 'none'; }, { once: true });
+    }
+    if (prog) {
+      prog.classList.add('hidden');
+      prog.addEventListener('transitionend', () => { prog.style.display = 'none'; }, { once: true });
+    }
+    if (actions) {
+      actions.classList.add('hidden');
+      actions.addEventListener('transitionend', () => { actions.style.display = 'none'; }, { once: true });
+    }
+    delete block1OpenBlocks[id];
+  }
+
+  function openRowGroup(id, blockClass) {
+    if (openedSpecId && openedSpecId !== id) {
+      closeRowGroup(openedSpecId);
+    }
+    ensureSpecWatched(id);
+    openedSpecId = id;
+    const cont = historyList.querySelector(`.spec-content[data-spec-id="${id}"]`);
+    const prog = historyList.querySelector(`.spec-progress[data-spec-id="${id}"]`);
+    const actions = historyList.querySelector(`.spec-container[data-spec-id="${id}"] .spec-action-row`);
+    if (cont) {
+      const oldT = hideTimers.get(cont);
+      if (oldT) {
+        clearTimeout(oldT);
+        hideTimers.delete(cont);
+      }
+      cont.style.display = 'block';
+      requestAnimationFrame(() => cont.classList.remove('hidden'));
+      if (blockClass) {
+        const targets = cont.querySelectorAll(`.modal-block.${blockClass}`);
+        if (targets.length) {
+          cont.querySelectorAll('.modal-block').forEach(b => b.classList.remove('open'));
+          targets.forEach(t => t.classList.add('open'));
+        } else {
+          resetDynamicBlocks(cont);
+        }
+      } else {
+        resetDynamicBlocks(cont);
+      }
+      const current = cont.querySelector('.modal-block.open');
+      if (current) {
+        const cls = Array.from(current.classList).find(c => c.startsWith('block'));
+        if (cls) historyOpenBlocks[id] = cls;
+      }
+    }
+    if (actions) {
+      const oldT = hideTimers.get(actions);
+      if (oldT) {
+        clearTimeout(oldT);
+        hideTimers.delete(actions);
+      }
+      actions.style.display = 'flex';
+      requestAnimationFrame(() => actions.classList.remove('hidden'));
+    }
+    if (prog) {
+      const oldT = hideTimers.get(prog);
+      if (oldT) {
+        clearTimeout(oldT);
+        hideTimers.delete(prog);
+      }
+      prog.style.display = 'flex';
+      requestAnimationFrame(() => prog.classList.remove('hidden'));
+    }
+
+    historyList.querySelectorAll('.spec-progress').forEach(p => {
+      if (p.dataset.specId !== String(id)) {
+        p.classList.add('hidden');
+        const t = setTimeout(() => {
+          p.style.display = 'none';
+          hideTimers.delete(p);
+        }, 500);
+        hideTimers.set(p, t);
+      }
+    });
+    historyList.querySelectorAll('.spec-action-row').forEach(row => {
+      const specId = row.closest('.spec-container')?.dataset.specId;
+      if (specId !== String(id)) {
+        row.classList.add('hidden');
+        const t = setTimeout(() => {
+          row.style.display = 'none';
+          hideTimers.delete(row);
+        }, 500);
+        hideTimers.set(row, t);
+      }
+    });
+    
+    const row = historyList.querySelector(`.history-item[data-spec-id="${id}"]`);
+    if (row) {
+      const specCont = row.querySelector('[data-field="id"]').closest('.input-container');
+      if (specCont) {
+        specCont.style.position = 'relative';
+        if (!specCont.querySelector('.spec-close-btn')) {
+          const extraBtn = document.createElement('button');
+          extraBtn.textContent = '×';
+          extraBtn.className = 'group-close ans5-close spec-close-btn';
+          extraBtn.style.position = 'absolute';
+          extraBtn.style.right = '-25px';
+          extraBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            closeRowGroup(id);
+          });
+          specCont.appendChild(extraBtn);
+        }
+      }
+    }
+  }
+
+  function closeRowGroup(id) {
+    if (openedSpecId === id) openedSpecId = null;
+    const cont = historyList.querySelector(`.spec-content[data-spec-id="${id}"]`);
+    const btn = historyList.querySelector(`.spec-container[data-spec-id="${id}"] .group-close`);
+    const extra = historyList.querySelector(`.history-item[data-spec-id="${id}"] .spec-close-btn`);
+    const prog = historyList.querySelector(`.spec-progress[data-spec-id="${id}"]`);
+    const actions = historyList.querySelector(`.spec-container[data-spec-id="${id}"] .spec-action-row`);
+    if (cont) {
+      cont.classList.add('hidden');
+      const t = setTimeout(() => {
+        cont.style.display = 'none';
+        hideTimers.delete(cont);
+      }, 500);
+      hideTimers.set(cont, t);
+    }
+    if (btn) {
+      btn.classList.add('hidden');
+      const t = setTimeout(() => {
+        btn.style.display = 'none';
+        hideTimers.delete(btn);
+      }, 500);
+      hideTimers.set(btn, t);
+    }
+    if (prog) {
+      prog.classList.add('hidden');
+      const t = setTimeout(() => {
+        prog.style.display = 'none';
+        hideTimers.delete(prog);
+      }, 500);
+      hideTimers.set(prog, t);
+    }
+    if (actions) {
+      actions.classList.add('hidden');
+      const t = setTimeout(() => {
+        actions.style.display = 'none';
+        hideTimers.delete(actions);
+      }, 500);
+      hideTimers.set(actions, t);
+    }
+    if (extra) extra.remove();
+  }
+
+  function updateDynamicModalHeight(dm) {
+    if (!dm) return;
+    const block1Content = dm.querySelector('.modal-block.block1 .modal-content');
+    if (!block1Content) {
+      dm.style.removeProperty('--block1-height');
+      return;
+    }
+    requestAnimationFrame(() => {
+      const height = block1Content.scrollHeight;
+      if (height) {
+        dm.style.setProperty('--block1-height', `${height}px`);
+        dm.style.height = `${height}px`;
+      } else {
+        dm.style.removeProperty('--block1-height');
+        dm.style.removeProperty('height');
+      }
+    });
+  }
+
+  function resetDynamicBlocks(scope) {
+    scope.querySelectorAll('.dynamic-modals').forEach(dm => {
+      const blocks = dm.querySelectorAll('.modal-block');
+      blocks.forEach((b, i) => {
+        if (i === 0) b.classList.add('open');
+        else b.classList.remove('open');
+      });
+      updateDynamicModalHeight(dm);
+    });
+  }
+
+  function setupDynamicBlocks(scope) {
+    scope.querySelectorAll('.dynamic-modals').forEach(dm => {
+      const blocks = dm.querySelectorAll('.modal-block');
+      const initiallyOpen = dm.querySelector('.modal-block.open') || blocks[0];
+      if (initiallyOpen) initiallyOpen.classList.add('open');
+      updateDynamicModalHeight(dm);
+      blocks.forEach(block => {
+        block.addEventListener('dblclick', () => {
+          dm.querySelectorAll('.modal-block').forEach(b => b.classList.remove('open'));
+          block.classList.add('open');
+          const specId = block.closest('.spec-content')?.dataset.specId;
+          const cls = Array.from(block.classList).find(c => c.startsWith('block'));
+          const posInput = block.closest('.modalCONTEINERpost')?.querySelector('[data-field="pos_number"]');
+          if (specId && cls && posInput) {
+            block1OpenBlocks[specId] = { block: cls, pos: posInput.value };
+          }
+          updateDynamicModalHeight(dm);
+        });
+      });
+    });
+  }
+  function setupOverflowTooltips(scope) {
+    scope.querySelectorAll('.styled_input_bar').forEach(input => {
+      const updateOverflow = () => {
+        const container = input.closest('.input-container');
+        if (!container) return;
+        if (input.scrollWidth > input.clientWidth) container.classList.add('overflow');
+        else container.classList.remove('overflow');
+      };
+      updateOverflow();
+      input.addEventListener('input', updateOverflow);
+      input.addEventListener('mouseenter', () => {
+        if (input.scrollWidth > input.clientWidth) {
+          input.setAttribute('title', input.value || input.textContent || '');
+        }
+      });
+      input.addEventListener('mouseleave', () => {
+        input.removeAttribute('title');
+      });
+    });
+  }
+  function boolLabel(value) {
+    return value ? 'да' : 'нет';
+  }
+  function padRow(row, length) {
+    const source = Array.isArray(row) ? row : [];
+    const result = source.slice(0, length);
+    while (result.length < length) {
+      result.push('');
+    }
+    return result;
+  }
+  function hideContextMenu() {
+    if (!contextMenu) return;
+    contextMenu.classList.remove('visible');
+    contextMenu.style.display = 'none';
+    contextMenu.dataset.specId = '';
+    contextSpecContent = null;
+  }
+  function showContextMenuAt(event, specContent) {
+    if (!contextMenu || !specContent) return;
+    const specId = specContent.dataset.specId;
+    if (!specId) return;
+    contextSpecContent = specContent;
+    contextMenu.dataset.specId = specId;
+    contextMenu.classList.remove('visible');
+    contextMenu.style.display = 'block';
+    contextMenu.style.left = '0px';
+    contextMenu.style.top = '0px';
+    requestAnimationFrame(() => {
+      const rootRect = root.getBoundingClientRect();
+      const rect = contextMenu.getBoundingClientRect();
+      let left = event.clientX - rootRect.left;
+      let top = event.clientY - rootRect.top;
+      const maxLeft = Math.max(0, rootRect.width - rect.width);
+      const maxTop = Math.max(0, rootRect.height - rect.height);
+      if (left < 0) left = 0;
+      else if (left > maxLeft) left = maxLeft;
+      if (top < 0) top = 0;
+      else if (top > maxTop) top = maxTop;
+      contextMenu.style.left = `${left}px`;
+      contextMenu.style.top = `${top}px`;
+      contextMenu.classList.add('visible');
+    });
+  }
+  function collectSpecData(specId, specContent) {
+    if (!specId) return null;
+    const idStr = String(specId);
+    const container = specContent
+      || historyList.querySelector(`.spec-content[data-spec-id="${idStr}"]`)
+      || block1List.querySelector(`.spec-content[data-spec-id="${idStr}"]`);
+    if (!container) return null;
+    const historyItem = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`);
+    const historyEntry = history.find(h => String(h.id) === idStr);
+    const readField = (field) => {
+      if (historyItem) {
+        const el = historyItem.querySelector(`[data-field="${field}"]`);
+        if (el) {
+          const raw = el.tagName === 'INPUT' ? el.value : el.textContent;
+          if (typeof raw === 'string') return raw.trim();
+        }
+      }
+      if (historyEntry) {
+        if (field === 'created_at') {
+          return historyEntry.created_at ? new Date(historyEntry.created_at).toLocaleString() : '';
+        }
+        const value = historyEntry[field];
+        if (value != null) return String(value).trim();
+      }
+      return '';
+    };
+    const data = {
+      id: idStr,
+      header: {
+        file_number: readField('file_number'),
+        user_login: readField('user_login'),
+        created_at: readField('created_at'),
+        file_name: readField('file_name'),
+        file_ext: readField('file_ext'),
+        status: readField('status'),
+        spec_id: idStr,
+      },
+      positions: [],
+    };
+    container.querySelectorAll('.modalCONTEINERpost').forEach(node => {
+      const pos = {
+        posNumber: node.querySelector('[data-field="pos_number"]')?.value?.trim() || '',
+        name: node.querySelector('[data-field="name"]')?.value?.trim() || '',
+        qty: node.querySelector('[data-field="qty"]')?.value?.trim() || '',
+        unit: node.querySelector('[data-field="unit"]')?.value?.trim() || '',
+        registries: {},
+        block1: [],
+        block2: [],
+        block21: [],
+        block3: [],
+        block31: [],
+      };
+      node.querySelectorAll('.registry-checkboxes input[data-field]').forEach(chk => {
+        if (chk.dataset.field) {
+          pos.registries[chk.dataset.field] = !!chk.checked;
+        }
+      });
+      const block1Content = node.querySelector('.block1 .modal-content');
+      if (block1Content) {
+        block1Content.querySelectorAll('.modalRow').forEach(row => {
+          const paramEl = row.querySelector('.param-input');
+          const valueEl = row.querySelector('.value-input');
+          const param = (paramEl?.value || paramEl?.textContent || '').trim();
+          const value = (valueEl?.value || valueEl?.textContent || '').trim();
+          if (param || value) {
+            pos.block1.push({ param, value });
+          }
+        });
+      }
+      const collectRows = (selector) => {
+        const block = node.querySelector(selector);
+        if (!block) return [];
+        const rows = [];
+        block.querySelectorAll('.modalRow').forEach(row => {
+          const inputs = row.querySelectorAll('input');
+          if (!inputs.length) return;
+          const values = Array.from(inputs, input => (input.value || input.textContent || '').trim());
+          rows.push(values);
+        });
+        return rows;
+      };
+      pos.block2 = collectRows('.block2 .modal-content');
+      pos.block21 = collectRows('.block21 .modal-content');
+      pos.block3 = collectRows('.block3 .modal-content');
+      pos.block31 = collectRows('.block31 .modal-content');
+      data.positions.push(pos);
+    });
+    return data;
+  }
+  async function runSpecAction(action, specId, specContent, button) {
+    if (action === 'support') {
+      openSupportTicketModal(specId);
+      return;
+    }
+    const specData = collectSpecData(specId, specContent);
+    if (!specData) return;
+    try {
+      if (action === 'copy') {
+        const text = formatSpecForClipboard(specData);
+        if (text) {
+          await navigator.clipboard.writeText(text);
+          if (button) showCopyTip(button);
+        }
+      } else if (action === 'excel') {
+        const blob = createExcelBlob(specData);
+        if (blob) {
+          downloadSpecExcel(specData, blob);
+        }
+      }
+    } catch (err) {
+      console.error('spec action error:', err);
+    }
+  }
+  function collectRepeatingRows(positions, key) {
+    const rows = [];
+    let maxLen = 0;
+    positions.forEach(pos => {
+      (pos[key] || []).forEach(row => {
+        const values = Array.isArray(row) ? row.slice() : [];
+        maxLen = Math.max(maxLen, values.length);
+        rows.push({ posNumber: pos.posNumber || '', values });
+      });
+    });
+    if (!rows.length || maxLen === 0) return null;
+    const header = ['№ в ТЗ'];
+    for (let i = 0; i < maxLen; i += 1) {
+      const label = i % 2 === 0 ? 'артикул' : 'магазин';
+      header.push(`${label} ${Math.floor(i / 2) + 1}`);
+    }
+    const normalized = rows.map(({ posNumber, values }) => {
+      const row = [posNumber];
+      for (let i = 0; i < maxLen; i += 1) {
+        row.push(values[i] || '');
+      }
+      return row;
+    });
+    return { header, rows: normalized };
+  }
+  function formatSpecForClipboard(data) {
+    if (!data) return '';
+    const lines = [];
+    const headerMap = [
+      ['номер', 'file_number'],
+      ['login', 'user_login'],
+      ['дата', 'created_at'],
+      ['файл', 'file_name'],
+      ['ext', 'file_ext'],
+      ['статус', 'status'],
+      ['spec #', 'spec_id'],
+    ];
+    headerMap.forEach(([label, key]) => {
+      const value = data.header?.[key] ?? '';
+      lines.push(`${label}\t${value}`);
+    });
+    lines.push('');
+    lines.push('BLOCK 1');
+    lines.push(['№ в ТЗ', 'наименование', 'кол-во', 'ед. изм.', 'РПП 878', 'ТОРП', 'РРПО 1875'].join('\t'));
+    data.positions.forEach(pos => {
+      const regs = pos.registries || {};
+      lines.push([
+        pos.posNumber || '',
+        pos.name || '',
+        pos.qty || '',
+        pos.unit || '',
+        boolLabel(regs.rpp_878),
+        boolLabel(regs.torp),
+        boolLabel(regs.rrpo_1875),
+      ].join('\t'));
+      (pos.block1 || []).forEach(attr => {
+        lines.push(`\t${attr.param || ''}\t${attr.value || ''}`);
+      });
+    });
+    lines.push('');
+    lines.push('BLOCK 2');
+    lines.push(['№ в ТЗ', ...BLOCK2_COLUMNS].join('\t'));
+    data.positions.forEach(pos => {
+      const rows = (pos.block2 && pos.block2.length) ? pos.block2 : [[]];
+      rows.forEach(row => {
+        const values = [pos.posNumber || ''];
+        const length = Math.max(BLOCK2_COLUMNS.length, row.length);
+        padRow(row, length).forEach(cell => values.push(cell));
+        lines.push(values.join('\t'));
+      });
+    });
+    const block21 = collectRepeatingRows(data.positions, 'block21');
+    if (block21) {
+      lines.push('');
+      lines.push('BLOCK 2.1');
+      lines.push(block21.header.join('\t'));
+      block21.rows.forEach(row => lines.push(row.join('\t')));
+    }
+    lines.push('');
+    lines.push('BLOCK 3');
+    lines.push(['№ в ТЗ', ...BLOCK3_COLUMNS].join('\t'));
+    data.positions.forEach(pos => {
+      const rows = (pos.block3 && pos.block3.length) ? pos.block3 : [[]];
+      rows.forEach(row => {
+        const values = [pos.posNumber || ''];
+        const length = Math.max(BLOCK3_COLUMNS.length, row.length);
+        padRow(row, length).forEach(cell => values.push(cell));
+        lines.push(values.join('\t'));
+      });
+    });
+    const block31 = collectRepeatingRows(data.positions, 'block31');
+    if (block31) {
+      lines.push('');
+      lines.push('BLOCK 3.1');
+      lines.push(block31.header.join('\t'));
+      block31.rows.forEach(row => lines.push(row.join('\t')));
+    }
+    return lines.join('\n');
+  }
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function buildTableHtml(caption, headers, rows) {
+    const head = headers.map(h => `<th>${escapeHtml(h)}</th>`).join('');
+    const body = rows.length
+      ? rows.map(row => `<tr>${row.map(cell => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`).join('')
+      : `<tr>${headers.map(() => '<td></td>').join('')}</tr>`;
+    const captionHtml = caption ? `<caption style="font-weight:600; text-align:left; padding:4px 0;">${escapeHtml(caption)}</caption>` : '';
+    return `<table border="1" cellspacing="0" cellpadding="4" style="border-collapse:collapse; margin-bottom:12px;">${captionHtml}<thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+  }
+  function buildExcelHtml(data) {
+    if (!data) return '';
+    const tables = [];
+    const headerRows = [
+      ['номер', data.header?.file_number || ''],
+      ['login', data.header?.user_login || ''],
+      ['дата', data.header?.created_at || ''],
+      ['файл', data.header?.file_name || ''],
+      ['ext', data.header?.file_ext || ''],
+      ['статус', data.header?.status || ''],
+      ['spec #', data.header?.spec_id || ''],
+    ];
+    tables.push(buildTableHtml('Реквизиты файла', ['Поле', 'Значение'], headerRows));
+    const block1MainRows = data.positions.map(pos => {
+      const regs = pos.registries || {};
+      return [
+        pos.posNumber || '',
+        pos.name || '',
+        pos.qty || '',
+        pos.unit || '',
+        boolLabel(regs.rpp_878),
+        boolLabel(regs.torp),
+        boolLabel(regs.rrpo_1875),
+      ];
+    });
+    tables.push(buildTableHtml('BLOCK 1', ['№ в ТЗ', 'наименование', 'кол-во', 'ед. изм.', 'РПП 878', 'ТОРП', 'РРПО 1875'], block1MainRows));
+    const block1Attrs = [];
+    data.positions.forEach(pos => {
+      (pos.block1 || []).forEach(attr => {
+        block1Attrs.push([pos.posNumber || '', attr.param || '', attr.value || '']);
+      });
+    });
+    if (block1Attrs.length) {
+      tables.push(buildTableHtml('BLOCK 1 параметры', ['№ в ТЗ', 'параметр', 'значение'], block1Attrs));
+    }
+    const block2Rows = [];
+    data.positions.forEach(pos => {
+      const rows = (pos.block2 && pos.block2.length) ? pos.block2 : [[]];
+      rows.forEach(row => {
+        const values = [pos.posNumber || ''];
+        const length = Math.max(BLOCK2_COLUMNS.length, row.length);
+        padRow(row, length).forEach(cell => values.push(cell));
+        block2Rows.push(values);
+      });
+    });
+    tables.push(buildTableHtml('BLOCK 2', ['№ в ТЗ', ...BLOCK2_COLUMNS], block2Rows));
+    const block21 = collectRepeatingRows(data.positions, 'block21');
+    if (block21) {
+      tables.push(buildTableHtml('BLOCK 2.1', block21.header, block21.rows));
+    }
+    const block3Rows = [];
+    data.positions.forEach(pos => {
+      const rows = (pos.block3 && pos.block3.length) ? pos.block3 : [[]];
+      rows.forEach(row => {
+        const values = [pos.posNumber || ''];
+        const length = Math.max(BLOCK3_COLUMNS.length, row.length);
+        padRow(row, length).forEach(cell => values.push(cell));
+        block3Rows.push(values);
+      });
+    });
+    tables.push(buildTableHtml('BLOCK 3', ['№ в ТЗ', ...BLOCK3_COLUMNS], block3Rows));
+    const block31 = collectRepeatingRows(data.positions, 'block31');
+    if (block31) {
+      tables.push(buildTableHtml('BLOCK 3.1', block31.header, block31.rows));
+    }
+    return tables.join('');
+  }
+  function createExcelBlob(data) {
+    const html = buildExcelHtml(data);
+    if (!html) return null;
+    const content = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${html}</body></html>`;
+    return new Blob(['\uFEFF', content], { type: 'application/vnd.ms-excel' });
+  }
+  function downloadSpecExcel(data, blob) {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const baseName = data?.header?.file_number || data?.header?.spec_id || 'specification';
+    const safeName = sanitize(String(baseName || 'specification')) || 'specification';
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `spec_${safeName}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      link.remove();
+    }, 0);
+  }
+  if (!root.__contextMenuSetup) {
+    root.addEventListener('contextmenu', event => {
+      if (!contextMenu) return;
+      const specContent = event.target.closest('.spec-content');
+      if (!specContent || specContent.classList.contains('hidden')) {
+        hideContextMenu();
+        return;
+      }
+      if (!specContent.closest('.history-list') && !specContent.closest('.block1-wrapper')) {
+        hideContextMenu();
+        return;
+      }
+      const computed = window.getComputedStyle(specContent);
+      if (computed.display === 'none' || computed.visibility === 'hidden' || Number(computed.opacity) === 0) {
+        hideContextMenu();
+        return;
+      }
+      event.preventDefault();
+      showContextMenuAt(event, specContent);
+    });
+    window.addEventListener('click', event => {
+      if (!contextMenu) return;
+      if (contextMenu.style.display === 'block' && !contextMenu.contains(event.target)) {
+        hideContextMenu();
+      }
+    });
+    window.addEventListener('resize', hideContextMenu);
+    root.addEventListener('scroll', hideContextMenu, true);
+    window.addEventListener('keydown', event => {
+      if (event.key === 'Escape') hideContextMenu();
+    });
+    if (contextMenu) {
+      contextMenu.addEventListener('click', async event => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const action = button.dataset.action;
+        const specId = contextMenu.dataset.specId;
+        if (!specId) return;
+        const specData = collectSpecData(specId, contextSpecContent);
+        if (!specData) {
+          hideContextMenu();
+          return;
+        }
+        try {
+          if (action === 'copy') {
+            const text = formatSpecForClipboard(specData);
+            if (text) {
+              await navigator.clipboard.writeText(text);
+              showCopyTip(button);
+            }
+          } else if (action === 'excel') {
+            const blob = createExcelBlob(specData);
+            if (blob) {
+              downloadSpecExcel(specData, blob);
+            }
+          }
+        } catch (err) {
+          console.error('context menu action error:', err);
+        } finally {
+          hideContextMenu();
+        }
+      });
+      contextMenu.addEventListener('contextmenu', event => event.preventDefault());
+      contextMenu.addEventListener('mousedown', event => event.stopPropagation());
+    }
+    root.__contextMenuSetup = true;
+  }
+  function initProgressHandlers(progress, specId) {
+    const buttons = progress.querySelectorAll('.refresh');
+    if (buttons[0]) buttons[0].addEventListener('click', async e => {
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      btn.classList.add('loading');
+      btn.disabled = true;
+      try {
+        await refreshParser(specId, progress);
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    });
+    if (buttons[1]) buttons[1].addEventListener('click', async e => {
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      btn.classList.add('loading');
+      btn.disabled = true;
+      try {
+        await refreshSelector(specId, progress);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    });
+  }
+
+  async function refreshParser(specId, progress) {
+    try {
+      await supabase.from(SELECT_TABLE).delete().eq('spec_id', specId);
+      await supabase.from(POS_TABLE).delete().eq('spec_id', specId);
+      await supabase.from(TABLE).update({ status: 'BLOCK 1 ( в работе )' }).eq('id', specId);
+      await supabase.functions.invoke('modal9-parser', { body: { request_id: specId } });
+      await loadHistory();
+    } catch (err) {
+      console.error('refreshParser error:', err);
+    }
+  }
+
+  // === НОВАЯ ДВУХФАЗНАЯ ЛОГИКА ДЛЯ BLOCK 2 / 2.1 ===
+  const delay = (ms) => new Promise(r => setTimeout(r, ms));
+
+  async function trackSelectorProgress(specId, progressEl, statusEl, options = {}) {
+    const { signal } = options;
+    let lastStatus = null;
+    for (;;) {
+      if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+      const { sent, received, total } = await getSelectorProgress(specId);
+      const countsText = `${sent} / ${received} / ${total}`;
+      const row = historyList.querySelector(`.history-item[data-spec-id="${specId}"]`);
+      const selEl = row?.querySelector('[data-field="status_selector"]');
+      if (selEl) updateStatus(selEl, countsText);
+
+      // Показываем прогресс на шаге 2, остальное читаем из DOM трёх полей
+      setProgress(progressEl, { status: 'BLOCK 2', sent, received, total });
+
+      if (countsText !== lastStatus) {
+        lastStatus = countsText;
+        await supabase.from(TABLE).update({ status_selector: countsText }).eq('id', specId);
+      }
+      if (total > 0 && received >= total) break;
+      await delay(1000);
+    }
+  }
+
+  async function refreshSelector(specId, progress) {
+    const { data: { session } = {} } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const statusEl = historyList.querySelector(`.history-item[data-spec-id="${specId}"] [data-field="status"]`);
+    updateStatus(statusEl, 'подготовка');
+    setProgress(progress, 'подготовка');
+    const controller = new AbortController();
+    const trackerPromise = (async () => {
+      try {
+        await trackSelectorProgress(specId, progress, statusEl, { signal: controller.signal });
+      } catch (err) {
+        if (err?.name !== 'AbortError') console.error('trackSelectorProgress error:', err);
+      }
+    })();
+    try {
+      await supabase.from(TABLE).update({ status: 'подготовка' }).eq('id', specId);
+      const { error } = await supabase.functions.invoke('modal9-selector', { body: { spec_id: specId } });
+      if (error) throw error;
+    } catch (err) {
+      controller.abort();
+      console.error('refreshSelector error:', err);
+    } finally {
+      try {
+        await trackerPromise;
+      } catch (err) {
+        if (err?.name !== 'AbortError') console.error('trackerPromise error:', err);
+      }
+      await loadHistory();
+    }
+  }
+  
+      function setupRealtime() {
+    if (!supabase) return;
+
+    realtimeSub = supabase
+      .channel('modal9-realtime')
+
+      // Реестр файлов: слушаем INSERT/DELETE для перезагрузки истории,
+      // UPDATE — только для наблюдаемых spec_id и только статусы
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: TABLE },
+        payload => {
+          if (!payload) return;
+          const { eventType, new: newRow, old } = payload;
+          const specId = newRow?.id ?? old?.id;
+
+          if (eventType === 'UPDATE' && newRow && specId != null && watchedSpecIds.has(String(specId))) {
+            applyRealtimeRegistryUpdate(newRow);
+          } else if (eventType === 'INSERT' || eventType === 'DELETE') {
+            // новая/удалённая запись: перечитываем историю, пересчитываем топ-12
+            loadHistory();
+          }
+        }
+      )
+
+      // POS_TABLE: позиции спецификации (BLOCK 1 / 2 / 3)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: POS_TABLE },
+        payload => {
+          const specId = payload.new?.spec_id ?? payload.old?.spec_id;
+          if (specId == null || !watchedSpecIds.has(String(specId))) return;
+          scheduleReloadSpec(specId);
+        }
+      )
+
+      // SELECT_TABLE: результаты селектора / прайсера (BLOCK 2 / 2.1 / 3 / 3.1)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: SELECT_TABLE },
+        payload => {
+          const specId = payload.new?.spec_id ?? payload.old?.spec_id;
+          if (specId == null || !watchedSpecIds.has(String(specId))) return;
+          scheduleReloadSpec(specId);
+        }
+      )
+
+      // STATUS_TABLE: статусы селектора — влияют на содержимое блоков
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: STATUS_TABLE },
+        payload => {
+          const specId = payload.new?.spec_id ?? payload.old?.spec_id;
+          if (specId == null || !watchedSpecIds.has(String(specId))) return;
+          scheduleReloadSpec(specId);
+        }
+      )
+
+      .subscribe();
+  }
+
+
+
+  
+
+  function cleanupRealtime() {
+    if (realtimeSub) {
+      realtimeSub.unsubscribe();
+      realtimeSub = null;
+    }
+    stopAutoRefresh();
+  }
+
+  window.cleanupRealtime = cleanupRealtime;
+
+  document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    loadHistory();
+  }
+});
+  
+  // ====== ПРОГРЕСС: ОПИРАЕМСЯ НА ТРИ СТАТУС-ПОЛЯ ======
+  function parseSelectorCounts(str) {
+    const m = String(str || '').match(/(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)/);
+    if (!m) return null;
+    const sent = Number(m[1]), received = Number(m[2]), total = Number(m[3]);
+    return { sent, received, total };
+  }
+  function interpretDone(str) {
+    const s = String(str || '').toLowerCase();
+    if (!s.trim()) return false;
+    if (parseSelectorCounts(s)) {
+      const c = parseSelectorCounts(s);
+      return c && c.total > 0 && c.received >= c.total;
+    }
+    return /(готов|готово|готова|done|complete|completed|обработан|обработано|success|успешн|ок|ok)/i.test(s);
+  }
+  function interpretInProgress(str) {
+    const s = String(str || '').toLowerCase();
+    const c = parseSelectorCounts(s);
+    if (c) return c.total > 0 && c.received < c.total && (c.sent > 0 || c.received > 0);
+    return /(в работе|идет|processing|running|запущ|старт|ожидан|queue|queued)/i.test(s);
+  }
+
+  function setProgress(progressEl, info) {
+    if (!progressEl) return;
+    const specId = progressEl.dataset.specId;
+
+    // Считываем текущие статусы из строки истории (для полноты картинки)
+    const row = historyList.querySelector(`.history-item[data-spec-id="${specId}"]`);
+    const rowParser = row?.querySelector('[data-field="status_parser"]')?.value || row?.querySelector('[data-field="status_parser"]')?.textContent || '';
+    const rowSelector = row?.querySelector('[data-field="status_selector"]')?.value || row?.querySelector('[data-field="status_selector"]')?.textContent || '';
+    const rowPricer = row?.querySelector('[data-field="status_pricer"]')?.value || row?.querySelector('[data-field="status_pricer"]')?.textContent || '';
+
+    // Пришёл ли нам объект "промежуточного" прогресса селектора?
+    let parserStatus = rowParser;
+    let selectorStatus = rowSelector;
+    let pricerStatus = rowPricer;
+
+    if (typeof info === 'object' && info && 'status' in info && ('sent' in info || 'received' in info || 'total' in info)) {
+      // В трекере обновляем только шаг 2, остальные — как в DOM
+      const seg = `${Number(info.sent||0)} / ${Number(info.received||0)} / ${Number(info.total||0)}`;
+      selectorStatus = seg;
+    } else if (typeof info === 'object' && info && ('parser' in info || 'selector' in info || 'pricer' in info)) {
+      parserStatus  = info.parser  ?? parserStatus;
+      selectorStatus = info.selector ?? selectorStatus;
+      pricerStatus  = info.pricer  ?? pricerStatus;
+    } else if (typeof info === 'string') {
+      // совместимость с прежними вызовами, но основные статусы берём из трёх полей
+      // ничего не меняем
+    }
+
+    const steps = progressEl.querySelectorAll('.step');
+
+    // Вычисляем состояния каждого шага
+    const pDone  = interpretDone(parserStatus);
+    const pProg  = !pDone && interpretInProgress(parserStatus);
+
+    const sCounts = parseSelectorCounts(selectorStatus);
+    const sDone  = interpretDone(selectorStatus);
+    const sProg  = !sDone && interpretInProgress(selectorStatus);
+
+    const rDone  = interpretDone(pricerStatus);
+    const rProg  = !rDone && interpretInProgress(pricerStatus);
+
+    // Заполняем иконки/активность по шагам
+    const apply = (stepEl, done, prog) => {
+      const icon = stepEl.querySelector('.status');
+      if (done) {
+        stepEl.classList.add('active');
+        if (icon) icon.textContent = 'done_all';
+      } else if (prog) {
+        stepEl.classList.add('active');
+        if (icon) icon.textContent = 'autorenew';
+      } else {
+        stepEl.classList.remove('active');
+        if (icon) icon.textContent = 'indeterminate_check_box';
+      }
+    };
+
+    apply(steps[0], pDone, pProg);
+    // для шага 2 — дополнительно дёргаем числа
+    apply(steps[1], sDone, sProg);
+    apply(steps[2], rDone, rProg);
+  }
+
+  async function getSelectorProgress(specId) {
+    const [totalRes, sentRes, selectRes] = await Promise.all([
+      supabase
+        .from(POS_TABLE)
+        .select('id', { count: 'exact', head: true })
+        .eq('spec_id', specId),
+      supabase
+        .from(STATUS_TABLE)
+        .select('pos_id', { count: 'exact', head: true })
+        .eq('spec_id', specId),
+      supabase
+        .from(SELECT_TABLE)
+        .select('pos_id')
+        .eq('spec_id', specId)
+        .limit(5000),
+    ]);
+
+    const totalCount = typeof totalRes?.count === 'number' ? totalRes.count : 0;
+    if (totalRes?.error) console.error('getSelectorProgress total error:', totalRes.error);
+
+    const sentCount = typeof sentRes?.count === 'number' ? sentRes.count : 0;
+    if (sentRes?.error) console.error('getSelectorProgress sent error:', sentRes.error);
+
+    let receivedCount = 0;
+    if (selectRes?.error) {
+      console.error('getSelectorProgress received error:', selectRes.error);
+    } else if (Array.isArray(selectRes?.data)) {
+      const unique = new Set();
+      selectRes.data.forEach(row => {
+        const posId = row?.pos_id ?? row?.posId ?? row?.posid;
+        if (posId !== null && posId !== undefined) {
+          unique.add(String(posId));
+        }
+      });
+      receivedCount = unique.size;
+    }
+
+    const normalizedSent = Math.max(sentCount, receivedCount);
+    const normalizedTotal = Math.max(totalCount, normalizedSent, receivedCount);
+
+    return {
+      sent: normalizedSent,
+      received: receivedCount,
+      total: normalizedTotal,
+    };
+  }
+
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (session) {
+      await supabase.functions.invoke('modal9-selector', { body: { mode: 'ping' } });
+    }
+  } catch (_) {}
+
+  await loadHistory({ resetLimit: true });
+  setupRealtime();
+}
+
+initModal9();
+
+</script>
