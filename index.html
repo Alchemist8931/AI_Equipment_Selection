@@ -104,7 +104,7 @@
       top: 20px; 
       left: 50%; 
       transform: translateX(-50%); 
-      width: 1450px; 
+      width: 1520px; 
       height: 60px; /* Reduced height */
       padding: 10px 15px; 
       box-sizing: border-box; 
@@ -171,7 +171,7 @@
       bottom: 20px; 
       left: 50%; 
       transform: translateX(-50%); 
-      width: 1450px;
+      width: 1520px;
       padding: 10px; 
       box-sizing: border-box; 
       z-index: 10; 
@@ -356,7 +356,7 @@
       cursor: pointer;
       transition: background 0.2s;
       position: absolute;
-      right: -12px; /* Сдвиг вправо */
+      right: -10px; /* Сдвиг вправо */
       top: 50%;
       transform: translateY(-50%);
       z-index: 10;
@@ -1129,7 +1129,7 @@
       function closeRowGroup(id) {
         if (openedSpecId === id) openedSpecId = null;
         const cont = historyList.querySelector(`.spec-content[data-spec-id="${id}"]`);
-        const extra = historyList.querySelector(`.history-item[data-spec-id="${id}"] .spec-close-btn`);
+        const extra = historyList.querySelector(`.history-item[data-spec-id="${id}"] .spec-close-btn-accent`);
         const prog = historyList.querySelector(`.spec-progress[data-spec-id="${id}"]`);
         const actions = historyList.querySelector(`.spec-container[data-spec-id="${id}"] .spec-action-row`);
         if (cont) { cont.classList.add('hidden'); const t = setTimeout(() => { cont.style.display = 'none'; hideTimers.delete(cont); }, 500); hideTimers.set(cont, t); }
