@@ -8,30 +8,26 @@
   <link href="https://fonts.googleapis.com/css2?family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
   
-  <style>
+    <style>
     :root {
-      /* Dark Theme Variables */
-      --bg: #09090b;
-      --bg-deep: #050507;
-      --bg-elevated: #111114;
-      --bg-card: rgba(20, 20, 24, 0.85);
-      --fg: #e8e8ec;
-      --fg-warm: #f2f0ed;
-      --fg-muted: #7a7a85;
-      --fg-dim: #45454f;
-      --accent: #f0ebe4;
-      --accent-warm: #e8e2d8;
-      --accent-soft: rgba(240, 235, 228, 0.06);
-      --accent-muted: rgba(240, 235, 228, 0.03);
-      --border: rgba(240, 235, 228, 0.1);
-      --border-subtle: rgba(240, 235, 228, 0.05);
-      --glow: rgba(240, 235, 228, 0.15);
-
-      /* App Specific Variables */
+      --bg-primary: #f8f9fa;
+      --bg-card: #ffffff;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border-color: #e5e7eb;
+      --accent: #000000;
+      --accent-hover: #333333;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --tab-bg: #e8e8e8;
+      --tab-active: #ffffff;
+      
+      /* Keep existing structural vars */
       --form-width: 900px;
       --form-height: 900px;
       --overlay-width: 385px;
-      --scrollbar-color: rgba(240, 235, 228, 0.2);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,67 +35,26 @@
     html, body { 
       width: 100vw; 
       height: 100vh; 
-      background: var(--bg); 
-      color: var(--fg); 
+      background: var(--bg-primary); 
+      color: var(--text-primary); 
       overflow: hidden !important; 
       position: relative; 
       font-family: 'SN Pro', sans-serif;
     }
 
-    /* === Atmospheric Background Layers === */
-    .grain-layer {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.03;
-    }
-    .grain-layer svg { width: 100%; height: 100%; }
-
-    .floating-orbs {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(120px);
-      opacity: 0.4;
-      will-change: transform;
-    }
-    .orb-1 {
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(200, 195, 185, 0.08) 0%, transparent 70%);
-      top: -200px; right: -100px;
-      animation: orbFloat1 25s ease-in-out infinite;
-    }
-    .orb-2 {
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(180, 175, 165, 0.05) 0%, transparent 70%);
-      bottom: -100px; left: -50px;
-      animation: orbFloat2 30s ease-in-out infinite;
-    }
-    @keyframes orbFloat1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-40px, 40px); } }
-    @keyframes orbFloat2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, -30px); } }
-
-    /* === Main App Styles === */
+    /* Main Containers */
     .glass3d {
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     /* Preloader */
     #preloader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 10px; opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease; z-index: 9999; }
     #preloader.visible { opacity: 1; visibility: visible; }
     #preloader.fade-out { opacity: 0; visibility: hidden; }
-    .line { width: 10px; height: 70px; background-color: var(--fg-warm); animation: bounce 1.5s infinite ease-in-out; border-radius: 4px; }
+    .line { width: 10px; height: 70px; background-color: var(--accent); animation: bounce 1.5s infinite ease-in-out; border-radius: 4px; }
     .line:nth-child(2) { animation-delay: 0.3s; }
     .line:nth-child(3) { animation-delay: 0.6s; }
     .line:nth-child(5) { animation-delay: 1.2s; }
@@ -108,10 +63,10 @@
     /* Login/Register */
     #login-wrapper { opacity: 0; transition: opacity 0.5s ease; width: 100%; height: 100%; position: relative; z-index: 100; pointer-events: none; }
     #login-wrapper.show { opacity: 1; pointer-events: auto; }
-    .container { width: var(--form-width); height: var(--form-height); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 16px; overflow: hidden; position: relative; z-index: 100; border: 1px solid var(--border); background: var(--bg-elevated); }
-    .overlay { position: absolute; top: 0; left: 0; width: var(--overlay-width); height: 100%; background: var(--bg); border-radius: 16px 0 0 16px; transition: left 1s ease; z-index: 9999 !important; pointer-events: auto !important; border-right: 1px solid var(--border); }
-    .overlay.open-sign-up { left: calc(var(--form-width) - var(--overlay-width)); border-radius: 0 16px 16px 0; border-right: none; border-left: 1px solid var(--border); }
-    .overlay .sign-in, .overlay .sign-up { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 30px; display: flex; flex-direction: column; justify-content: center; gap: 15px; transition: opacity 0.5s; pointer-events: auto; z-index: 10000; }
+    .container { width: var(--form-width); height: var(--form-height); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 16px; overflow: hidden; position: relative; z-index: 100; border: 1px solid var(--border-color); background: var(--bg-card); }
+    .overlay { position: absolute; top: 0; left: 0; width: var(--overlay-width); height: 100%; background: var(--accent); border-radius: 16px 0 0 16px; transition: left 1s ease; z-index: 9999 !important; pointer-events: auto !important; }
+    .overlay.open-sign-up { left: calc(var(--form-width) - var(--overlay-width)); border-radius: 0 16px 16px 0; }
+    .overlay .sign-in, .overlay .sign-up { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 30px; display: flex; flex-direction: column; justify-content: center; gap: 15px; transition: opacity 0.5s; pointer-events: auto; z-index: 10000; color: #fff; }
     .overlay .sign-in { opacity: 1; pointer-events: auto; }
     .overlay .sign-up { opacity: 0; pointer-events: none; }
     .overlay.open-sign-up .sign-in { opacity: 0; pointer-events: none; }
@@ -121,295 +76,225 @@
     .form .sign-in.show { display: flex; opacity: 1; }
     .form .sign-up.show { display: flex; opacity: 1; }
     
-    .modalFORM { display: flex; flex-direction: column; gap: 20px; background: var(--bg-card); backdrop-filter: blur(10px); padding: 30px; width: 380px; border-radius: 12px; z-index: 200; border: 1px solid var(--border); }
-    .modalFORM h3 { font-size: 26px; font-weight: 500; text-align: center; text-transform: uppercase; color: var(--fg-warm); margin: 0; }
+    .modalFORM { display: flex; flex-direction: column; gap: 20px; background: var(--bg-card); border: 1px solid var(--border-color); padding: 30px; width: 380px; border-radius: 12px; z-index: 200; }
+    .modalFORM h3 { font-size: 22px; font-weight: 600; text-align: center; text-transform: uppercase; color: var(--text-primary); margin: 0; }
     
-    .inputField { width: 98%; padding: 12px; font-size: 14px; font-weight: 500; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); outline: none; transition: all 0.3s ease; color: var(--fg); }
-    .inputField:focus { border-color: var(--accent); background: rgba(255,255,255,0.05); }
-    .inputField::placeholder { color: var(--fg-dim); }
+    .inputField { width: 98%; padding: 12px; font-size: 14px; font-weight: 500; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); outline: none; transition: all 0.3s ease; color: var(--text-primary); }
+    .inputField:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,0,0,0.05); }
+    .inputField::placeholder { color: var(--text-muted); }
     
-    .button-submit { width: 100%; padding: 12px; background: var(--fg-warm); border: none; color: var(--bg); font-size: 14px; font-weight: 600; border-radius: 8px; height: 40px; cursor: pointer; transition: all 0.4s; }
-    .button-submit:hover { background: var(--accent); box-shadow: 0 0 20px var(--glow); transform: translateY(-2px); }
+    .button-submit { width: 100%; padding: 12px; background: var(--accent); border: none; color: #fff; font-size: 14px; font-weight: 600; border-radius: 8px; height: 40px; cursor: pointer; transition: all 0.4s; }
+    .button-submit:hover { background: var(--accent-hover); }
     
-    .button-submit2 { padding: 12px; background: transparent; border: 1px solid var(--border); color: var(--fg); font-size: 14px; font-weight: 600; border-radius: 8px; height: 40px; width: 100%; cursor: pointer; transition: all 0.4s; margin-top: 26px; }
-    .button-submit2:hover { background: var(--accent-soft); border-color: var(--fg-muted); }
+    .button-submit2 { padding: 12px; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #fff; font-size: 14px; font-weight: 600; border-radius: 8px; height: 40px; width: 100%; cursor: pointer; transition: all 0.4s; margin-top: 26px; }
+    .button-submit2:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
 
     /* DB Disconnect */
-    #db-disconnect-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: 2000; }
+    #db-disconnect-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: 2000; }
     #db-disconnect-overlay.show { opacity: 1; pointer-events: auto; }
-    .loading-wave { position: absolute; bottom: 20px; right: 20px; width: 1000px; height: 0; display: flex; justify-content: center; align-items: flex-end; opacity: 0; transition: opacity 1s ease; }
-    #db-disconnect-overlay.show .loading-wave { opacity: 1; }
-    .loading-bar { width: 20px; height: 40px; margin: 0 5px; background-color: var(--accent); border-radius: 5px; animation: loading-wave-animation 1s ease-in-out infinite; }
-    .loading-bar:nth-child(2) { animation-delay: 0.1s; }
-    .loading-bar:nth-child(3) { animation-delay: 0.3s; }
-    .loading-bar:nth-child(4) { animation-delay: 0.5s; }
-    .loading-bar:nth-child(5) { animation-delay: 0.7s; }
-    .loading-bar:nth-child(6) { animation-delay: 0.9s; }
-    .loading-bar:nth-child(7) { animation-delay: 0.11s; }
-    @keyframes loading-wave-animation { 0% { height: 10px; } 50% { height: 40px; } 100% { height: 10px; } }
+    .loading-bar { background-color: var(--error); }
 
-    #home_wave { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: -1; }
+    #home_wave { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: -1; opacity: 0.4; }
     
     /* Modal 9 App Styles */
     .spec-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease; z-index: 10; }
     .spec-modal.visible { opacity: 1; visibility: visible; }
 
-    /* Top Window */
-    .modal9-top-window { color: var(--fg); position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 1930px; height: 160px; padding: 20px; box-sizing: border-box; overflow: visible; z-index: 30; }
-    .modal9-top-body { display: flex; flex-direction: column; gap: 16px; }
+    /* Top Window - Layout: Top 20px, Padding 10px */
+    .modal9-top-window { 
+      color: var(--text-primary); 
+      position: fixed; 
+      top: 20px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      width: calc(100% - 40px); 
+      height: 140px; 
+      padding: 10px; 
+      box-sizing: border-box; 
+      z-index: 30; 
+    }
+    .modal9-top-body { display: flex; flex-direction: column; gap: 12px; height: 100%; }
     
-    nav.nav_copy { display:flex; gap:8px; margin-bottom:10px; position:relative; background: rgba(255,255,255,0.03); border-radius:6px; overflow:hidden; width: 400px; border: 1px solid var(--border); }
-    nav.nav_copy .slider { position:absolute; top:0; left:0; width:49%; height:100%; background: var(--fg-warm); border-radius:6px; transition:left 0.3s; }
-    nav.nav_copy .tab { flex:1; text-align:center; color: var(--fg-muted); z-index:1; padding:6px 12px; cursor:pointer; transition:color 0.3s; user-select:none; }
-    nav.nav_copy .tab.active { color: var(--bg); }
+    /* Tabs */
+    nav.nav_copy { display:flex; gap:2px; position:relative; background: var(--tab-bg); border-radius:6px; overflow:hidden; width: 300px; height: 32px; border: 1px solid var(--border-color); }
+    nav.nav_copy .slider { position:absolute; top:0; left:0; width:49%; height:100%; background: var(--tab-active); border-radius:4px; transition:left 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    nav.nav_copy .tab { flex:1; text-align:center; color: var(--text-secondary); z-index:1; padding:6px 12px; cursor:pointer; transition:color 0.3s; user-select:none; font-size: 13px; font-weight: 500; }
+    nav.nav_copy .tab.active { color: var(--text-primary); }
     
-    .spec-history-list { width: 100%; margin-top: 10px; overflow-x: auto; overflow-y: hidden; height: 100%; }
+    .spec-history-list { width: 100%; margin-top: 0; overflow-x: auto; overflow-y: hidden; height: 100%; }
     .spec-history-item { display:flex; justify-content:space-between; padding:4px 8px; transition: background 0.2s; border-radius: 4px; }
-    .spec-history-item:hover { background: var(--accent-soft); }
+    .spec-history-item:hover { background: var(--bg-primary); }
     
-    .history-controls { width:100%; display:flex; justify-content:center; margin:12px 0 0; }
+    .history-controls { width:100%; display:flex; justify-content:center; margin-top:8px; }
     .history-load-more { min-width:200px; display:inline-flex; align-items:center; justify-content:center; }
-    .history-load-more.loading { opacity:0.7; pointer-events:none; }
 
     .input-container { position: relative; width: auto; }
     .status-field-wrapper { display: inline-flex; align-items: center; gap: 6px; }
-    .status-icon { font-family: 'Material Symbols Outlined'; font-size: 24px; line-height: 1; color: var(--fg-muted); transition: color 0.3s ease, text-shadow 0.3s ease; user-select: none; }
+    .status-icon { font-family: 'Material Symbols Outlined'; font-size: 20px; line-height: 1; color: var(--text-muted); transition: color 0.3s ease; user-select: none; }
     .input-container.overflow::after { content: ''; position: absolute; top: 0; right: 0; width: 20px; height: 100%; pointer-events: none; background: linear-gradient(to left, var(--bg-card), transparent); }
     
-    .styled_input_bar { width: auto; padding: 10px; font-size: 14px; border: 1px solid var(--border); border-radius: 8px; background-color: transparent; color: var(--fg); outline: none; transition: all 0.3s ease; box-sizing: border-box; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .styled_input_bar::placeholder { color: var(--fg-dim); transition: all 0.3s ease; }
-    .styled_input_bar:hover { border-color: var(--fg-muted); background: rgba(255,255,255,0.02); }
-    .styled_input_bar:focus { border-color: var(--accent); background: rgba(255,255,255,0.03); }
+    .styled_input_bar { width: auto; padding: 8px 10px; font-size: 13px; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--bg-primary); color: var(--text-primary); outline: none; transition: all 0.3s ease; box-sizing: border-box; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .styled_input_bar::placeholder { color: var(--text-muted); transition: all 0.3s ease; }
+    .styled_input_bar:hover { border-color: var(--text-muted); }
+    .styled_input_bar:focus { border-color: var(--accent); background: #fff; }
     
-    .input-label { position: absolute; left: 10px; top: 10px; transform: translateY(-50%); font-size: 10px; background-color: var(--bg-elevated); color: var(--fg-muted); pointer-events: none; transition: all 0.3s ease; padding: 0 5px; }
-    .styled_input_bar:hover + .input-label, .styled_input_bar:not(:placeholder-shown) + .input-label { top: -2px; left: 10px; font-size: 11px; color: var(--accent); background-color: var(--bg-elevated); padding: 0 5px; }
+    .input-label { position: absolute; left: 10px; top: 10px; transform: translateY(-50%); font-size: 10px; background-color: var(--bg-primary); color: var(--text-muted); pointer-events: none; transition: all 0.3s ease; padding: 0 4px; }
+    .styled_input_bar:hover + .input-label, .styled_input_bar:not(:placeholder-shown) + .input-label { top: 0; left: 10px; font-size: 10px; color: var(--text-secondary); background-color: var(--bg-card); }
     
-    .spec-history-item.input-row { gap: 10px; flex-wrap: nowrap; width: max-content; }
-    .copy-tooltip { position: fixed; background: var(--fg-warm); color: var(--bg); padding: 4px 8px; border-radius: 4px; font-size: 12px; pointer-events: none; z-index: 11000; }
-    .spec-context-menu { position: absolute; display: none; min-width: 220px; background: var(--bg-elevated); color: var(--fg); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); padding: 6px 0; z-index: 4000; }
+    .spec-history-item.input-row { gap: 8px; flex-wrap: nowrap; width: max-content; }
+    .copy-tooltip { position: fixed; background: var(--accent); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; pointer-events: none; z-index: 11000; }
+    .spec-context-menu { position: absolute; display: none; min-width: 200px; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 6px 0; z-index: 4000; }
     .spec-context-menu.visible { display: block; }
-    .spec-context-menu button { width: 100%; padding: 8px 16px; border: none; background: none; font-size: 14px; text-align: left; color: inherit; cursor: pointer; transition: background 0.2s; }
-    .spec-context-menu button:hover, .spec-context-menu button:focus { background: var(--accent-soft); outline: none; }
-    
-    .tooltip-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter: blur(5px); display:flex; align-items:center; justify-content:center; z-index:10000; }
-    .tooltip-modal { position:relative; background: var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; width:1320px; max-width:90vw; max-height:90vh; overflow-y:auto; margin:30px; display:inline-block; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-    .tooltip-modal::-webkit-scrollbar { width:6px; }
-    .tooltip-modal::-webkit-scrollbar-track { background:transparent; }
-    .tooltip-modal::-webkit-scrollbar-thumb { background:var(--border); border-radius:10px; }
-    .ans5-close { position:absolute; top:8px; right:10px; font-size:24px; background:none; border:none; cursor:pointer; color: var(--fg-muted); transition: color 0.2s; }
-    .ans5-close:hover { color: var(--fg); }
+    .spec-context-menu button { width: 100%; padding: 8px 16px; border: none; background: none; font-size: 13px; text-align: left; color: inherit; cursor: pointer; transition: background 0.2s; }
+    .spec-context-menu button:hover { background: var(--bg-primary); }
 
-    .modalRow { display:flex; gap:10px; margin-top:10px; }
-    .modalColumn { display:flex; flex-direction:column; gap:10px; }
-    .registry-checkboxes { display:flex; flex-direction:column; margin-top:10px; opacity: 0.8; }
-    .registry-checkboxes .checkbox-item { display:flex; align-items:center; gap:6px; font-size: 12px; color: var(--fg-muted); }
-    .registry-checkboxes input[type="checkbox"] { accent-color: var(--accent); }
+    .modalRow { display:flex; gap:8px; margin-top:8px; }
+    .modalColumn { display:flex; flex-direction:column; gap:8px; }
+    .registry-checkboxes { display:flex; flex-direction:column; margin-top:8px; }
+    .registry-checkboxes .checkbox-item { display:flex; align-items:center; gap:6px; font-size: 11px; color: var(--text-secondary); }
     
-    .modalCONTEINERpost { display: flex; border-radius: 8px; background: transparent; border: none; }
-    .status-display { width: auto; padding: 10px; font-size: 14px; border: 1px solid var(--border); border-radius: 8px; background-color: transparent; color: var(--fg); box-sizing: border-box; text-align: left; transition: opacity 1s, filter 1s; text-transform: uppercase; text-align: center; }
-    .status-display.error { border-color: #ff4d4d; color: #ff4d4d; }
-    .status-display.fade { opacity: 0; filter: blur(2px); }
-    .fade-toggle { transition: opacity 0.5s, filter 0.5s; }
-    .fade-toggle.hidden { opacity: 0; filter: blur(2px); pointer-events: none; }
-    .fade-in { animation: fadeIn 0.5s ease; }
+    .modalCONTEINERpost { display: flex; border-radius: 6px; background: transparent; border: none; }
+    .status-display { width: auto; padding: 8px; font-size: 12px; border: 1px solid var(--border-color); border-radius: 6px; background-color: transparent; color: var(--text-secondary); box-sizing: border-box; text-align: left; transition: opacity 1s; text-transform: uppercase; text-align: center; }
+    .status-display.error { border-color: var(--error); color: var(--error); }
+    .fade-toggle { transition: opacity 0.5s; }
+    .fade-toggle.hidden { opacity: 0; pointer-events: none; }
+    .fade-in { animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* Bottom Window */
-    .modal9-window { color: var(--fg); position: fixed; top: 190px; bottom: 0; left: 50%; transform: translateX(-50%); width: 1930px; padding: 20px; box-sizing: border-box; z-index: 10; display: flex; flex-direction: column; }
-    .modal9-content { width: 100%; height: 100%; box-sizing: border-box; overflow-y: auto; overflow-x: visible; padding-right: 10px; }
-    .modal9-content::-webkit-scrollbar{width:6px;}
+    /* Bottom Window - Layout: Top 180px (20+140+20), Bottom 20px, Padding 10px */
+    .modal9-window { 
+      color: var(--text-primary); 
+      position: fixed; 
+      top: 180px; 
+      bottom: 20px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      width: calc(100% - 40px); 
+      padding: 10px; 
+      box-sizing: border-box; 
+      z-index: 10; 
+      display: flex; 
+      flex-direction: column; 
+    }
+    .modal9-content { width: 100%; height: 100%; box-sizing: border-box; overflow-y: auto; overflow-x: visible; padding-right: 5px; }
+    .modal9-content::-webkit-scrollbar{width:4px;}
     .modal9-content::-webkit-scrollbar-track{background:transparent;}
-    .modal9-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+    .modal9-content::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:10px;}
 
-    .file-upload__modal { display:flex; align-items:flex-start; }
-    .file-upload-form { width:fit-content; height:fit-content; display:flex; align-items:center; justify-content:center; }
-    .file-upload-label input { display:none; }
-    .file-upload-label { cursor:pointer; background: var(--accent-soft); padding:10px 20px; border-radius:8px; border:1px dashed var(--border); transition: all 0.3s; }
-    .file-upload-label:hover { background: rgba(240, 235, 228, 0.1); border-color: var(--fg-muted); }
-    .file-upload-design { display:flex; flex-direction:column; align-items:center; justify-content:space-between; height:100%; gap: 5px; }
-    .browse-button { width:100%; }
-    .upload-status-wrapper { display:flex; flex-direction:column; align-items:flex-start; margin-left:15px; color: var(--fg-muted); font-size: 13px; }
-    .js-dropzone.drag { background: rgba(255,255,255,0.02); }
-
-    .darkmatter-btn { background: var(--fg-warm); border:none; color: var(--bg); padding:8px 12px; width: 245px; border-radius:8px; font-size:14px; cursor:pointer; position:relative; overflow:hidden; transition:all 0.3s ease; z-index:1; font-weight: 600; }
-    .darkmatter-btn:hover { background: var(--accent); box-shadow: 0 0 15px var(--glow); transform: translateY(-1px); }
-    .darkmatter-btn:active { transform:scale(0.98); }
-    .darkmatter-btn .loader { display:none; position:absolute; inset:0; margin:auto; width:16px; height:16px; border:2px solid rgba(0,0,0,0.2); border-top-color:var(--bg); border-radius:50%; animation:spin 1s linear infinite; }
-    @keyframes spin { from{transform:rotate(0);} to{transform:rotate(360deg);} }
+    /* Simplified Upload Button */
+    .upload-btn-main {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0 20px;
+      height: 40px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .upload-btn-main:hover { background: var(--accent-hover); }
+    .upload-btn-main:disabled { opacity: 0.6; cursor: default; }
+    
+    .upload-status-wrapper { display:flex; flex-direction:column; align-items:flex-start; margin-left:15px; color: var(--text-secondary); font-size: 12px; min-width: 200px; }
+    
+    .darkmatter-btn { background: var(--accent); border:none; color: #fff; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:background 0.2s; font-weight: 500; }
+    .darkmatter-btn:hover { background: var(--accent-hover); }
+    .darkmatter-btn:disabled { opacity:0.5; cursor:default; pointer-events:none; }
+    .darkmatter-btn .loader { display:none; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 1s linear infinite; }
     .darkmatter-btn.loading .loader { display:block; }
     .darkmatter-btn.loading .button-text { visibility:hidden; }
+    @keyframes spin { from{transform:rotate(0);} to{transform:rotate(360deg);} }
 
-    .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+    .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-elevated); transition: .4s; border-radius: 34px; border: 1px solid var(--border); }
-    .toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 2px; background-color: var(--fg-muted); transition: .4s; border-radius: 50%; }
-    input:checked + .toggle-slider { background-color: var(--accent-soft); border-color: var(--accent); }
-    input:checked + .toggle-slider:before { transform: translateX(19px); background-color: var(--fg-warm); }
+    .toggle-slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--border-color); transition: .4s; border-radius: 20px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: #fff; transition: .4s; border-radius: 50%; }
+    input:checked + .toggle-slider { background-color: var(--accent); }
+    input:checked + .toggle-slider:before { transform: translateX(16px); }
 
     .block1-wrapper{ height:100%; overflow-y:auto; overflow-x:hidden; }
-    .spec-container { margin-bottom:10px; margin-right:50px; padding-top:10px;}
+    .spec-container { margin-bottom:8px; padding-top:8px; }
     
     /* Progress Steps */
-    .spec-progress.multistep { display:flex; gap:10px; margin:0 10px; width:calc(100% - 20px); }
+    .spec-progress.multistep { display:flex; gap:8px; width:100%; }
     .spec-progress.multistep .step { flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:2px; }
-    .spec-progress.multistep .step-body { display:flex; gap:8px; margin-left:20px; align-items: center; }
-    .spec-progress.multistep .step-body .darkmatter-btn { height:auto; padding:6px 10px; width:200px; font-size: 12px; }
-    .spec-progress.multistep .step-body .darkmatter-btn:disabled { opacity:0.4; cursor:default; pointer-events:none; }
-    .spec-progress.multistep .bar { width:100%; height:2px; background: var(--fg-dim); opacity:0.5; border-radius:2px; transition:opacity 0.3s, background 0.3s; }
-    .spec-progress.multistep .step.active .bar { opacity:1; background: var(--accent); box-shadow:0 0 4px var(--glow); }
-    .spec-progress.multistep .label { font-size:11px; color: var(--fg-muted); }
-    .spec-progress.multistep .icons { display:flex; gap:4px; align-items:center; }
-    .spec-progress.multistep .icons .material-symbols-outlined { font-size:16px; color:var(--fg-muted); }
-    .spec-progress.multistep .step.active .label { color: var(--fg); }
-    .spec-progress.multistep .step.active .icons .material-symbols-outlined { color: var(--accent); }
+    .spec-progress.multistep .step-body { display:flex; gap:8px; margin-left:0; align-items: center; width: 100%; }
+    .spec-progress.multistep .step-body .darkmatter-btn { height:28px; padding:0 10px; width:auto; flex-shrink: 0; }
+    .spec-progress.multistep .bar { width:100%; height:2px; background: var(--border-color); border-radius:2px; transition:background 0.3s; }
+    .spec-progress.multistep .step.active .bar { background: var(--accent); }
+    .spec-progress.multistep .label { font-size:10px; color: var(--text-muted); white-space: nowrap; }
+    .spec-progress.multistep .icons .material-symbols-outlined { font-size:14px; color: var(--text-muted); }
+    .spec-progress.multistep .step.active .label { color: var(--text-primary); font-weight: 600; }
+    .spec-progress.multistep .step.active .icons .material-symbols-outlined { color: var(--success); }
     
-    .spec-header { background:transparent; cursor:pointer; font-weight:700; }
-    .group-close { float:right; background:none; border:none; cursor:pointer; color: var(--fg-muted); transition: color 0.2s; }
-    .group-close:hover { color: var(--fg); }
+    .spec-header { background:transparent; cursor:pointer; font-weight:600; }
+    .group-close { float:right; background:none; border:none; cursor:pointer; color: var(--text-muted); transition: color 0.2s; font-size: 18px; line-height: 1; }
+    .group-close:hover { color: var(--accent); }
 
     /* Action Buttons */
-    .spec-action-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
-    .spec-action-btn { display: inline-flex; align-items: center; justify-content: center; position: relative; overflow: hidden; min-width: 160px; height: 34px; padding: 0 20px; border: none; border-radius: 8px; background: var(--bg-elevated); color: var(--fg); font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); transition: all 0.3s ease; }
-    .spec-action-btn:hover { background: var(--fg-warm); color: var(--bg); border-color: var(--fg-warm); box-shadow: 0 0 15px rgba(240, 235, 228, 0.2); }
-    .spec-action-btn--excel { border-color: #307750; background: rgba(48, 119, 80, 0.1); color: #5fd47a; }
-    .spec-action-btn--excel:hover { background: #5fd47a; color: #000; border-color: #5fd47a; }
+    .spec-action-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .spec-action-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 120px; height: 28px; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-primary); font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .spec-action-btn:hover { background: var(--bg-primary); border-color: var(--accent); }
+    .spec-action-btn--excel { border-color: var(--success); color: var(--success); background: rgba(16, 185, 129, 0.05); }
+    .spec-action-btn--excel:hover { background: var(--success); color: #fff; }
 
-    /* Updates Panel */
-    .modal9-updates { position: absolute; top: 15px; right: 20px; width: 700px; max-height: 54px; padding: 12px 15px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border); backdrop-filter: blur(20px); display: flex; flex-direction: column; gap: 10px; overflow-y: auto; cursor: pointer; transition: max-height 0.35s ease; z-index: 10000; }
-    .modal9-updates.is-expanded { max-height: 600px; }
+    /* Updates Panel - Light Theme */
+    .modal9-updates { position: absolute; top: 10px; right: 10px; width: 300px; max-height: 40px; padding: 8px 12px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; overflow: hidden; cursor: pointer; transition: max-height 0.3s ease, box-shadow 0.3s; z-index: 5; }
+    .modal9-updates.is-expanded { max-height: 400px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
     .modal9-updates-header { display: flex; justify-content: space-between; align-items: center; }
-    .modal9-updates-title { font-size: 12px; font-weight: 600; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .modal9-updates-toggle { font-size: 11px; color: var(--accent); background: none; border: 1px solid var(--border); padding: 2px 8px; border-radius: 4px; cursor: pointer; }
-    .modal9-updates-body { display: none; margin-top: 5px; }
+    .modal9-updates-title { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .modal9-updates-toggle { font-size: 10px; color: var(--accent); background: none; border: none; padding: 0; cursor: pointer; font-weight: 500; }
+    .modal9-updates-body { display: none; margin-top: 8px; border-top: 1px solid var(--border-color); padding-top: 8px; }
     .modal9-updates.is-expanded .modal9-updates-body { display: block; }
-    .modal9-update-card { padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.02); margin-bottom: 8px; border: 1px solid var(--border-subtle); }
-    .modal9-update-title { font-size: 13px; font-weight: 600; color: var(--fg); margin-bottom: 4px; }
-    .modal9-update-body { font-size: 12px; color: var(--fg-muted); line-height: 1.5; }
+    .modal9-update-card { padding: 8px; border-radius: 6px; background: var(--bg-primary); margin-bottom: 6px; }
+    .modal9-update-title { font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
+    .modal9-update-body { font-size: 11px; color: var(--text-secondary); line-height: 1.4; }
 
     /* === SLIDESHOW STYLES === */
     .slideshow-container {
       position: relative;
       width: 100%;
-      min-width: 800px;
+      min-width: 700px;
       height: auto;
-      min-height: 300px;
+      min-height: 250px;
       overflow: hidden;
-      border-radius: 12px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      margin-left: 10px;
+      border-radius: 8px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
     }
 
-    .slide {
-      position: relative;
-      width: 100%;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 1s ease;
-      display: none;
-    }
-
-    .slide.active {
-      opacity: 1;
-      pointer-events: auto;
-      display: block;
-    }
-
-    .slide-content {
-      padding: 20px 30px;
-      height: 100%;
-      overflow-y: auto;
-      max-height: 600px;
-    }
-
-    .caption {
-      padding: 10px 20px;
-      font-family: 'SN Pro', sans-serif;
-      font-size: 1rem;
-      letter-spacing: 0.5px;
-      background: rgba(0,0,0,0.3);
-      backdrop-filter: blur(5px);
-      border-top: 1px solid var(--border);
-      text-align: right;
-      color: var(--fg);
-    }
+    .slide { position: relative; width: 100%; opacity: 0; pointer-events: none; transition: opacity 0.8s ease; display: none; }
+    .slide.active { opacity: 1; pointer-events: auto; display: block; }
+    .slide-content { padding: 15px; height: 100%; overflow-y: auto; max-height: 400px; }
+    .caption { padding: 8px 15px; font-size: 11px; letter-spacing: 0.5px; background: var(--bg-primary); border-top: 1px solid var(--border-color); text-align: right; color: var(--text-secondary); font-weight: 500; }
 
     /* Navigation */
     .prev, .next {
-      cursor: pointer;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--fg);
-      font-size: 1.5rem;
-      padding: 10px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(4px);
-      transition: all 0.3s ease;
-      opacity: 0.6;
-      z-index: 3;
-      user-select: none;
-      font-weight: bold;
-      border: 1px solid var(--border);
+      cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); color: var(--text-muted);
+      font-size: 18px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color);
+      transition: all 0.2s ease; opacity: 0.8; z-index: 3; user-select: none; font-weight: bold;
     }
-
-    .prev:hover, .next:hover {
-      opacity: 1;
-      background: var(--fg-warm);
-      color: var(--bg);
-    }
-
-    .prev { left: 5px; }
-    .next { right: 5px; }
+    .prev:hover, .next:hover { opacity: 1; background: var(--accent); color: #fff; border-color: var(--accent); }
+    .prev { left: 8px; } .next { right: 8px; }
 
     /* Dots */
-    .dots-container {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-      z-index: 3;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.3);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .dot.active {
-      background: var(--fg-warm);
-      transform: scale(1.3);
-    }
+    .dots-container { position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 3; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-color); cursor: pointer; transition: all 0.3s ease; }
+    .dot.active { background: var(--accent); transform: scale(1.2); }
     
     /* Custom Scrollbar for Slides */
     .slide-content::-webkit-scrollbar { width: 4px; }
     .slide-content::-webkit-scrollbar-track { background: transparent; }
-    .slide-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .slide-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
   </style>
 </head>
 <body>
-  <!-- Atmospheric Backgrounds -->
-  <div class="grain-layer" aria-hidden="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-      <filter id="grainy">
-        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/>
-      </filter>
-      <rect width="100%" height="100%" filter="url(#grainy)"/>
-    </svg>
-  </div>
-  
-  <div class="floating-orbs" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-  </div>
-
   <div id="home_wave"></div>
   <div id="preloader"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>
   <div id="db-disconnect-overlay"><div class="loading-wave"><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div></div></div>
@@ -418,12 +303,12 @@
   <div id="login-wrapper">
     <div class="container glass3d">
       <div class="overlay" id="overlay">
-        <div class="sign-in"><h3 style="color: white;">ТОЛЬКО УЗНАЛИ О НАС?</h3><p style="color: #aaa;">Расскажите немного о себе,<br>и совершенствуйте своё дело вместе с нами!</p><button class="button-submit2" id="slide-right-button">Создать учетную запись</button></div>
-        <div class="sign-up" style="text-align:left;"><h3 style="color: white;">МЫ ЗНАКОМЫ?</h3><p style="color: #aaa;">Если вы уже зарегистрированы,<br>перейдите на форму входа</p><button class="button-submit2" id="slide-left-button">Форма входа</button></div>
+        <div class="sign-in"><h3 style="color: white;">ТОЛЬКО УЗНАЛИ О НАС?</h3><p style="color: rgba(255,255,255,0.7);">Расскажите немного о себе,<br>и совершенствуйте своё дело вместе с нами!</p><button class="button-submit2" id="slide-right-button">Создать учетную запись</button></div>
+        <div class="sign-up" style="text-align:left;"><h3 style="color: white;">МЫ ЗНАКОМЫ?</h3><p style="color: rgba(255,255,255,0.7);">Если вы уже зарегистрированы,<br>перейдите на форму входа</p><button class="button-submit2" id="slide-left-button">Форма входа</button></div>
       </div>
       <div class="form">
-        <div class="sign-in" id="sign-in-info" style="margin-left: -255px;"><h2 style="color: var(--fg-warm)">AI Equipment Selection</h2><form id="registration-form"><div class="modalFORM"><h3>ФОРМА РЕГИСТРАЦИИ</h3><div class="inputForm"><input class="inputField" placeholder="Фамилия" type="text" name="lastname"/></div><div class="inputForm"><input class="inputField" placeholder="Имя" type="text" name="firstname"/></div><div class="inputForm"><input class="inputField" placeholder="Отчество" type="text" name="middlename"/></div><div class="inputForm"><input class="inputField" placeholder="+7 (999) 999 99 99" type="text" name="phone"/></div><div class="inputForm"><input class="inputField" placeholder="mail@gmail.com" type="email" name="email"/></div><div class="inputForm"><input class="inputField" placeholder="пароль" type="password" name="password"/></div><button class="button-submit" id="regBtn">Отправить заявку</button></div></form></div>
-        <div class="sign-up show" id="sign-up-info" style="margin-left: 130px;"><h2 style="color: var(--fg-warm)">AI Equipment Selection</h2><form id="login-form" method="post" autocomplete="on"><div class="modalFORM"><h3>ФОРМА ВХОДА</h3><div class="inputForm"><input class="inputField" type="email" placeholder="email: user@gmail.com" id="loginEmail" name="email" autocomplete="username"/></div><div class="inputForm"><input class="inputField" type="password" placeholder="ваш пароль" id="loginPassword" name="password" autocomplete="current-password"/></div><button class="button-submit" id="loginBtn">Войти</button></div></form></div>
+        <div class="sign-in" id="sign-in-info" style="margin-left: -255px;"><h2 style="color: var(--text-primary)">AI Equipment Selection</h2><form id="registration-form"><div class="modalFORM"><h3>ФОРМА РЕГИСТРАЦИИ</h3><div class="inputForm"><input class="inputField" placeholder="Фамилия" type="text" name="lastname"/></div><div class="inputForm"><input class="inputField" placeholder="Имя" type="text" name="firstname"/></div><div class="inputForm"><input class="inputField" placeholder="Отчество" type="text" name="middlename"/></div><div class="inputForm"><input class="inputField" placeholder="+7 (999) 999 99 99" type="text" name="phone"/></div><div class="inputForm"><input class="inputField" placeholder="mail@gmail.com" type="email" name="email"/></div><div class="inputForm"><input class="inputField" placeholder="пароль" type="password" name="password"/></div><button class="button-submit" id="regBtn">Отправить заявку</button></div></form></div>
+        <div class="sign-up show" id="sign-up-info" style="margin-left: 130px;"><h2 style="color: var(--text-primary)">AI Equipment Selection</h2><form id="login-form" method="post" autocomplete="on"><div class="modalFORM"><h3>ФОРМА ВХОДА</h3><div class="inputForm"><input class="inputField" type="email" placeholder="email: user@gmail.com" id="loginEmail" name="email" autocomplete="username"/></div><div class="inputForm"><input class="inputField" type="password" placeholder="ваш пароль" id="loginPassword" name="password" autocomplete="current-password"/></div><button class="button-submit" id="loginBtn">Войти</button></div></form></div>
       </div>
     </div>
   </div>
@@ -431,22 +316,28 @@
   <!-- Modal 9 App -->
   <div id="modal9-container" class="spec-modal">
     <div class="spec-context-menu" aria-hidden="true"><button type="button" data-action="copy">Скопировать спецификацию</button><button type="button" data-action="excel">Скачать спецификацию Excel</button></div>
-    <div id="modal9-ticket-modal" class="tooltip-overlay" style="display:none;"><div class="tooltip-modal"><button class="ans5-close modal9-ticket-close" style="position:absolute; top:4px; right:8px;">×</button><div class="modalRow" style="margin-top:0;"><div class="input-container"><input type="text" id="modal9-ticket-spec-id" class="styled_input_bar" style="width: 90px; text-transform: uppercase; text-align: center;" inputmode="numeric" placeholder=""><label class="input-label">spec #</label></div><div class="input-container"><input type="text" id="modal9-ticket-subject" class="styled_input_bar" style="width: 700px;" maxlength="70" placeholder=""><label class="input-label">тема обращения</label></div></div><div class="modalRow"><div class="input-container" style="width:100%;"><textarea id="modal9-ticket-message" class="styled_input_bar" style="width: 800px; height: 500px;"></textarea><label class="input-label">текст обращения</label></div></div><div class="modalRow"><button type="button" class="darkmatter-btn modal9-submit-ticket-btn" style="height:40px;">отправить обращение</button></div></div></div>
     
     <!-- Top Window -->
     <div class="modal9-top-window glass3d">
      <div class="modal9-top-body">
       <div class="file-upload__modal">
-       <form class="file-upload-form js-dropzone"><label class="file-upload-label"><div class="file-upload-design" style="width: 200px; height: 74px;"><button type="button" class="darkmatter-btn browse-button">выбрать файл</button><button type="button" class="darkmatter-btn upload-btn"><span class="button-text">загрузить</span><span class="loader"></span></button></div><input type="file" class="js-file__input" /></label></form>
-       <div class="upload-status-wrapper"><progress class="upload-progress spec-upload-progress" value="0" max="100" style="width:100%;display:none;"></progress><div class="upload-status"></div></div>
+         <!-- Simplified Upload Button -->
+         <button type="button" class="upload-btn-main">
+            <span class="button-text">загрузить техническое задание</span>
+            <span class="loader"></span>
+         </button>
+         <input type="file" class="js-file__input" style="display:none" />
+         <div class="upload-status-wrapper">
+            <progress class="upload-progress spec-upload-progress" value="0" max="100" style="width:100%;display:none;"></progress>
+            <div class="upload-status"></div>
+         </div>
       </div>
-      <div class="button-group" style="margin-top: 15px; display:flex; align-items:center; gap:10px;">
-        <div class="file-filter-container input-container" style="position: relative; margin-top: -10px; width: 300px;"><input id="file-filter-input" class="styled_input_bar" style="width: 100%;" /><label class="input-label">поиск совпадений</label><button class="group-close ans5-close file-filter-clear" style="display:none;">×</button></div>
-        <label class="switch"><input type="checkbox" id="my-files-toggle"><span class="toggle-slider"></span></label><span class="toggle-text" style="color: var(--fg-muted); font-size: 13px;">демонстрация файлов компании</span>
+      <div class="button-group" style="margin-top: 0; display:flex; align-items:center; gap:10px;">
+        <div class="file-filter-container input-container" style="position: relative; width: 200px;"><input id="file-filter-input" class="styled_input_bar" style="width: 100%;" /><label class="input-label">поиск</label><button class="group-close ans5-close file-filter-clear" style="display:none;">×</button></div>
+        <label class="switch"><input type="checkbox" id="my-files-toggle"><span class="toggle-slider"></span></label><span class="toggle-text" style="color: var(--text-secondary); font-size: 12px;">демонстрация файлов компании</span>
       </div>
-      <ul class="file-upload__list"></ul>
      </div>
-     <section class="modal9-updates" aria-label="Последние обновления"><div class="modal9-updates-header"><h2 class="modal9-updates-title">информация об обновлениях сервиса</h2><button type="button" class="modal9-updates-toggle" aria-expanded="false">развернуть</button></div><div class="modal9-updates-body"><article class="modal9-update-card"><h3 class="modal9-update-title">Обновление</h3><p class="modal9-update-body">Исправления</p></article></div></section>
+     <section class="modal9-updates" aria-label="Последние обновления"><div class="modal9-updates-header"><h2 class="modal9-updates-title">обновления</h2><button type="button" class="modal9-updates-toggle" aria-expanded="false">+</button></div><div class="modal9-updates-body"><article class="modal9-update-card"><h3 class="modal9-update-title">Обновление</h3><p class="modal9-update-body">Исправления</p></article></div></section>
     </div>
     
     <!-- Bottom Window -->
@@ -456,61 +347,44 @@
           <div class="history-list spec-history-list"></div>
           <div class="history-controls"><button type="button" class="darkmatter-btn history-load-more" style="display:none;">показать ещё</button></div>
           
-          <template id="history-row-template"><div class="history-item spec-history-item input-row" style="display: flex; flex-direction: row; padding-top: 5px;"><div class="input-container" style="margin-left: -6px;"><input type="text" class="styled_input_bar" data-field="file_number" readonly style="width: 100px;" placeholder="AK-000001"><label class="input-label">номер</label></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="user_login" readonly style="width: 240px;" placeholder="login"><label class="input-label">login</label></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="created_at" readonly style="width: 160px; text-align: center;" placeholder="дата"><label class="input-label">дата</label></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="file_name" readonly style="width: 580px;" placeholder="Техническое задание"><label class="input-label">файл</label></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="file_ext" style="width: 120px; text-transform: uppercase; text-align: center;" readonly placeholder="ext"><label class="input-label">ext</label></div><div class="status-field-wrapper"><div class="input-container"><input type="text" class="styled_input_bar" data-field="status_parser" style="width: 100px; text-transform: uppercase; text-align: center;" readonly placeholder="парсинг"><label class="input-label">парсинг</label></div><span class="material-symbols-outlined status-icon" data-status-icon="status_parser" aria-hidden="true">clear_all</span></div><div class="status-field-wrapper"><div class="input-container"><input type="text" class="styled_input_bar" data-field="status_selector" style="width: 100px; text-transform: uppercase; text-align: center;" readonly placeholder="подбор"><label class="input-label">подбор</label></div><span class="material-symbols-outlined status-icon" data-status-icon="status_selector" aria-hidden="true">clear_all</span></div><div class="status-field-wrapper"><div class="input-container"><input type="text" class="styled_input_bar" data-field="status_pricer" style="width: 100px; text-transform: uppercase; text-align: center;" readonly placeholder="проценка"><label class="input-label">проценка</label></div><span class="material-symbols-outlined status-icon" data-status-icon="status_pricer" aria-hidden="true">clear_all</span></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="-" style="width: 90px; text-transform: uppercase; text-align: center;" readonly placeholder="0.00$"><label class="input-label">tokens</label></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="id" style="width: 80px; text-transform: uppercase; text-align: center;" readonly placeholder="1"><label class="input-label">spec #</label></div></div></template>
+          <template id="history-row-template"><div class="history-item spec-history-item input-row" style="display: flex; flex-direction: row; padding-top: 5px;"><div class="input-container" style="margin-left: -6px;"><input type="text" class="styled_input_bar" data-field="file_number" readonly style="width: 100px;" placeholder="AK-000001"><label class="input-label">номер</label></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="user_login" readonly style="width: 180px;" placeholder="login"><label class="input-label">login</label></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="created_at" readonly style="width: 130px; text-align: center;" placeholder="дата"><label class="input-label">дата</label></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="file_name" readonly style="width: 400px;" placeholder="Техническое задание"><label class="input-label">файл</label></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="file_ext" style="width: 60px; text-transform: uppercase; text-align: center;" readonly placeholder="ext"><label class="input-label">ext</label></div><div class="status-field-wrapper"><div class="input-container"><input type="text" class="styled_input_bar" data-field="status_parser" style="width: 80px; text-transform: uppercase; text-align: center;" readonly placeholder="парсинг"><label class="input-label">парсинг</label></div><span class="material-symbols-outlined status-icon" data-status-icon="status_parser" aria-hidden="true">clear_all</span></div><div class="status-field-wrapper"><div class="input-container"><input type="text" class="styled_input_bar" data-field="status_selector" style="width: 80px; text-transform: uppercase; text-align: center;" readonly placeholder="подбор"><label class="input-label">подбор</label></div><span class="material-symbols-outlined status-icon" data-status-icon="status_selector" aria-hidden="true">clear_all</span></div><div class="status-field-wrapper"><div class="input-container"><input type="text" class="styled_input_bar" data-field="status_pricer" style="width: 80px; text-transform: uppercase; text-align: center;" readonly placeholder="проценка"><label class="input-label">проценка</label></div><span class="material-symbols-outlined status-icon" data-status-icon="status_pricer" aria-hidden="true">clear_all</span></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="-" style="width: 60px; text-transform: uppercase; text-align: center;" readonly placeholder="0.00$"><label class="input-label">tokens</label></div><div class="input-container"><input type="text" class="styled_input_bar" data-field="id" style="width: 60px; text-transform: uppercase; text-align: center;" readonly placeholder="1"><label class="input-label">spec #</label></div></div></template>
         </div>
         <div class="page spec-page" data-page="2">
           <div class="block1-wrapper"></div>
           <template id="spec-template"><div class="spec-container"><div class="spec-header"><div class="spec-title"></div><button class="group-close ans5-close" style="display:none;">×</button></div><div class="spec-content"></div></div></template>
-          <template id="button-group-spec"><div class="modalRow spec-action-row"><button type="button" class="spec-action-btn spec-action-btn--excel" data-action="excel"><span class="label">скачать excel</span></button><button type="button" class="spec-action-btn spec-action-btn--copy" data-action="copy"><span class="label">скопировать</span></button><button type="button" class="spec-action-btn spec-action-btn--help" data-action="support"><span class="label">создать обращение</span></button></div></template>
-          <template id="spec-progress-template"><div class="spec-progress multistep" style="margin-bottom: 16px;"><div class="step" data-step="1"><div class="bar"></div><div class="step-body" style="margin-top: 16px;"><div class="label" style="margin-top: 4px; font-size: 14px;">BLOCK 1</div><button class="darkmatter-btn refresh" title="Перезапустить парсер" style="border-radius: 4px;"><span class="button-text">запуск шага</span><span class="loader"></span></button></div></div><div class="step" data-step="2"><div class="bar"></div><div class="step-body" style="margin-top: 16px;"><div class="label" style="margin-top: 4px; font-size: 14px;">BLOCK 2 / 2.1</div><button class="darkmatter-btn refresh" title="Перезапустить селектор" style="border-radius: 4px;"><span class="button-text">запуск шага</span><span class="loader"></span></button></div></div><div class="step" data-step="3"><div class="bar"></div><div class="step-body" style="margin-top: 16px;"><div class="label" style="margin-top: 4px; font-size: 14px;">BLOCK 3 / 3.1</div><button class="darkmatter-btn refresh" style="border-radius: 4px;" disabled><span class="button-text">запуск шага</span><span class="loader"></span></button></div></div></div></template>
+          <!-- Removed "Create Request" button below -->
+          <template id="button-group-spec"><div class="modalRow spec-action-row"><button type="button" class="spec-action-btn spec-action-btn--excel" data-action="excel"><span class="label">скачать excel</span></button><button type="button" class="spec-action-btn spec-action-btn--copy" data-action="copy"><span class="label">скопировать</span></button></div></template>
+          <template id="spec-progress-template"><div class="spec-progress multistep" style="margin-bottom: 10px;"><div class="step" data-step="1"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 1</div><button class="darkmatter-btn refresh" title="Перезапустить парсер"><span class="button-text">запуск</span><span class="loader"></span></button></div></div><div class="step" data-step="2"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 2</div><button class="darkmatter-btn refresh" title="Перезапустить селектор"><span class="button-text">запуск</span><span class="loader"></span></button></div></div><div class="step" data-step="3"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 3</div><button class="darkmatter-btn refresh" disabled><span class="button-text">запуск</span><span class="loader"></span></button></div></div></div></template>
           
-          <!-- NEW ROW TEMPLATE WITH SLIDESHOW -->
+          <!-- ROW TEMPLATE WITH SLIDESHOW -->
           <template id="spec-row-template">
             <div class="modalCONTEINERpost modalRow">
               <div class="modalColumn">
                 <div class="modalRow">
                   <div class="input-container" style="margin-top: 0px;">
-                    <input type="text" style="width: 100px; text-align: center;" class="styled_input_bar" data-field="pos_number" readonly>
+                    <input type="text" style="width: 80px; text-align: center;" class="styled_input_bar" data-field="pos_number" readonly>
                     <label class="input-label">№ в ТЗ</label>
                   </div>
                   <div class="input-container" style="margin-top: 0px;">
-                    <input type="text" style="width: 400px; text-align: left;" class="styled_input_bar" data-field="name" readonly>
+                    <input type="text" style="width: 300px; text-align: left;" class="styled_input_bar" data-field="name" readonly>
                     <label class="input-label">наименование</label>
                   </div>
                   <div class="input-container" style="margin-top: 0px;">
-                    <input type="text" style="width: 100px; text-align: center;" class="styled_input_bar" data-field="qty" readonly>
+                    <input type="text" style="width: 60px; text-align: center;" class="styled_input_bar" data-field="qty" readonly>
                     <label class="input-label">кол-во</label>
                   </div>
                   <div class="input-container" style="margin-top: 0px;">
-                    <input type="text" style="width: 100px; text-align: center;" class="styled_input_bar" data-field="unit" readonly>
+                    <input type="text" style="width: 60px; text-align: center;" class="styled_input_bar" data-field="unit" readonly>
                     <label class="input-label">ед. изм.</label>
                   </div>
-                </div>
-                <div class="registry-checkboxes">
-                  <label class="checkbox-item"><input type="checkbox" data-field="rpp_878"> присутствие в реестре РПП 878</label>
-                  <label class="checkbox-item"><input type="checkbox" data-field="torp"> присутствие в реестре ТОРП</label>
-                  <label class="checkbox-item"><input type="checkbox" data-field="rrpo_1875"> присутствие в реестре РРПО 1875</label>
                 </div>
               </div>
               
               <!-- Slideshow Container -->
               <div class="slideshow-container">
-                <!-- Slide 1: Requirements -->
-                <div class="slide active" data-slide="1">
-                  <div class="slide-content"></div>
-                  <div class="caption">Блок 1, требования к ТЗ</div>
-                </div>
-                <!-- Slide 2: Selection -->
-                <div class="slide" data-slide="2">
-                  <div class="slide-content"></div>
-                  <div class="caption">Блок 2, подобранная позиция</div>
-                </div>
-                <!-- Slide 3: Price Sources -->
-                <div class="slide" data-slide="3">
-                  <div class="slide-content"></div>
-                  <div class="caption">Блок 3, ценовые источники</div>
-                </div>
-
+                <div class="slide active" data-slide="1"><div class="slide-content"></div><div class="caption">Блок 1, требования к ТЗ</div></div>
+                <div class="slide" data-slide="2"><div class="slide-content"></div><div class="caption">Блок 2, подобранная позиция</div></div>
+                <div class="slide" data-slide="3"><div class="slide-content"></div><div class="caption">Блок 3, ценовые источники</div></div>
                 <a class="prev">&#10094;</a>
                 <a class="next">&#10095;</a>
                 <div class="dots-container">
@@ -524,81 +398,36 @@
 
           <template id="spec-block2-template">
             <div class="modalRow">
-              <div class="input-container">
-                <input type="text" style="width: 140px;" class="styled_input_bar param-input" placeholder="артикул" readonly>
-                <label class="input-label">артикул</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 300px;" class="styled_input_bar value-input" placeholder="наименование" readonly>
-                <label class="input-label">наименование</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 80px; text-align: center;" class="styled_input_bar value-input" placeholder="кол-во" readonly>
-                <label class="input-label">кол-во</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 80px; text-align: center;" class="styled_input_bar value-input" placeholder="ед. изм." readonly>
-                <label class="input-label">ед. изм.</label>
-              </div>
-              <div class="input-container">
-                 <input type="text" style="width: 110px; text-align: right;" class="styled_input_bar value-input" placeholder="000 000 000" readonly>
-                <label class="input-label">цена</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 110px; text-align: right;" class="styled_input_bar value-input" placeholder="000 000 000" readonly>
-                <label class="input-label">сумма</label>
-              </div>
+              <div class="input-container"><input type="text" style="width: 120px;" class="styled_input_bar param-input" placeholder="артикул" readonly><label class="input-label">артикул</label></div>
+              <div class="input-container"><input type="text" style="width: 220px;" class="styled_input_bar value-input" placeholder="наименование" readonly><label class="input-label">наименование</label></div>
+              <div class="input-container"><input type="text" style="width: 60px; text-align: center;" class="styled_input_bar value-input" placeholder="кол-во" readonly><label class="input-label">кол-во</label></div>
+              <div class="input-container"><input type="text" style="width: 60px; text-align: center;" class="styled_input_bar value-input" placeholder="ед. изм." readonly><label class="input-label">ед. изм.</label></div>
+              <div class="input-container"><input type="text" style="width: 90px; text-align: right;" class="styled_input_bar value-input" placeholder="цена" readonly><label class="input-label">цена</label></div>
+              <div class="input-container"><input type="text" style="width: 90px; text-align: right;" class="styled_input_bar value-input" placeholder="сумма" readonly><label class="input-label">сумма</label></div>
              </div>
           </template>
           <template id="spec-block21-template">
             <div class="modalRow">
-              <!-- offer #1 -->
-              <div class="input-container">
-                <input type="text" style="width: 110px; text-align: right;" class="styled_input_bar" data-offer="1-price" placeholder="0" readonly>
-                <label class="input-label">цена 1</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 120px;" class="styled_input_bar" data-offer="1-store" placeholder="магазин" readonly>
-                <label class="input-label">магазин</label>
-              </div>
-              <a class="icons" data-offer="1-url" target="_blank" rel="noopener">
-                <span class="material-symbols-outlined status">link</span>
-              </a>
+              <div class="input-container"><input type="text" style="width: 90px; text-align: right;" class="styled_input_bar" data-offer="1-price" placeholder="0" readonly><label class="input-label">цена 1</label></div>
+              <div class="input-container"><input type="text" style="width: 100px;" class="styled_input_bar" data-offer="1-store" placeholder="магазин" readonly><label class="input-label">магазин</label></div>
+              <a class="icons" data-offer="1-url" target="_blank" rel="noopener"><span class="material-symbols-outlined status">link</span></a>
 
-              <!-- offer #2 -->
-              <div class="input-container">
-                <input type="text" style="width: 110px; text-align: right;" class="styled_input_bar" data-offer="2-price" placeholder="0" readonly>
-                <label class="input-label">цена 2</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 120px;" class="styled_input_bar" data-offer="2-store" placeholder="магазин" readonly>
-                <label class="input-label">магазин</label>
-              </div>
-              <a class="icons" data-offer="2-url" target="_blank" rel="noopener">
-                <span class="material-symbols-outlined status">link</span>
-              </a>
+              <div class="input-container"><input type="text" style="width: 90px; text-align: right;" class="styled_input_bar" data-offer="2-price" placeholder="0" readonly><label class="input-label">цена 2</label></div>
+              <div class="input-container"><input type="text" style="width: 100px;" class="styled_input_bar" data-offer="2-store" placeholder="магазин" readonly><label class="input-label">магазин</label></div>
+              <a class="icons" data-offer="2-url" target="_blank" rel="noopener"><span class="material-symbols-outlined status">link</span></a>
 
-              <!-- offer #3 -->
-              <div class="input-container">
-                <input type="text" style="width: 110px; text-align: right;" class="styled_input_bar" data-offer="3-price" placeholder="0" readonly>
-                <label class="input-label">цена 3</label>
-              </div>
-              <div class="input-container">
-                <input type="text" style="width: 120px;" class="styled_input_bar" data-offer="3-store" placeholder="магазин" readonly>
-                <label class="input-label">магазин</label>
-              </div>
-              <a class="icons" data-offer="3-url" target="_blank" rel="noopener">
-                <span class="material-symbols-outlined status">link</span>
-              </a>
+              <div class="input-container"><input type="text" style="width: 90px; text-align: right;" class="styled_input_bar" data-offer="3-price" placeholder="0" readonly><label class="input-label">цена 3</label></div>
+              <div class="input-container"><input type="text" style="width: 100px;" class="styled_input_bar" data-offer="3-store" placeholder="магазин" readonly><label class="input-label">магазин</label></div>
+              <a class="icons" data-offer="3-url" target="_blank" rel="noopener"><span class="material-symbols-outlined status">link</span></a>
             </div>
           </template>
-          <template id="spec-attr-template"><div class="modalRow"><div class="input-container"><input type="text" style="width: 580px;" class="styled_input_bar param-input" placeholder="параметр" readonly><label class="input-label">параметр</label></div><div class="input-container"><input type="text" style="width: 280px;" class="styled_input_bar value-input" placeholder="значение" readonly><label class="input-label">значение</label></div></div></template>
+          <template id="spec-attr-template"><div class="modalRow"><div class="input-container"><input type="text" style="width: 400px;" class="styled_input_bar param-input" placeholder="параметр" readonly><label class="input-label">параметр</label></div><div class="input-container"><input type="text" style="width: 200px;" class="styled_input_bar value-input" placeholder="значение" readonly><label class="input-label">значение</label></div></div></template>
         </div>
        </div>
     </div>
   </div>
 
-  <script type="module">
+    <script type="module">
     import { createClient } from "./vendor/supabase-client.js";
     window.SUPABASE_URL = 'https://jviswahajwmwibedxcll.supabase.co';
     window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2aXN3YWhhandtd2liZWR4Y2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMzU5NDcsImV4cCI6MjA2NDkxMTk0N30.Bkgknn8BAhlUp429fhyOErV-afbPkfcneTdVhKwgn7c';
@@ -732,7 +561,7 @@
     async function checkDbConnection() { const isOk = await pingDatabase(); const dbOverlay = document.getElementById('db-disconnect-overlay'); if (isOk) dbOverlay.classList.remove('show'); else dbOverlay.classList.add('show'); }
     setInterval(checkDbConnection, 10000); checkDbConnection();
 
-    // ================ INTEGRATED MODAL 9 LOGIC (FULL RESTORATION) ================
+    // ================ INTEGRATED MODAL 9 LOGIC ================
     async function initModal9() {
       console.log('[modal9] Application started');
       
@@ -752,12 +581,8 @@
       const pages = root.querySelectorAll('.page');
       const loadMoreBtn = root.querySelector('.history-load-more');
       const historyList = root.querySelector('.history-list');
-      const dropzone = root.querySelector('.js-dropzone');
       const rowTemplate = root.querySelector('#history-row-template');
       const fileInput = root.querySelector('.js-file__input');
-      const fileList = root.querySelector('.file-upload__list');
-      const uploadBtn = root.querySelector('.upload-btn');
-      const browseBtn = root.querySelector('.browse-button');
       const uploadProgress = root.querySelector('.upload-progress');
       const uploadStatus = root.querySelector('.upload-status');
       const myFilesToggle = root.querySelector('#my-files-toggle');
@@ -775,12 +600,9 @@
       const updatesPanel = root.querySelector('.modal9-updates');
       const updatesToggle = root.querySelector('.modal9-updates-toggle');
       const contextMenu = root.querySelector('.spec-context-menu');
-      const ticketModal = root.querySelector('#modal9-ticket-modal');
-      const ticketCloseBtn = ticketModal ? ticketModal.querySelector('.modal9-ticket-close') : null;
-      const ticketSpecInput = root.querySelector('#modal9-ticket-spec-id');
-      const ticketSubjectInput = root.querySelector('#modal9-ticket-subject');
-      const ticketMessageInput = root.querySelector('#modal9-ticket-message');
-      const ticketSubmitBtn = root.querySelector('.modal9-submit-ticket-btn');
+      
+      // New simplified upload button
+      const mainUploadBtn = root.querySelector('.upload-btn-main');
 
       const STATUS_FIELDS = new Set(['status_parser', 'status_selector', 'status_pricer']);
       
@@ -806,7 +628,6 @@
       const hideTimers = new WeakMap();
       let openedSpecId = null;
       let contextSpecContent = null;
-      let lastSupportSpecId = null;
 
       // Helpers
       const sanitize = (s) => s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9._-]/gi, '_');
@@ -826,11 +647,11 @@
       
       function getStatusIconState(rawValue) {
         const value = String(rawValue ?? '').trim();
-        if (!value || value === '-') return { icon: 'clear_all', color: 'var(--fg-muted)', glow: false };
+        if (!value || value === '-') return { icon: 'clear_all', color: 'var(--text-muted)', glow: false };
         const normalized = value.replace(/\s+/g, ' ');
         const parts = normalized.split('/').map(part => part.trim());
-        if (parts.length === 3 && parts.every(part => part && part === parts[0])) return { icon: 'done_all', color: '#5fd47a', glow: true };
-        return { icon: 'text_fields_alt', color: 'var(--fg)', glow: false };
+        if (parts.length === 3 && parts.every(part => part && part === parts[0])) return { icon: 'done_all', color: 'var(--success)', glow: true };
+        return { icon: 'text_fields_alt', color: 'var(--text-primary)', glow: false };
       }
 
       function applyStatusIcon(scope, field, value) {
@@ -841,7 +662,7 @@
         const state = getStatusIconState(value);
         if (icon.textContent !== state.icon) icon.textContent = state.icon;
         icon.style.color = state.color;
-        icon.style.textShadow = state.glow ? '0 0 8px rgba(95, 212, 122, 0.6)' : 'none';
+        icon.style.textShadow = state.glow ? '0 0 8px rgba(16, 185, 129, 0.6)' : 'none';
       }
 
       function showCopyTip(el) { const tip = document.createElement('div'); tip.className = 'copy-tooltip'; tip.textContent = 'скопировано'; document.body.appendChild(tip); const r = el.getBoundingClientRect(); tip.style.left = r.left + r.width / 2 - tip.offsetWidth / 2 + 'px'; tip.style.top = r.top - tip.offsetHeight - 6 + 'px'; setTimeout(() => tip.remove(), 1000); }
@@ -850,49 +671,90 @@
 
       // Updates Panel
       if (updatesPanel && !updatesPanel.dataset.bound) {
-        const toggleUpdatesHeight = expanded => { const next = typeof expanded === 'boolean' ? expanded : !updatesPanel.classList.contains('is-expanded'); updatesPanel.classList.toggle('is-expanded', next); if (updatesToggle) { updatesToggle.setAttribute('aria-expanded', String(next)); updatesToggle.textContent = next ? 'свернуть' : 'развернуть'; } };
-        const handleOutsideClick = event => { if (!updatesPanel.contains(event.target)) toggleUpdatesHeight(false); };
-        updatesPanel.addEventListener('click', event => { if (updatesToggle && event.target === updatesToggle) return; if (!updatesPanel.classList.contains('is-expanded')) toggleUpdatesHeight(true); });
-        if (updatesToggle) updatesToggle.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); toggleUpdatesHeight(); });
-        document.addEventListener('click', handleOutsideClick, { capture: true });
+        const toggleUpdatesHeight = expanded => { const next = typeof expanded === 'boolean' ? expanded : !updatesPanel.classList.contains('is-expanded'); updatesPanel.classList.toggle('is-expanded', next); if (updatesToggle) { updatesToggle.textContent = next ? '–' : '+'; } };
+        updatesPanel.addEventListener('click', event => { if (!updatesPanel.classList.contains('is-expanded')) toggleUpdatesHeight(true); });
+        if (updatesToggle) updatesToggle.addEventListener('click', event => { event.stopPropagation(); toggleUpdatesHeight(); });
+        document.addEventListener('click', event => { if (!updatesPanel.contains(event.target)) toggleUpdatesHeight(false); }, { capture: true });
         updatesPanel.dataset.bound = 'true';
       }
       
       // Tabs
       tabs.forEach(tab => { tab.addEventListener('click', () => { if (tab.classList.contains('active')) return; tabs.forEach(t => t.classList.remove('active')); pages.forEach(p => p.classList.remove('active')); tab.classList.add('active'); root.querySelector(`.page[data-page="${tab.dataset.page}"]`).classList.add('active'); if (navSlider) navSlider.style.left = tab.dataset.page === '1' ? '0%' : '50%'; if (tab.dataset.page === '2') loadBlock1(); }); });
 
-      // File Upload
-      fileInput.addEventListener('change', () => { selectedFile = fileInput.files[0] || null; renderFileList(); });
-      browseBtn.addEventListener('click', () => fileInput.click());
-      dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag'); });
-      dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
-      dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('drag'); selectedFile = e.dataTransfer.files[0]; renderFileList(); });
-      function renderFileList() { fileList.innerHTML = ''; uploadStatus.textContent = selectedFile ? `Выбран: ${selectedFile.name}` : ''; if (selectedFile) { const li = document.createElement('li'); li.textContent = selectedFile.name; fileList.appendChild(li); } }
+      // === SIMPLIFIED FILE UPLOAD LOGIC ===
+      // Click the main button -> open file dialog
+      mainUploadBtn.addEventListener('click', () => {
+         if (mainUploadBtn.classList.contains('loading')) return;
+         fileInput.click();
+      });
 
-      uploadBtn.addEventListener('click', async () => {
-        if (!selectedFile || uploadBtn.classList.contains('loading')) return;
-        uploadBtn.classList.add('loading'); uploadBtn.disabled = true;
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { uploadStatus.textContent = 'Необходим вход'; uploadBtn.classList.remove('loading'); uploadBtn.disabled = false; return; }
-        const ext = selectedFile.name.split('.').pop().toLowerCase();
-        if (!ALLOWED_EXTS.includes(ext)) { uploadStatus.textContent = 'Недопустимый тип файла'; uploadBtn.classList.remove('loading'); uploadBtn.disabled = false; return; }
-        const safeName = sanitize(selectedFile.name); const safeFolder = sanitize(session.user.id); const filePath = `${safeFolder}/${Date.now()}_${safeName}`;
-        uploadProgress.style.display = 'block'; uploadProgress.value = 0; uploadStatus.textContent = '0%';
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${window.SUPABASE_URL}/storage/v1/object/${BUCKET}/${filePath}`);
-        xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
-        xhr.setRequestHeader('apikey', window.SUPABASE_ANON_KEY);
-        xhr.setRequestHeader('x-upsert', 'true');
-        xhr.upload.onprogress = e => { if (e.lengthComputable) { const percent = Math.round((e.loaded / e.total) * 100); uploadProgress.value = percent; uploadStatus.textContent = percent + '%'; } };
-        xhr.onload = async () => {
-           if (xhr.status >= 200 && xhr.status < 300) {
-             uploadStatus.textContent = 'Загрузка завершена...';
-             try { const { data: insertedRow, error: regErr } = await supabase.from(TABLE).insert({ user_login: window.USER_LOGIN || '', file_path: filePath, file_name: selectedFile.name, file_ext: ext }).select('*').single(); if (regErr) throw regErr; uploadStatus.textContent = `Файл поставлен в очередь: ${insertedRow.file_number}`; loadHistory(); }
-             catch (err) { uploadStatus.textContent = 'Ошибка записи в БД'; console.error(err); }
-           } else { uploadStatus.textContent = 'Ошибка загрузки файла'; }
-           uploadBtn.classList.remove('loading'); uploadBtn.disabled = false; selectedFile = null; fileInput.value = ''; renderFileList();
-        };
-        xhr.send(selectedFile);
+      // On file select -> upload immediately
+      fileInput.addEventListener('change', async () => {
+         selectedFile = fileInput.files[0];
+         if (!selectedFile) return;
+         
+         mainUploadBtn.classList.add('loading');
+         mainUploadBtn.disabled = true;
+         
+         const { data: { session } } = await supabase.auth.getSession();
+         if (!session) { 
+             uploadStatus.textContent = 'Необходим вход'; 
+             mainUploadBtn.classList.remove('loading'); 
+             mainUploadBtn.disabled = false; 
+             selectedFile = null; fileInput.value = ''; 
+             return; 
+         }
+         
+         const ext = selectedFile.name.split('.').pop().toLowerCase();
+         if (!ALLOWED_EXTS.includes(ext)) { 
+             uploadStatus.textContent = 'Недопустимый тип файла'; 
+             mainUploadBtn.classList.remove('loading'); 
+             mainUploadBtn.disabled = false; 
+             selectedFile = null; fileInput.value = ''; 
+             return; 
+         }
+         
+         const safeName = sanitize(selectedFile.name); 
+         const safeFolder = sanitize(session.user.id); 
+         const filePath = `${safeFolder}/${Date.now()}_${safeName}`;
+         
+         uploadProgress.style.display = 'block'; 
+         uploadProgress.value = 0; 
+         uploadStatus.textContent = '0%';
+         
+         const xhr = new XMLHttpRequest();
+         xhr.open('POST', `${window.SUPABASE_URL}/storage/v1/object/${BUCKET}/${filePath}`);
+         xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+         xhr.setRequestHeader('apikey', window.SUPABASE_ANON_KEY);
+         xhr.setRequestHeader('x-upsert', 'true');
+         
+         xhr.upload.onprogress = e => { 
+             if (e.lengthComputable) { 
+                 const percent = Math.round((e.loaded / e.total) * 100); 
+                 uploadProgress.value = percent; 
+                 uploadStatus.textContent = percent + '%'; 
+             } 
+         };
+         
+         xhr.onload = async () => {
+             mainUploadBtn.classList.remove('loading');
+             mainUploadBtn.disabled = false;
+             selectedFile = null; 
+             fileInput.value = '';
+             
+             if (xhr.status >= 200 && xhr.status < 300) {
+                 uploadStatus.textContent = 'Загрузка завершена...';
+                 try { 
+                     const { data: insertedRow, error: regErr } = await supabase.from(TABLE).insert({ user_login: window.USER_LOGIN || '', file_path: filePath, file_name: selectedFile.name, file_ext: ext }).select('*').single(); 
+                     if (regErr) throw regErr; 
+                     uploadStatus.textContent = `Файл поставлен в очередь: ${insertedRow.file_number}`; 
+                     loadHistory(); 
+                 } catch (err) { uploadStatus.textContent = 'Ошибка записи в БД'; console.error(err); }
+             } else { 
+                 uploadStatus.textContent = 'Ошибка загрузки файла'; 
+             }
+         };
+         xhr.send(selectedFile);
       });
 
       // Filters & Toggles
@@ -992,7 +854,9 @@
 
        async function loadBlock1(options = {}) {
         const { fromHistory = false } = options;
+        // FIX: Added missing closing parenthesis
         const specIds = Array.from(new Set((history || []).map(h => h?.id).filter(id => id !== null && id !== undefined)));
+        
         if (!specIds.length) { block1Rows = []; specGroups = {}; selectionMap = {}; renderBlock1(); return; }
         const { data, error } = await supabase.from(POS_TABLE).select('file_number, user_login, file_name, id, spec_id, pos_number, pos_number_int, name, qty, unit, attrs, attrs_json').in('spec_id', specIds).order('spec_id', { ascending: false }).order('pos_number_int', { ascending: true });
         if (error) { console.error(error); return; }
@@ -1173,8 +1037,8 @@
         setupOverflowTooltips(content);
       }
 
-      function restoreHistoryBlockState(specId, content) { if (!content) return; const saved = historyOpenBlocks[specId]; if (!saved) return; /* Add logic if needed */ }
-      function restoreBlock1State(specId, content) { if (!content) return; const saved = block1OpenBlocks[specId]; if (!saved) return; /* Add logic if needed */ }
+      function restoreHistoryBlockState(specId, content) { if (!content) return; const saved = historyOpenBlocks[specId]; if (!saved) return; }
+      function restoreBlock1State(specId, content) { if (!content) return; const saved = block1OpenBlocks[specId]; if (!saved) return; }
 
       function updateSpecProgress(specId, info) { const idStr = String(specId); let statuses = info; if (!statuses || (typeof statuses === 'object' && !('parser' in statuses) && !('selector' in statuses) && !('pricer' in statuses))) { const row = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`); const parser = row?.querySelector('[data-field="status_parser"]')?.value || row?.querySelector('[data-field="status_parser"]')?.textContent || ''; const selector = row?.querySelector('[data-field="status_selector"]')?.value || row?.querySelector('[data-field="status_selector"]')?.textContent || ''; const pricer = row?.querySelector('[data-field="status_pricer"]')?.value || row?.querySelector('[data-field="status_pricer"]')?.textContent || ''; statuses = { parser, selector, pricer }; } root.querySelectorAll(`.spec-progress[data-spec-id="${idStr}"]`).forEach(el => setProgress(el, statuses)); }
       
@@ -1198,20 +1062,15 @@
         if (cont) {
           const oldT = hideTimers.get(cont); if (oldT) { clearTimeout(oldT); hideTimers.delete(cont); }
           cont.style.display = 'block'; requestAnimationFrame(() => cont.classList.remove('hidden'));
-          // Logic to open specific slide if blockClass provided? For now just show container
-          const current = cont.querySelector('.slide.active');
-          if (current) { const cls = 'active'; historyOpenBlocks[id] = cls; } // Store index or class
         }
         if (actions) { const oldT = hideTimers.get(actions); if (oldT) { clearTimeout(oldT); hideTimers.delete(actions); } actions.style.display = 'flex'; requestAnimationFrame(() => actions.classList.remove('hidden')); }
         if (prog) { const oldT = hideTimers.get(prog); if (oldT) { clearTimeout(oldT); hideTimers.delete(prog); } prog.style.display = 'flex'; requestAnimationFrame(() => prog.classList.remove('hidden')); }
-        // Hide others
         historyList.querySelectorAll('.spec-progress').forEach(p => { if (p.dataset.specId !== String(id)) { p.classList.add('hidden'); const t = setTimeout(() => { p.style.display = 'none'; hideTimers.delete(p); }, 500); hideTimers.set(p, t); } });
         historyList.querySelectorAll('.spec-action-row').forEach(row => { const specId = row.closest('.spec-container')?.dataset.specId; if (specId !== String(id)) { row.classList.add('hidden'); const t = setTimeout(() => { row.style.display = 'none'; hideTimers.delete(row); }, 500); hideTimers.set(row, t); } });
-        // Add close button
         const row = historyList.querySelector(`.history-item[data-spec-id="${id}"]`);
         if (row) {
           const specCont = row.querySelector('[data-field="id"]').closest('.input-container');
-          if (specCont) { specCont.style.position = 'relative'; if (!specCont.querySelector('.spec-close-btn')) { const extraBtn = document.createElement('button'); extraBtn.textContent = '×'; extraBtn.className = 'group-close ans5-close spec-close-btn'; extraBtn.style.position = 'absolute'; extraBtn.style.right = '-25px'; extraBtn.style.color = 'var(--fg)'; extraBtn.addEventListener('click', e => { e.stopPropagation(); closeRowGroup(id); }); specCont.appendChild(extraBtn); } }
+          if (specCont) { specCont.style.position = 'relative'; if (!specCont.querySelector('.spec-close-btn')) { const extraBtn = document.createElement('button'); extraBtn.textContent = '×'; extraBtn.className = 'group-close ans5-close spec-close-btn'; extraBtn.style.position = 'absolute'; extraBtn.style.right = '-25px'; extraBtn.style.color = 'var(--text-muted)'; extraBtn.addEventListener('click', e => { e.stopPropagation(); closeRowGroup(id); }); specCont.appendChild(extraBtn); } }
         }
       }
       
@@ -1242,13 +1101,11 @@
             dots[index].classList.add("active");
           };
 
-          // Nav buttons
           const prevBtn = container.querySelector(".prev");
           const nextBtn = container.querySelector(".next");
           if (prevBtn) prevBtn.addEventListener("click", () => showSlide(index - 1));
           if (nextBtn) nextBtn.addEventListener("click", () => showSlide(index + 1));
 
-          // Dots click
           dots.forEach((dot) => {
             dot.addEventListener("click", () => showSlide(parseInt(dot.dataset.index)));
           });
@@ -1266,17 +1123,10 @@
       if (contextMenu) { contextMenu.addEventListener('click', async event => { const button = event.target.closest('button[data-action]'); if (!button) return; event.preventDefault(); event.stopPropagation(); const action = button.dataset.action; const specId = contextMenu.dataset.specId; if (!specId) return; const specData = collectSpecData(specId, contextSpecContent); if (!specData) { hideContextMenu(); return; } try { if (action === 'copy') { const text = formatSpecForClipboard(specData); if (text) { await navigator.clipboard.writeText(text); showCopyTip(button); } } else if (action === 'excel') { const blob = createExcelBlob(specData); if (blob) downloadSpecExcel(specData, blob); } } catch (err) { console.error('context menu action error:', err); } finally { hideContextMenu(); } }); contextMenu.addEventListener('contextmenu', event => event.preventDefault()); contextMenu.addEventListener('mousedown', event => event.stopPropagation()); }
 
       function collectSpecData(specId, specContent) { if (!specId) return null; const idStr = String(specId); const container = specContent || historyList.querySelector(`.spec-content[data-spec-id="${idStr}"]`) || block1List.querySelector(`.spec-content[data-spec-id="${idStr}"]`); if (!container) return null; const historyItem = historyList.querySelector(`.history-item[data-spec-id="${idStr}"]`); const historyEntry = history.find(h => String(h.id) === idStr); const readField = (field) => { if (historyItem) { const el = historyItem.querySelector(`[data-field="${field}"]`); if (el) { const raw = el.tagName === 'INPUT' ? el.value : el.textContent; if (typeof raw === 'string') return raw.trim(); } } if (historyEntry) { if (field === 'created_at') return historyEntry.created_at ? new Date(historyEntry.created_at).toLocaleString() : ''; const value = historyEntry[field]; if (value != null) return String(value).trim(); } return ''; }; const data = { id: idStr, header: { file_number: readField('file_number'), user_login: readField('user_login'), created_at: readField('created_at'), file_name: readField('file_name'), file_ext: readField('file_ext'), status: readField('status'), spec_id: idStr }, positions: [] }; container.querySelectorAll('.modalCONTEINERpost').forEach(node => { const pos = { posNumber: node.querySelector('[data-field="pos_number"]')?.value?.trim() || '', name: node.querySelector('[data-field="name"]')?.value?.trim() || '', block1: [], block2: [] }; const block1Content = node.querySelector('.slide[data-slide="1"] .slide-content'); if (block1Content) block1Content.querySelectorAll('.modalRow').forEach(row => { const param = (row.querySelector('.param-input')?.value || '').trim(); const value = (row.querySelector('.value-input')?.value || '').trim(); if (param || value) pos.block1.push({ param, value }); }); const block2Content = node.querySelector('.slide[data-slide="2"] .slide-content'); if (block2Content) block2Content.querySelectorAll('.modalRow').forEach(row => { const inputs = row.querySelectorAll('input'); if (!inputs.length) return; pos.block2.push(Array.from(inputs, input => (input.value || '').trim())); }); data.positions.push(pos); }); return data; }
-      async function runSpecAction(action, specId, specContent, button) { if (action === 'support') openSupportTicketModal(specId); return; const specData = collectSpecData(specId, specContent); if (!specData) return; try { if (action === 'copy') { const text = formatSpecForClipboard(specData); if (text) { await navigator.clipboard.writeText(text); if (button) showCopyTip(button); } } else if (action === 'excel') { const blob = createExcelBlob(specData); if (blob) downloadSpecExcel(specData, blob); } } catch (err) { console.error('spec action error:', err); } }
+      async function runSpecAction(action, specId, specContent, button) { const specData = collectSpecData(specId, specContent); if (!specData) return; try { if (action === 'copy') { const text = formatSpecForClipboard(specData); if (text) { await navigator.clipboard.writeText(text); if (button) showCopyTip(button); } } else if (action === 'excel') { const blob = createExcelBlob(specData); if (blob) downloadSpecExcel(specData, blob); } } catch (err) { console.error('spec action error:', err); } }
       function formatSpecForClipboard(data) { if (!data) return ''; const lines = []; lines.push(`Spec #${data.id}`); lines.push(`File: ${data.header.file_name}`); lines.push(''); data.positions.forEach(pos => { lines.push(`${pos.posNumber}. ${pos.name}`); pos.block1.forEach(attr => lines.push(`\t${attr.param}: ${attr.value}`)); pos.block2.forEach(row => lines.push(`\t${row.join('\t')}`)); }); return lines.join('\n'); }
       function createExcelBlob(data) { const html = `<table><tr><th>Spec</th><th>${data.id}</th></tr>${data.positions.map(p => `<tr><td>${p.posNumber}</td><td>${p.name}</td></tr>`).join('')}</table>`; return new Blob(['\uFEFF', html], { type: 'application/vnd.ms-excel' }); }
       function downloadSpecExcel(data, blob) { if (!blob) return; const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `spec_${data.id}.xls`; document.body.appendChild(link); link.click(); setTimeout(() => { URL.revokeObjectURL(url); link.remove(); }, 0); }
-
-      function openSupportTicketModal(specId) { if (!ticketModal) return; const normalizedSpec = specId != null ? String(specId).replace(/[^0-9]/g, '') : ''; lastSupportSpecId = normalizedSpec || null; if (ticketSpecInput) ticketSpecInput.value = normalizedSpec; if (ticketSubjectInput) ticketSubjectInput.value = ''; if (ticketMessageInput) ticketMessageInput.value = ''; ticketModal.style.display = 'flex'; }
-      function closeSupportTicketModal(options = {}) { if (!ticketModal) return; const { preserveSpec = false } = options; ticketModal.style.display = 'none'; if (ticketSubjectInput) ticketSubjectInput.value = ''; if (ticketMessageInput) ticketMessageInput.value = ''; if (ticketSpecInput) { if (preserveSpec && lastSupportSpecId) ticketSpecInput.value = lastSupportSpecId; else { ticketSpecInput.value = ''; lastSupportSpecId = null; } } }
-      if (ticketCloseBtn) ticketCloseBtn.addEventListener('click', () => closeSupportTicketModal({ preserveSpec: false }));
-      if (ticketModal) ticketModal.addEventListener('click', event => { if (event.target === ticketModal) closeSupportTicketModal({ preserveSpec: true }); });
-      if (ticketSpecInput) ticketSpecInput.addEventListener('input', () => ticketSpecInput.value = ticketSpecInput.value.replace(/\D/g, ''));
-      if (ticketSubmitBtn) ticketSubmitBtn.addEventListener('click', async () => { if (!supabase) return; const specId = (ticketSpecInput?.value || '').trim(); const subject = (ticketSubjectInput?.value || '').trim(); const message = (ticketMessageInput?.value || '').trim(); if (!specId || !subject || !message) { alert('Заполните все поля'); return; } if (!currentUserEmail) { alert('Не удалось получить email пользователя'); return; } try { const { error } = await supabase.from('support_tickets').insert({ spec_id: specId, subject, message, user_login: currentUserEmail }); if (error) throw error; closeSupportTicketModal({ preserveSpec: false }); } catch (err) { console.error('[modal9] support ticket insert error:', err); alert('Ошибка отправки'); } });
 
       function setupRealtime() { if (!supabase) return; realtimeSub = supabase.channel('modal9-realtime').on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, payload => { if (!payload) return; const { eventType, new: newRow, old } = payload; const specId = newRow?.id ?? old?.id; if (eventType === 'UPDATE' && newRow && specId != null && watchedSpecIds.has(String(specId))) applyRealtimeRegistryUpdate(newRow); else if (eventType === 'INSERT' || eventType === 'DELETE') loadHistory(); }).on('postgres_changes', { event: '*', schema: 'public', table: POS_TABLE }, payload => { const specId = payload.new?.spec_id ?? payload.old?.spec_id; if (specId == null || !watchedSpecIds.has(String(specId))) return; scheduleReloadSpec(specId); }).on('postgres_changes', { event: '*', schema: 'public', table: SELECT_TABLE }, payload => { const specId = payload.new?.spec_id ?? payload.old?.spec_id; if (specId == null || !watchedSpecIds.has(String(specId))) return; scheduleReloadSpec(specId); }).subscribe(); }
       function scheduleReloadSpec(specId) { if (specId === null || specId === undefined) return; const key = String(specId); if (reloadTimers.has(key)) return; const timer = setTimeout(async () => { reloadTimers.delete(key); try { await reloadSingleSpec(specId); } catch (err) { console.error('[modal9] reloadSingleSpec error:', err); } }, 400); reloadTimers.set(key, timer); }
