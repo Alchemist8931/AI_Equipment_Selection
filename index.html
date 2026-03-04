@@ -682,7 +682,8 @@
 
       async function loadBlock1(options = {}) {
         const { fromHistory = false } = options;
-        const specIds = Array.from(new Set((history || []).map(h => h?.id).filter(id => id !== null && id !== undefined));
+        // В следующей строке добавлена скобка в самом конце перед ";"
+        const specIds = Array.from(new Set((history || []).map(h => h?.id).filter(id => id !== null && id !== undefined)));
         if (!specIds.length) { block1Rows = []; specGroups = {}; selectionMap = {}; renderBlock1(); return; }
         const { data, error } = await supabase.from(POS_TABLE).select('file_number, user_login, file_name, id, spec_id, pos_number, pos_number_int, name, qty, unit, attrs, attrs_json').in('spec_id', specIds).order('spec_id', { ascending: false }).order('pos_number_int', { ascending: true });
         if (error) { console.error(error); return; }
@@ -699,7 +700,7 @@
         renderBlock1();
         // === ИСПРАВЛЕНИЕ: Добавлен вызов обновления контейнеров истории ===
         updateHistorySpecContainers({ forceAll: true });
-      }
+      }}
 
       function renderBlock1() { updateBlock1SpecContainers({ forceAll: true }); }
       
