@@ -1352,18 +1352,37 @@
       function parseSelectorCounts(str) { const m = String(str || '').match(/(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)/); return m ? { sent: Number(m[1]), received: Number(m[2]), total: Number(m[3]) } : null; }
       
       async function getSelectorProgress(specId) {
-        const [totalRes, sentRes, recvRes] = await Promise.all([
+        const [totalRes, sentRes, selectRes] = await Promise.all([
           supabase.from(POS_TABLE).select('id', { count: 'exact', head: true }).eq('spec_id', specId),
-          supabase.from(STATUS_TABLE).select('pos_id', { count: 'exact', head: true }).eq('spec_id', specId).in('status', ['pending_async', 'processing', 'done', 'failed', 'timeout_24h']),
-          supabase.from(STATUS_TABLE).select('pos_id', { count: 'exact', head: true }).eq('spec_id', specId).in('status', ['done', 'failed', 'timeout_24h']),
+          supabase.from(STATUS_TABLE).select('pos_id', { count: 'exact', head: true }).eq('spec_id', specId),
+          supabase.from(SELECT_TABLE).select('pos_id').eq('spec_id', specId).limit(5000),
         ]);
 
+        const totalCount = typeof totalRes?.count === 'number' ? totalRes.count : 0;
+        const sentCount = typeof sentRes?.count === 'number' ? sentRes.count : 0;
+        
+        let receivedCount = 0;
+        if (selectRes?.data) {
+          const unique = new Set();
+          selectRes.data.forEach(row => {
+            const posId = row?.pos_id ?? row?.posId ?? row?.posid;
+            if (posId !== null && posId !== undefined) {
+              unique.add(String(posId));
+            }
+          });
+          receivedCount = unique.size;
+        }
+
+        // Нормализация: отправлено не может быть меньше полученного
+        const normalizedSent = Math.max(sentCount, receivedCount);
+        const normalizedTotal = Math.max(totalCount, normalizedSent, receivedCount);
+
         return {
-          sent: sentRes.count ?? 0,
-          received: recvRes.count ?? 0,
-          total: totalRes.count ?? 0,
+          sent: normalizedSent,
+          received: receivedCount,
+          total: normalizedTotal,
         };
-      }
+      }}
       
       function initProgressHandlers(progress, specId) { const buttons = progress.querySelectorAll('.refresh'); if (buttons[0]) buttons[0].addEventListener('click', async e => { e.stopPropagation(); const btn = e.currentTarget; btn.classList.add('loading'); btn.disabled = true; try { await refreshParser(specId, progress); } finally { btn.classList.remove('loading'); btn.disabled = false; } }); if (buttons[1]) buttons[1].addEventListener('click', async e => { e.stopPropagation(); const btn = e.currentTarget; btn.classList.add('loading'); btn.disabled = true; try { await refreshSelector(specId, progress); } finally { btn.classList.remove('loading'); btn.disabled = false; } }); }
       async function refreshParser(specId, progress) { try { await supabase.from(SELECT_TABLE).delete().eq('spec_id', specId); await supabase.from(POS_TABLE).delete().eq('spec_id', specId); await supabase.from(TABLE).update({ status: 'BLOCK 1 ( в работе )' }).eq('id', specId); await supabase.functions.invoke('modal9-parser', { body: { request_id: specId } }); await loadHistory(); } catch (err) { console.error('refreshParser error:', err); } }
