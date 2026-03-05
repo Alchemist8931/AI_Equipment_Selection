@@ -1590,7 +1590,7 @@
     window.logout = function() { location.reload(); };
 
         // Function to check DEMO table and update upload button
-    async function checkDemoTableAndLimitUploads() {
+        async function checkDemoTableAndLimitUploads() {
       try {
         const userLogin = window.USER_LOGIN;
         const watermarkContainer = document.querySelector('.watermark-container');
@@ -1629,20 +1629,45 @@
           watermarkContainer.style.display = 'flex';
         }
 
-        const remainingCount = userRecord['Разница'];
-        
-        // Обновляем отображение
-        const layers = ['remaining-count-back', 'remaining-count-mid', 'remaining-count-front'];
-        layers.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.textContent = remainingCount;
-        });
+        // Функция для обновления UI счетчика
+        const updateCounterUI = (count) => {
+          // Обновляем отображение
+          const layers = ['remaining-count-back', 'remaining-count-mid', 'remaining-count-front'];
+          layers.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = count;
+          });
 
-        // Управляем кнопкой загрузки
-        const uploadBtn = document.querySelector('.upload-btn-main');
-        if (uploadBtn) {
-          uploadBtn.disabled = remainingCount <= 0;
-        }
+          // Управляем кнопкой загрузки
+          const uploadBtn = document.querySelector('.upload-btn-main');
+          if (uploadBtn) {
+            uploadBtn.disabled = count <= 0;
+          }
+        };
+
+        // Первичная установка значения
+        updateCounterUI(userRecord['Разница']);
+
+        // === REALTIME ПОДПИСКА ===
+        // Подписываемся на обновления в таблице DEMO для текущего пользователя
+        supabase
+          .channel('demo-counter-changes')
+          .on(
+            'postgres_changes',
+            {
+              event: 'UPDATE',
+              schema: 'public',
+              table: 'DEMO',
+              filter: `Логин=eq.${userLogin}` // Фильтр по логину пользователя
+            },
+            (payload) => {
+              // При обновлении записи получаем новое значение 'Разница'
+              const newCount = payload.new['Разница'];
+              updateCounterUI(newCount);
+            }
+          )
+          .subscribe();
+
       } catch (error) {
         console.error('Error in checkDemoTableAndLimitUploads:', error);
         const watermarkContainer = document.querySelector('.watermark-container');
