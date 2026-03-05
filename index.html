@@ -1382,7 +1382,7 @@
           received: receivedCount,
           total: normalizedTotal,
         };
-      }}
+      }
       
       function initProgressHandlers(progress, specId) { const buttons = progress.querySelectorAll('.refresh'); if (buttons[0]) buttons[0].addEventListener('click', async e => { e.stopPropagation(); const btn = e.currentTarget; btn.classList.add('loading'); btn.disabled = true; try { await refreshParser(specId, progress); } finally { btn.classList.remove('loading'); btn.disabled = false; } }); if (buttons[1]) buttons[1].addEventListener('click', async e => { e.stopPropagation(); const btn = e.currentTarget; btn.classList.add('loading'); btn.disabled = true; try { await refreshSelector(specId, progress); } finally { btn.classList.remove('loading'); btn.disabled = false; } }); }
       async function refreshParser(specId, progress) { try { await supabase.from(SELECT_TABLE).delete().eq('spec_id', specId); await supabase.from(POS_TABLE).delete().eq('spec_id', specId); await supabase.from(TABLE).update({ status: 'BLOCK 1 ( в работе )' }).eq('id', specId); await supabase.functions.invoke('modal9-parser', { body: { request_id: specId } }); await loadHistory(); } catch (err) { console.error('refreshParser error:', err); } }
