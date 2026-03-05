@@ -546,6 +546,19 @@
   </style>
 </head>
 <body>
+
+  <!-- Watermark Container -->
+        <div class="watermark-container">
+          <div class="watermark-text">осталось файлов для загрузки</div>
+          <div class="card-9" aria-hidden="true">
+            <div class="card-9__holo">
+              <div class="card-9__layer card-9__layer--back" id="remaining-count-back">-</div>
+              <div class="card-9__layer card-9__layer--mid" id="remaining-count-mid">-</div>
+              <div class="card-9__layer card-9__layer--front" id="remaining-count-front">-</div>
+            </div>
+          </div>
+        </div>
+  
   <div id="home_wave"></div>
   <div id="preloader"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>
   <div id="db-disconnect-overlay"><div class="loading-wave"><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div></div></div>
@@ -586,18 +599,6 @@
 
         <!-- Spacer -->
         <div style="flex-grow: 1;"></div>
-
-       <!-- Watermark Container -->
-        <div class="watermark-container">
-          <div class="watermark-text">осталось файлов для загрузки</div>
-          <div class="card-9" aria-hidden="true">
-            <div class="card-9__holo">
-              <div class="card-9__layer card-9__layer--back" id="remaining-count-back">-</div>
-              <div class="card-9__layer card-9__layer--mid" id="remaining-count-mid">-</div>
-              <div class="card-9__layer card-9__layer--front" id="remaining-count-front">-</div>
-            </div>
-          </div>
-        </div>
 
         <!-- Search -->
         <div class="file-filter-container input-container" style="width: 200px;">
