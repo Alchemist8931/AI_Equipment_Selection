@@ -1608,8 +1608,7 @@
 
     window.logout = function() { location.reload(); };
 
-        // Function to check DEMO table and update upload button
-        async function checkDemoTableAndLimitUploads() {
+    async function checkDemoTableAndLimitUploads() {
       try {
         const userLogin = window.USER_LOGIN;
         const watermarkContainer = document.querySelector('.watermark-container');
@@ -1623,29 +1622,6 @@
         if (!userLogin.startsWith('demo')) {
           if (watermarkContainer) watermarkContainer.style.display = 'none';
           return;
-        }
-
-        // Получаем данные из таблицы DEMO
-        const { data: demoData, error } = await supabase
-          .from('DEMO')
-          .select('Логин, Разница');
-
-        if (error || !demoData) {
-          if (watermarkContainer) watermarkContainer.style.display = 'none';
-          return;
-        }
-
-        // Ищем пользователя в DEMO таблице
-        const userRecord = demoData.find(record => record['Логин'] === userLogin);
-
-        if (!userRecord) {
-          if (watermarkContainer) watermarkContainer.style.display = 'none';
-          return;
-        }
-
-        // Показываем счетчик только если пользователь найден
-        if (watermarkContainer) {
-          watermarkContainer.style.display = 'flex';
         }
 
         // Функция для обновления UI счетчика
@@ -1664,28 +1640,40 @@
           }
         };
 
-        // Первичная установка значения
-        updateCounterUI(userRecord['Разница']);
+        // Функция запроса данных из БД
+        const fetchAndUpdate = async () => {
+          try {
+            // Используем .single() для оптимизации (ждаем одну строку)
+            const { data: userRecord, error } = await supabase
+              .from('DEMO')
+              .select('Разница')
+              .eq('Логин', userLogin)
+              .single();
 
-        // === REALTIME ПОДПИСКА ===
-        // Подписываемся на обновления в таблице DEMO для текущего пользователя
-        supabase
-          .channel('demo-counter-changes')
-          .on(
-            'postgres_changes',
-            {
-              event: 'UPDATE',
-              schema: 'public',
-              table: 'DEMO',
-              filter: `Логин=eq.${userLogin}` // Фильтр по логину пользователя
-            },
-            (payload) => {
-              // При обновлении записи получаем новое значение 'Разница'
-              const newCount = payload.new['Разница'];
-              updateCounterUI(newCount);
+            if (error) throw error;
+
+            if (userRecord) {
+              if (watermarkContainer) watermarkContainer.style.display = 'flex';
+              updateCounterUI(userRecord['Разница']);
+            } else {
+              // Если пользователя нет в таблице
+              if (watermarkContainer) watermarkContainer.style.display = 'none';
             }
-          )
-          .subscribe();
+          } catch (err) {
+            console.error('Demo poll error:', err);
+          }
+        };
+
+        // 1. Первичная установка значения
+        await fetchAndUpdate();
+
+        // 2. Запускаем Polling (опрос) каждые 5 секунд
+        // Очищаем старый интервал, если он был (на случай повторного вызова)
+        if (window.demoPollInterval) {
+          clearInterval(window.demoPollInterval);
+        }
+        
+        window.demoPollInterval = setInterval(fetchAndUpdate, 5000);
 
       } catch (error) {
         console.error('Error in checkDemoTableAndLimitUploads:', error);
