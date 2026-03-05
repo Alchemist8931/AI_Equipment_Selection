@@ -331,12 +331,12 @@
       position: absolute;
       inset: 0;
       border-radius: 26px;
-      border: 1px solid rgba(255, 255, 0, 0.16);
+      border: 1px solid #131313;
       background: linear-gradient(
         120deg,
-        rgba(255, 255, 0, 0.05),
-        rgba(255, 255, 0, 0.01) 45%,
-        rgba(0, 0, 0, 0)
+        #30333C,
+        #C5C6CB,
+        #FFFFFF
       );
       opacity: 0.55;
       transform: translateZ(-45px);
@@ -362,6 +362,7 @@
 
     /* Watermark container */
     .watermark-container {
+      display: none; /* Скрываем по умолчанию */
       position: fixed;
       top: 30px;
       right: 30px;
@@ -1350,29 +1351,19 @@
       function interpretDone(str) { const s = String(str || '').toLowerCase(); const c = parseSelectorCounts(s); return c ? (c.total > 0 && c.received >= c.total) : /(готов|done)/i.test(s); }
       function parseSelectorCounts(str) { const m = String(str || '').match(/(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)/); return m ? { sent: Number(m[1]), received: Number(m[2]), total: Number(m[3]) } : null; }
       
-      // === ДОБАВИТЬ ЭТУ ФУНКЦИЮ ===
       async function getSelectorProgress(specId) {
-        const [totalRes, sentRes, selectRes] = await Promise.all([
+        const [totalRes, sentRes, recvRes] = await Promise.all([
           supabase.from(POS_TABLE).select('id', { count: 'exact', head: true }).eq('spec_id', specId),
-          supabase.from(STATUS_TABLE).select('pos_id', { count: 'exact', head: true }).eq('spec_id', specId),
-          supabase.from(SELECT_TABLE).select('pos_id').eq('spec_id', specId).limit(5000),
+          supabase.from(STATUS_TABLE).select('pos_id', { count: 'exact', head: true }).eq('spec_id', specId).in('status', ['pending_async', 'processing', 'done', 'failed', 'timeout_24h']),
+          supabase.from(STATUS_TABLE).select('pos_id', { count: 'exact', head: true }).eq('spec_id', specId).in('status', ['done', 'failed', 'timeout_24h']),
         ]);
 
-        const totalCount = totalRes.count ?? 0;
-        const sentCount = sentRes.count ?? 0;
-        let receivedCount = 0;
-        
-        if (selectRes.data) {
-          const unique = new Set(selectRes.data.map(r => r.pos_id));
-          receivedCount = unique.size;
-        }
-
         return {
-          sent: sentCount,
-          received: receivedCount,
-          total: totalCount,
+          sent: sentRes.count ?? 0,
+          received: recvRes.count ?? 0,
+          total: totalRes.count ?? 0,
         };
-      }
+      }}
       
       function initProgressHandlers(progress, specId) { const buttons = progress.querySelectorAll('.refresh'); if (buttons[0]) buttons[0].addEventListener('click', async e => { e.stopPropagation(); const btn = e.currentTarget; btn.classList.add('loading'); btn.disabled = true; try { await refreshParser(specId, progress); } finally { btn.classList.remove('loading'); btn.disabled = false; } }); if (buttons[1]) buttons[1].addEventListener('click', async e => { e.stopPropagation(); const btn = e.currentTarget; btn.classList.add('loading'); btn.disabled = true; try { await refreshSelector(specId, progress); } finally { btn.classList.remove('loading'); btn.disabled = false; } }); }
       async function refreshParser(specId, progress) { try { await supabase.from(SELECT_TABLE).delete().eq('spec_id', specId); await supabase.from(POS_TABLE).delete().eq('spec_id', specId); await supabase.from(TABLE).update({ status: 'BLOCK 1 ( в работе )' }).eq('id', specId); await supabase.functions.invoke('modal9-parser', { body: { request_id: specId } }); await loadHistory(); } catch (err) { console.error('refreshParser error:', err); } }
@@ -1592,6 +1583,8 @@
       if (supabase?.auth?.getUser) { try { supabase.auth.getUser().then(({ data: { user } = {}, error }) => { if (error) return; currentUserEmail = user?.email || null; }); } catch (err) {} }
       await loadHistory({ resetLimit: true });
       setupRealtime();
+      // Добавьте эту строку:
+      checkDemoTableAndLimitUploads();
     }
 
     window.logout = function() { location.reload(); };
@@ -1599,78 +1592,61 @@
         // Function to check DEMO table and update upload button
     async function checkDemoTableAndLimitUploads() {
       try {
-        // Получаем контейнер ватермарка
-        const watermarkContainer = document.querySelector('.watermark-container');
-        
-        // По умолчанию скрываем его
-        if (watermarkContainer) watermarkContainer.style.display = 'none';
-
-        // Get current user's login
         const userLogin = window.USER_LOGIN;
+        const watermarkContainer = document.querySelector('.watermark-container');
 
         if (!userLogin) {
-          console.log("No user login found, skipping demo table check");
+          if (watermarkContainer) watermarkContainer.style.display = 'none';
           return;
         }
 
-        // Fetch DEMO table data
+        // Скрываем счетчик, если логин не начинается с "demo"
+        if (!userLogin.startsWith('demo')) {
+          if (watermarkContainer) watermarkContainer.style.display = 'none';
+          return;
+        }
+
+        // Получаем данные из таблицы DEMO
         const { data: demoData, error } = await supabase
           .from('DEMO')
           .select('Логин, Разница');
 
-        if (error) {
-          console.error('Error fetching DEMO table:', error);
+        if (error || !demoData) {
+          if (watermarkContainer) watermarkContainer.style.display = 'none';
           return;
         }
 
-        if (!demoData || demoData.length === 0) {
-          console.log('No data found in DEMO table');
-          return;
-        }
-
-        // Find matching user in DEMO table
+        // Ищем пользователя в DEMO таблице
         const userRecord = demoData.find(record => record['Логин'] === userLogin);
 
         if (!userRecord) {
-          console.log('User not found in DEMO table:', userLogin);
-          // Если пользователя нет в таблице DEMO, контейнер останется скрытым (display: none)
+          if (watermarkContainer) watermarkContainer.style.display = 'none';
           return;
         }
 
-        // Если пользователь найден, показываем контейнер
-        if (watermarkContainer) watermarkContainer.style.display = 'flex';
+        // Показываем счетчик только если пользователь найден
+        if (watermarkContainer) {
+          watermarkContainer.style.display = 'flex';
+        }
 
         const remainingCount = userRecord['Разница'];
-        console.log('Found user in DEMO table, remaining count:', remainingCount);
+        
+        // Обновляем отображение
+        const layers = ['remaining-count-back', 'remaining-count-mid', 'remaining-count-front'];
+        layers.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = remainingCount;
+        });
 
-        // Update the watermark display with the remaining count
-        const backLayer = document.getElementById('remaining-count-back');
-        const midLayer = document.getElementById('remaining-count-mid');
-        const frontLayer = document.getElementById('remaining-count-front');
-
-        if (backLayer && midLayer && frontLayer) {
-          backLayer.textContent = remainingCount;
-          midLayer.textContent = remainingCount;
-          frontLayer.textContent = remainingCount;
-        }
-
-        // Get the upload button
+        // Управляем кнопкой загрузки
         const uploadBtn = document.querySelector('.upload-btn-main');
-        if (!uploadBtn) {
-          console.error('Upload button not found');
-          return;
-        }
-
-        // Disable button if remaining count is 0 or negative
-        if (remainingCount <= 0) {
-          uploadBtn.disabled = true;
-          console.log('Upload button disabled due to limit reached');
-        } else {
-          uploadBtn.disabled = false;
-          console.log('Upload button enabled');
+        if (uploadBtn) {
+          uploadBtn.disabled = remainingCount <= 0;
         }
       } catch (error) {
         console.error('Error in checkDemoTableAndLimitUploads:', error);
+        const watermarkContainer = document.querySelector('.watermark-container');
+        if (watermarkContainer) watermarkContainer.style.display = 'none';
       }
     }
 
