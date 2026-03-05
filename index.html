@@ -232,6 +232,153 @@
     }
     .upload-btn-main:hover { background: var(--accent-hover); }
     .upload-btn-main:disabled { opacity: 0.6; cursor: default; }
+
+    /* Card 9 styles */
+    .card-9 {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 900px;
+      margin: 34px 0;
+    }
+
+    .card-9__holo {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      border-radius: 26px;
+      transform-style: preserve-3d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      animation: card9-wobble 6.2s ease-in-out infinite;
+    }
+
+    @keyframes card9-wobble {
+      0% {
+        transform: rotateX(16deg) rotateY(-18deg);
+      }
+      50% {
+        transform: rotateX(18deg) rotateY(18deg);
+      }
+      100% {
+        transform: rotateX(16deg) rotateY(-18deg);
+      }
+    }
+
+    .card-9__layer {
+      position: absolute;
+      font-weight: 900;
+      font-size: 108px;
+      letter-spacing: -6px;
+      line-height: 1;
+
+      -webkit-text-stroke: 1px rgba(255, 255, 0, 0.7);
+
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 0, 0.18) 0%,
+        rgba(255, 255, 0, 0.92) 35%,
+        rgba(255, 255, 0, 0.7) 60%,
+        rgba(255, 255, 0, 0.22) 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+
+      filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.55));
+      opacity: 0.95;
+      transform-style: preserve-3d;
+    }
+
+    .card-9__layer--back {
+      opacity: 0.18;
+      filter: blur(1px);
+      transform: translateZ(-70px);
+      -webkit-text-stroke: 1px rgba(255, 255, 0, 0.45);
+    }
+    .card-9__layer--mid {
+      opacity: 0.42;
+      filter: blur(0.4px);
+      transform: translateZ(-34px);
+      -webkit-text-stroke: 1px rgba(255, 255, 0, 0.55);
+    }
+    .card-9__layer--front {
+      opacity: 0.98;
+      transform: translateZ(0px);
+      -webkit-text-stroke: 1px rgba(255, 255, 0, 0.78);
+    }
+
+    .card-9__holo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 26px;
+      background: radial-gradient(
+        circle at 40% 35%,
+        rgba(255, 255, 0, 0.14),
+        rgba(0, 0, 0, 0) 62%
+      );
+      filter: blur(8px);
+      opacity: 0.9;
+      transform: translateZ(-80px);
+    }
+
+    .card-9__holo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 26px;
+      border: 1px solid rgba(255, 255, 0, 0.16);
+      background: linear-gradient(
+        120deg,
+        rgba(255, 255, 0, 0.05),
+        rgba(255, 255, 0, 0.01) 45%,
+        rgba(0, 0, 0, 0)
+      );
+      opacity: 0.55;
+      transform: translateZ(-45px);
+    }
+
+    @media (max-width: 600px) {
+      .card-9__holo {
+        width: 128px;
+        height: 128px;
+        border-radius: 24px;
+      }
+      .card-9__layer {
+        font-size: 96px;
+        letter-spacing: -5px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-9__holo {
+        animation: none !important;
+      }
+    }
+
+    /* Watermark container */
+    .watermark-container {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      z-index: 1000;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .watermark-text {
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: lowercase;
+    }
     
     .upload-status-wrapper { display:flex; flex-direction:column; align-items:flex-start; color: var(--text-secondary); font-size: 12px; min-width: 150px; }
     
@@ -439,6 +586,18 @@
 
         <!-- Spacer -->
         <div style="flex-grow: 1;"></div>
+
+       <!-- Watermark Container -->
+        <div class="watermark-container">
+          <div class="watermark-text">осталось файлов для загрузки</div>
+          <div class="card-9" aria-hidden="true">
+            <div class="card-9__holo">
+              <div class="card-9__layer card-9__layer--back" id="remaining-count-back">-</div>
+              <div class="card-9__layer card-9__layer--mid" id="remaining-count-mid">-</div>
+              <div class="card-9__layer card-9__layer--front" id="remaining-count-front">-</div>
+            </div>
+          </div>
+        </div>
 
         <!-- Search -->
         <div class="file-filter-container input-container" style="width: 200px;">
@@ -1191,59 +1350,73 @@
       function interpretDone(str) { const s = String(str || '').toLowerCase(); const c = parseSelectorCounts(s); return c ? (c.total > 0 && c.received >= c.total) : /(готов|done)/i.test(s); }
       function parseSelectorCounts(str) { const m = String(str || '').match(/(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)/); return m ? { sent: Number(m[1]), received: Number(m[2]), total: Number(m[3]) } : null; }
       
+      // === ДОБАВИТЬ ЭТУ ФУНКЦИЮ ===
+      async function getSelectorProgress(specId) {
+        const [totalRes, sentRes, selectRes] = await Promise.all([
+          supabase.from(POS_TABLE).select('id', { count: 'exact', head: true }).eq('spec_id', specId),
+          supabase.from(STATUS_TABLE).select('pos_id', { count: 'exact', head: true }).eq('spec_id', specId),
+          supabase.from(SELECT_TABLE).select('pos_id').eq('spec_id', specId).limit(5000),
+        ]);
+
+        const totalCount = totalRes.count ?? 0;
+        const sentCount = sentRes.count ?? 0;
+        let receivedCount = 0;
+        
+        if (selectRes.data) {
+          const unique = new Set(selectRes.data.map(r => r.pos_id));
+          receivedCount = unique.size;
+        }
+
+        return {
+          sent: sentCount,
+          received: receivedCount,
+          total: totalCount,
+        };
+      }
+      
       function initProgressHandlers(progress, specId) { const buttons = progress.querySelectorAll('.refresh'); if (buttons[0]) buttons[0].addEventListener('click', async e => { e.stopPropagation(); const btn = e.currentTarget; btn.classList.add('loading'); btn.disabled = true; try { await refreshParser(specId, progress); } finally { btn.classList.remove('loading'); btn.disabled = false; } }); if (buttons[1]) buttons[1].addEventListener('click', async e => { e.stopPropagation(); const btn = e.currentTarget; btn.classList.add('loading'); btn.disabled = true; try { await refreshSelector(specId, progress); } finally { btn.classList.remove('loading'); btn.disabled = false; } }); }
       async function refreshParser(specId, progress) { try { await supabase.from(SELECT_TABLE).delete().eq('spec_id', specId); await supabase.from(POS_TABLE).delete().eq('spec_id', specId); await supabase.from(TABLE).update({ status: 'BLOCK 1 ( в работе )' }).eq('id', specId); await supabase.functions.invoke('modal9-parser', { body: { request_id: specId } }); await loadHistory(); } catch (err) { console.error('refreshParser error:', err); } }
-      async function refreshSelector(specId, progress) {
-        try {
-          // 1. Сбрасываем статус перед стартом
-          await supabase.from(TABLE).update({ 
-            status: 'подготовка', 
-            status_selector: '0 / 0 / 0' 
-          }).eq('id', specId);
+      async function refreshSelector(specId, progress) { 
+        try { 
+          // 1. Ставим начальный статус
+          await supabase.from(TABLE).update({ status: 'подготовка', status_selector: '0 / 0 / 0' }).eq('id', specId); 
           
-          // Обновляем UI немедленно
-          await loadHistory(); 
-
           // 2. Запускаем Edge Function
-          const { error } = await supabase.functions.invoke('modal9-selector', { 
-            body: { spec_id: specId } 
-          });
-          if (error) throw error;
-
-          // 3. Запускаем цикл отслеживания прогресса (аналог старого trackSelectorProgress)
-          let lastStatus = null;
+          const { error } = await supabase.functions.invoke('modal9-selector', { body: { spec_id: specId } }); 
+          if (error) throw error; 
+          
+          // 3. Запускаем цикл отслеживания прогресса (Polling)
+          let lastStatus = '';
           while (true) {
-            // Получаем цифры из таблицы статусов (STATUS_TABLE)
             const { sent, received, total } = await getSelectorProgress(specId);
             const countsText = `${sent} / ${received} / ${total}`;
             
-            // Обновляем UI (поле ввода и прогресс-бар)
+            // Обновляем UI (поле ввода)
             const row = historyList.querySelector(`.history-item[data-spec-id="${specId}"]`);
             const selEl = row?.querySelector('[data-field="status_selector"]');
             if (selEl) updateStatus(selEl, countsText);
-            setProgress(progress, { status: 'BLOCK 2', sent, received, total });
+            
+            // Обновляем UI (прогресс-бар)
+            setProgress(progress, { selector: countsText });
 
-            // Записываем в БД (чтобы Realtime увидел и другие клиенты)
+            // Пишем в БД, чтобы Realtime увидели другие клиенты
             if (countsText !== lastStatus) {
               await supabase.from(TABLE).update({ status_selector: countsText }).eq('id', specId);
               lastStatus = countsText;
             }
 
-            // Условие выхода: всё готово
-            if (total > 0 && received >= total) {
-              break;
-            }
-
-            // Ждем перед следующим опросом
-            await delay(2000);
+            // Если всё готово, выходим
+            if (total > 0 && received >= total) break;
+            
+            // Ждем 2 секунды перед следующим опросом
+            await new Promise(r => setTimeout(r, 2000));
           }
 
-          // 4. Финальная синхронизация
-          await loadHistory();
-
-        } catch (err) {
-          console.error('refreshSelector error:', err);
-        }
+          // Финальная синхронизация
+          await loadHistory(); 
+        } catch (err) { 
+          console.error('refreshSelector error:', err); 
+        } 
       }
 
       function openGroup(id, saved) { }
@@ -1422,6 +1595,77 @@
     }
 
     window.logout = function() { location.reload(); };
+
+    // Function to check DEMO table and update upload button
+    async function checkDemoTableAndLimitUploads() {
+      try {
+        // Get current user's login
+        const userLogin = window.USER_LOGIN;
+
+        if (!userLogin) {
+          console.log("No user login found, skipping demo table check");
+          return;
+        }
+
+        // Fetch DEMO table data
+        const { data: demoData, error } = await supabase
+          .from('DEMO')
+          .select('Логин, Разница');
+
+        if (error) {
+          console.error('Error fetching DEMO table:', error);
+          return;
+        }
+
+        if (!demoData || demoData.length === 0) {
+          console.log('No data found in DEMO table');
+          return;
+        }
+
+        // Find matching user in DEMO table
+        const userRecord = demoData.find(record => record['Логин'] === userLogin);
+
+        if (!userRecord) {
+          console.log('User not found in DEMO table:', userLogin);
+          return;
+        }
+
+        const remainingCount = userRecord['Разница'];
+        console.log('Found user in DEMO table, remaining count:', remainingCount);
+
+        // Update the watermark display with the remaining count
+        const backLayer = document.getElementById('remaining-count-back');
+        const midLayer = document.getElementById('remaining-count-mid');
+        const frontLayer = document.getElementById('remaining-count-front');
+
+        if (backLayer && midLayer && frontLayer) {
+          backLayer.textContent = remainingCount;
+          midLayer.textContent = remainingCount;
+          frontLayer.textContent = remainingCount;
+        }
+
+        // Get the upload button
+        const uploadBtn = document.querySelector('.upload-btn-main');
+        if (!uploadBtn) {
+          console.error('Upload button not found');
+          return;
+        }
+
+        // Disable button if remaining count is 0 or negative
+        if (remainingCount <= 0) {
+          uploadBtn.disabled = true;
+          console.log('Upload button disabled due to limit reached');
+        } else {
+          uploadBtn.disabled = false;
+          console.log('Upload button enabled');
+        }
+      } catch (error) {
+        console.error('Error in checkDemoTableAndLimitUploads:', error);
+      }
+    }
+
+    // Call the function after page load and initialization
+    setTimeout(checkDemoTableAndLimitUploads, 1000);
   </script>
 </body>
 </html>
