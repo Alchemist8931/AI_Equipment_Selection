@@ -132,7 +132,7 @@
 
     .input-container { position: relative; width: auto; flex-shrink: 0; }
     .status-field-wrapper { display: inline-flex; align-items: center; gap: 6px; }
-    .status-icon { font-family: 'SN Pro'; font-size: 20px; line-height: 1; color: var(--text-muted); transition: color 0.3s ease; user-select: none; }
+    .status-icon { font-size: 20px; line-height: 1; color: var(--text-muted); transition: color 0.3s ease; user-select: none; }
     .date-time-input {
       width: auto;
       padding: 8px 10px;
@@ -627,8 +627,7 @@
           <div class="block1-wrapper"></div>
           <template id="spec-template"><div class="spec-container"><div class="spec-header"><div class="spec-title"></div><button class="group-close ans5-close" style="display:none;">×</button></div><div class="spec-content"></div></div></template>
           <template id="button-group-spec"><div class="modalRow spec-action-row"><button type="button" class="spec-action-btn spec-action-btn--excel" data-action="excel"><span class="label">скачать excel</span></button><button type="button" class="spec-action-btn spec-action-btn--copy" data-action="copy"><span class="label">скопировать</span></button></div></template>
-          <template id="spec-progress-template"><div class="spec-progress multistep" style="margin-bottom: 10px;"><div class="step" data-step="1"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 1</div><button class="darkmatter-btn refresh" title="Перезапустить парсер"><span class="button-text">запуск</span><span class="loader"></span></button></div></div><div class="step" data-step="2"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 2</div><button class="darkmatter-btn refresh" title="Перезапустить селектор"><span class="button-text">запуск</span><span class="loader"></span></button></div></div></div></template>
-          
+          <template id="spec-progress-template"><div class="spec-progress multistep" style="margin-bottom: 10px;"><div class="step" data-step="1"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 1</div><div class="icons"><span class="material-symbols-outlined status">indeterminate_check_box</span></div><button class="darkmatter-btn refresh" title="Перезапустить парсер"><span class="button-text">запуск</span><span class="loader"></span></button></div></div><div class="step" data-step="2"><div class="bar"></div><div class="step-body"><div class="label">BLOCK 2</div><div class="icons"><span class="material-symbols-outlined status">indeterminate_check_box</span></div><button class="darkmatter-btn refresh" title="Перезапустить селектор"><span class="button-text">запуск</span><span class="loader"></span></button></div></div></div></template>
           <!-- ROW TEMPLATE WITH SLIDESHOW -->
           <template id="spec-row-template">
             <div class="modalCONTEINERpost modalRow">
@@ -1597,9 +1596,15 @@
 
     window.logout = function() { location.reload(); };
 
-    // Function to check DEMO table and update upload button
+        // Function to check DEMO table and update upload button
     async function checkDemoTableAndLimitUploads() {
       try {
+        // Получаем контейнер ватермарка
+        const watermarkContainer = document.querySelector('.watermark-container');
+        
+        // По умолчанию скрываем его
+        if (watermarkContainer) watermarkContainer.style.display = 'none';
+
         // Get current user's login
         const userLogin = window.USER_LOGIN;
 
@@ -1628,8 +1633,12 @@
 
         if (!userRecord) {
           console.log('User not found in DEMO table:', userLogin);
+          // Если пользователя нет в таблице DEMO, контейнер останется скрытым (display: none)
           return;
         }
+
+        // Если пользователь найден, показываем контейнер
+        if (watermarkContainer) watermarkContainer.style.display = 'flex';
 
         const remainingCount = userRecord['Разница'];
         console.log('Found user in DEMO table, remaining count:', remainingCount);
