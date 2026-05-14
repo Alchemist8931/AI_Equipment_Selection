@@ -47,38 +47,30 @@
     @keyframes bounce { 0%,20%,50%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-30px); } 60% { transform: translateY(-15px); } }
 
     /* ============ LOGIN ============ */
-    #login-wrapper { opacity: 0; transition: opacity 0.5s; width: 100%; height: 100vh; position: fixed; top: 0; left: 0; z-index: 100; pointer-events: none; display: flex; align-items: center; justify-content: center; }
-    #login-wrapper.show { opacity: 1; pointer-events: auto; }
-    .login-card { width: 900px; max-width: 95vw; height: 600px; max-height: 90vh; border-radius: 16px; overflow: hidden; position: relative; border: 1px solid var(--line); background: var(--bg); display: flex; box-shadow: 0 25px 50px -12px rgba(0,0,0,.15); }
-    .login-overlay { position: absolute; top: 0; left: 0; width: 385px; height: 100%; background: var(--accent); color: var(--bg); border-radius: 16px 0 0 16px; transition: left 1s; z-index: 9999; pointer-events: auto; }
-    .login-overlay.open-sign-up { left: calc(100% - 385px); border-radius: 0 16px 16px 0; }
-    .login-overlay .ov-pane { position: absolute; inset: 0; padding: 40px 30px; display: flex; flex-direction: column; justify-content: center; gap: 18px; transition: opacity 0.5s; }
-    .login-overlay .ov-pane.signup { opacity: 0; pointer-events: none; }
-    .login-overlay.open-sign-up .ov-pane.signin { opacity: 0; pointer-events: none; }
-    .login-overlay.open-sign-up .ov-pane.signup { opacity: 1; pointer-events: auto; }
-    .login-overlay h3 { font-size: 18px; font-weight: 700; }
-    .login-overlay p { font-size: 13px; opacity: 0.7; line-height: 1.5; }
-    .btn-overlay { padding: 12px; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: inherit; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.4s; }
-    .btn-overlay:hover { background: rgba(255,255,255,0.1); border-color: currentColor; }
+#login-wrapper { opacity: 0; transition: opacity 0.5s; width: 100%; height: 100vh; position: fixed; top: 0; left: 0; z-index: 100; pointer-events: none; display: flex; align-items: center; justify-content: center; padding: 20px; }
+#login-wrapper.show { opacity: 1; pointer-events: auto; }
 
-    .login-form-area { position: absolute; top: 0; left: 385px; width: calc(100% - 385px); height: 100%; display: flex; align-items: center; justify-content: center; }
-    .form-pane { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; opacity: 0; transition: opacity 0.5s; }
-    .form-pane.show { display: flex; opacity: 1; }
-    .form-pane h2 { font-size: 24px; font-weight: 600; margin-bottom: 16px; }
+.login-card-simple { width: 100%; max-width: 420px; background: var(--bg); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,.12); padding: 40px 36px 28px; display: flex; flex-direction: column; gap: 28px; }
 
-    .modalFORM { display: flex; flex-direction: column; gap: 14px; background: var(--bg-card); border: 1px solid var(--line); padding: 26px; width: 380px; border-radius: 12px; }
-    .modalFORM h3 { font-size: 16px; font-weight: 700; text-align: center; text-transform: uppercase; color: var(--fg); }
-    .inputField { width: 100%; padding: 11px 14px; font-size: 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); outline: none; transition: all 0.3s; color: var(--fg); font-family: inherit; }
-    .inputField:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,0,0,.06); }
-    .inputField::placeholder { color: var(--fg-muted); }
-    .btn-submit { width: 100%; padding: 12px; background: var(--accent); border: none; color: var(--bg); font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.4s; font-family: inherit; }
-    .btn-submit:hover { background: var(--accent-hover); }
-    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-google-login { width: 100%; padding: 11px; background: var(--bg); border: 1px solid var(--line); color: var(--fg); font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; font-family: inherit; }
-    .btn-google-login:hover { background: var(--bg-alt); border-color: var(--fg); }
-    .login-error { padding: 8px 12px; background: rgba(239,68,68,.1); color: var(--error); border-radius: 6px; font-size: 12px; }
-    .login-divider { display: flex; align-items: center; gap: 10px; color: var(--fg-muted); font-size: 11px; }
-    .login-divider::before, .login-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.login-brand { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+.login-brand-icon { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 16px; background: var(--bg-card); border: 1px solid var(--line); margin-bottom: 6px; color: var(--fg); }
+.login-brand h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; color: var(--fg); margin: 0; }
+.login-brand p { font-size: 13px; color: var(--fg-muted); margin: 0; }
+
+.login-body { display: flex; flex-direction: column; gap: 14px; }
+.btn-google-login { width: 100%; padding: 13px 16px; background: var(--bg); border: 1px solid var(--line); color: var(--fg); font-size: 14px; font-weight: 600; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s; font-family: inherit; }
+.btn-google-login:hover { background: var(--bg-alt); border-color: var(--fg); }
+.btn-google-login:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.login-error { padding: 10px 14px; background: rgba(239,68,68,.1); color: var(--error); border-radius: 8px; font-size: 12px; text-align: center; }
+.login-note { font-size: 12px; color: var(--fg-muted); text-align: center; line-height: 1.5; padding-top: 12px; border-top: 1px solid var(--line-light); margin: 0; }
+
+.login-footer { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; color: var(--fg-muted); padding-top: 4px; }
+
+@media (max-width: 480px) {
+  .login-card-simple { padding: 32px 24px 22px; }
+  .login-brand h1 { font-size: 18px; }
+}
 
     /* ============ DB DISCONNECT ============ */
     #db-disconnect-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.5s; z-index: 2000; }
@@ -274,60 +266,46 @@
 
 <!-- DB disconnect overlay -->
 <div id="db-disconnect-overlay"></div>
-
+  
 <!-- ============================================
      LOGIN SCREEN
      ============================================ -->
 <div id="login-wrapper">
-  <div class="login-card">
-    <div class="login-overlay" id="overlay">
-      <div class="ov-pane signin">
-        <h3>ТОЛЬКО УЗНАЛИ О НАС?</h3>
-        <p>Расскажите немного о себе,<br>и совершенствуйте своё дело вместе с нами!</p>
-        <button class="btn-overlay" id="slide-right-button">Создать учётную запись</button>
+  <div class="login-card-simple">
+    <div class="login-brand">
+      <div class="login-brand-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 20V4h6a4 4 0 0 1 0 8H7"/>
+          <path d="m13 12 4 8"/>
+        </svg>
       </div>
-      <div class="ov-pane signup" style="text-align:left;">
-        <h3>МЫ ЗНАКОМЫ?</h3>
-        <p>Если вы уже зарегистрированы,<br>перейдите на форму входа</p>
-        <button class="btn-overlay" id="slide-left-button">Форма входа</button>
-      </div>
+      <h1>AI Equipment Selection</h1>
+      <p>Подбор оборудования по техническому заданию</p>
     </div>
-    <div class="login-form-area">
-      <div class="form-pane signin show" id="sign-up-info">
-        <h2>AI Equipment Selection</h2>
-        <form id="login-form" autocomplete="on">
-          <div class="modalFORM">
-            <h3>ФОРМА ВХОДА</h3>
-            <button type="button" class="btn-google-login" id="google-signin-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Войти через Google
-            </button>
-            <div class="login-divider"><span>или</span></div>
-            <input class="inputField" type="email" placeholder="email: user@gmail.com" id="loginEmail" name="email" autocomplete="username" required>
-            <input class="inputField" type="password" placeholder="ваш пароль" id="loginPassword" name="password" autocomplete="current-password" minlength="6" required>
-            <div id="login-error" class="login-error" style="display:none"></div>
-            <button class="btn-submit" id="loginBtn">Войти</button>
-          </div>
-        </form>
-      </div>
-      <div class="form-pane signup" id="sign-in-info">
-        <h2>AI Equipment Selection</h2>
-        <form id="registration-form" autocomplete="on">
-          <div class="modalFORM">
-            <h3>ФОРМА РЕГИСТРАЦИИ</h3>
-            <input class="inputField" placeholder="Имя и фамилия" type="text" name="full_name" required>
-            <input class="inputField" placeholder="mail@gmail.com" type="email" name="email" autocomplete="email" required>
-            <input class="inputField" placeholder="пароль (мин. 6 символов)" type="password" name="password" autocomplete="new-password" minlength="6" required>
-            <div id="signup-error" class="login-error" style="display:none"></div>
-            <button class="btn-submit" id="regBtn">Создать аккаунт</button>
-          </div>
-        </form>
-      </div>
+
+    <div class="login-body">
+      <button type="button" class="btn-google-login" id="google-signin-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Войти через Google
+      </button>
+      <div id="login-error" class="login-error" style="display:none"></div>
+      <p class="login-note">
+        При первом входе создаётся личная группа.<br>
+        Вас также могут пригласить в группы коллег.
+      </p>
+    </div>
+
+    <div class="login-footer">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Защищённое соединение
     </div>
   </div>
 </div>
@@ -756,65 +734,6 @@ function showApp() {
   $("login-wrapper").classList.remove("show");
   $("main-app").style.display = "block";
   $("modal9-container").classList.add("visible");
-}
-
-function toggleLoginOverlay(toSignUp) {
-  const overlay = $("overlay");
-  const signinPane = $("sign-up-info");
-  const signupPane = $("sign-in-info");
-  if (toSignUp) {
-    overlay.classList.add("open-sign-up");
-    signinPane.classList.remove("show");
-    setTimeout(() => signupPane.classList.add("show"), 500);
-  } else {
-    overlay.classList.remove("open-sign-up");
-    signupPane.classList.remove("show");
-    setTimeout(() => signinPane.classList.add("show"), 500);
-  }
-}
-
-async function handleEmailLogin(e) {
-  e.preventDefault();
-  const email = $("loginEmail").value.trim();
-  const pass = $("loginPassword").value.trim();
-  const btn = $("loginBtn");
-  const errEl = $("login-error");
-  errEl.style.display = "none";
-  if (!email || !pass) return;
-  btn.disabled = true; btn.textContent = "Вход...";
-  try {
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
-    if (error) throw error;
-  } catch (err) {
-    errEl.textContent = translateAuthError(err.message);
-    errEl.style.display = "block";
-    btn.disabled = false; btn.textContent = "Войти";
-  }
-}
-
-async function handleSignup(e) {
-  e.preventDefault();
-  const form = e.target;
-  const fd = new FormData(form);
-  const errEl = $("signup-error");
-  const btn = $("regBtn");
-  errEl.style.display = "none";
-  btn.disabled = true; btn.textContent = "Создание...";
-  try {
-    const { error } = await supabase.auth.signUp({
-      email: fd.get("email"),
-      password: fd.get("password"),
-      options: { data: { full_name: fd.get("full_name") } }
-    });
-    if (error) throw error;
-    toast("Аккаунт создан — проверь почту", "success", 6000);
-    toggleLoginOverlay(false);
-  } catch (err) {
-    errEl.textContent = translateAuthError(err.message);
-    errEl.style.display = "block";
-  } finally {
-    btn.disabled = false; btn.textContent = "Создать аккаунт";
-  }
 }
 
 async function handleGoogleSignIn() {
@@ -1545,11 +1464,7 @@ function scheduleSpecReload(specId) {
 // WIRING
 // ============================================================
 function wireUI() {
-  // Login slide
-  $("slide-right-button").addEventListener("click", () => toggleLoginOverlay(true));
-  $("slide-left-button").addEventListener("click", () => toggleLoginOverlay(false));
-  $("login-form").addEventListener("submit", handleEmailLogin);
-  $("registration-form").addEventListener("submit", handleSignup);
+  // Login (только Google)
   $("google-signin-btn").addEventListener("click", handleGoogleSignIn);
   $("btn-signout-main").addEventListener("click", handleSignOut);
 
