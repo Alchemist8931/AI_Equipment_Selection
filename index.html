@@ -38,13 +38,47 @@
     .theme-transition-overlay { position: fixed; inset: 0; z-index: 1000; background: var(--bg); opacity: 0; pointer-events: none; transition: opacity var(--transition-duration); }
     .theme-transition-overlay.active { opacity: 0.85; pointer-events: all; }
 
-    /* ============ PRELOADER ============ */
-    #preloader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 10px; opacity: 0; visibility: hidden; transition: opacity 0.5s, visibility 0.5s; z-index: 9999; }
-    #preloader.visible { opacity: 1; visibility: visible; }
-    #preloader.fade-out { opacity: 0; visibility: hidden; }
-    .line { width: 10px; height: 70px; background: var(--fg); animation: bounce 1.5s infinite ease-in-out; border-radius: 4px; }
-    .line:nth-child(2) { animation-delay: 0.3s; } .line:nth-child(3) { animation-delay: 0.6s; } .line:nth-child(5) { animation-delay: 1.2s; }
-    @keyframes bounce { 0%,20%,50%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-30px); } 60% { transform: translateY(-15px); } }
+/* ============ PRELOADER (loading-wave, bottom-right) ============ */
+#preloader {
+  position: fixed;
+  bottom: 10vh;
+  right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 40px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s, visibility 0.4s;
+  z-index: 9999;
+  pointer-events: none;
+}
+#preloader.visible { opacity: 1; visibility: visible; }
+#preloader.fade-out { opacity: 0; visibility: hidden; }
+.loading-bar {
+  width: 8px;
+  height: 8px;
+  margin: 0 2px;
+  background-color: var(--fg);
+  border-radius: 3px;
+  animation: loading-wave-animation 1s ease-in-out infinite;
+}
+.loading-bar:nth-child(2)  { animation-delay: 0.1s; }
+.loading-bar:nth-child(3)  { animation-delay: 0.2s; }
+.loading-bar:nth-child(4)  { animation-delay: 0.3s; }
+.loading-bar:nth-child(5)  { animation-delay: 0.4s; }
+.loading-bar:nth-child(6)  { animation-delay: 0.5s; }
+.loading-bar:nth-child(7)  { animation-delay: 0.6s; }
+.loading-bar:nth-child(8)  { animation-delay: 0.7s; }
+.loading-bar:nth-child(9)  { animation-delay: 0.8s; }
+.loading-bar:nth-child(10) { animation-delay: 0.9s; }
+.loading-bar:nth-child(11) { animation-delay: 1.0s; }
+.loading-bar:nth-child(12) { animation-delay: 1.1s; }
+@keyframes loading-wave-animation {
+  0%   { height: 8px; }
+  50%  { height: 32px; }
+  100% { height: 8px; }
+}
 
     /* ============ LOGIN ============ */
 #login-wrapper { opacity: 0; transition: opacity 0.5s; width: 100%; height: 100vh; position: fixed; top: 0; left: 0; z-index: 100; pointer-events: none; display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -247,6 +281,57 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .fade { transition: opacity 0.5s; opacity: 0.3; }
 
+    /* ============ CONFIRM MODAL (group creation) ============ */
+.confirm-overlay {
+  position: fixed; inset: 0; z-index: 6000;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.confirm-overlay.visible { opacity: 1; pointer-events: auto; }
+.confirm-modal {
+  background: var(--bg); color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px 26px;
+  max-width: 460px; width: 100%;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
+  transform: translateY(8px);
+  transition: transform 0.25s;
+}
+.confirm-overlay.visible .confirm-modal { transform: none; }
+.confirm-modal h3 {
+  font-size: 15px; font-weight: 700; margin-bottom: 14px;
+  text-transform: uppercase; letter-spacing: 0.02em;
+}
+.confirm-modal p {
+  font-size: 13px; color: var(--fg-secondary);
+  line-height: 1.55; margin-bottom: 12px;
+}
+.confirm-modal p strong { color: var(--fg); font-weight: 600; }
+.confirm-actions {
+  display: flex; gap: 10px; justify-content: flex-end;
+  margin-top: 20px;
+}
+.btn-confirm-cancel, .btn-confirm-ok {
+  padding: 10px 20px; font-size: 13px; font-weight: 600;
+  border-radius: 8px; cursor: pointer;
+  font-family: inherit; transition: all 0.2s;
+}
+.btn-confirm-cancel {
+  background: var(--bg); color: var(--fg-secondary);
+  border: 1px solid var(--line);
+}
+.btn-confirm-cancel:hover { background: var(--bg-alt); color: var(--fg); }
+.btn-confirm-ok {
+  background: var(--accent); color: var(--bg);
+  border: 1px solid var(--accent);
+}
+.btn-confirm-ok:hover { background: var(--accent-hover); }
+
     @media (max-width: 768px) {
       .header-inner { padding: 0 12px; }
       .login-card { width: 95vw; height: auto; flex-direction: column; }
@@ -260,9 +345,22 @@
 <body>
 
 <div class="theme-transition-overlay"></div>
-
-<!-- Preloader -->
-<div id="preloader"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>
+  
+<!-- Preloader (loading-wave, bottom-right corner) -->
+<div id="preloader" class="loading-wave">
+  <div class="loading-bar"></div>
+  <div class="loading-bar"></div>
+  <div class="loading-bar"></div>
+  <div class="loading-bar"></div>
+  <div class="loading-bar"></div>
+  <div class="loading-bar"></div>
+  <div class="loading-bar"></div>
+  <div class="loading-bar"></div>
+  <div class="loading-bar"></div>
+  <div class="loading-bar"></div>
+  <div class="loading-bar"></div>
+  <div class="loading-bar"></div>
+</div>
 
 <!-- DB disconnect overlay -->
 <div id="db-disconnect-overlay"></div>
@@ -630,6 +728,7 @@ const state = {
   openedSpecId: null,
   realtimeSub: null,
   contextSpecContent: null,
+  ensureInProgress: false,
 };
 
 // ============================================================
@@ -754,6 +853,86 @@ async function handleSignOut() {
   await supabase.auth.signOut();
   state.session = null; state.user = null; state.profile = null; state.groupId = null;
   showLogin();
+}
+
+  // ============================================================
+// FIRST-TIME GROUP FLOW
+// ============================================================
+function showCreateGroupConfirmation() {
+  return new Promise(resolve => {
+    const modal = document.createElement("div");
+    modal.className = "confirm-overlay";
+    modal.innerHTML = `
+      <div class="confirm-modal">
+        <h3>Создание рабочей области</h3>
+        <p>
+          Внимание: ваша учётная запись Google ещё не приглашена ни в одну из групп.
+          Если вы продолжите вход, для вас будет создана группа,
+          в которую вы сможете приглашать пользователей.
+        </p>
+        <p>
+          Оплата подписки и расходуемых токенов будет осуществляться
+          с <strong>вашей учётной записи</strong>.
+        </p>
+        <p><strong>Продолжить?</strong></p>
+        <div class="confirm-actions">
+          <button class="btn-confirm-cancel" data-action="cancel">Отмена</button>
+          <button class="btn-confirm-ok" data-action="ok">Продолжить</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    requestAnimationFrame(() => modal.classList.add("visible"));
+
+    const finish = (ok) => {
+      modal.classList.remove("visible");
+      setTimeout(() => modal.remove(), 250);
+      resolve(ok);
+    };
+    modal.querySelector('[data-action="ok"]').addEventListener("click", () => finish(true));
+    modal.querySelector('[data-action="cancel"]').addEventListener("click", () => finish(false));
+  });
+}
+
+async function ensureUserHasGroup() {
+  if (state.ensureInProgress) return false;
+  state.ensureInProgress = true;
+  try {
+    // 1. Принимаем pending-приглашения по email
+    try {
+      const { data: claimed } = await supabase.rpc("claim_pending_invitations");
+      if (claimed > 0) toast(`Принято приглашений: ${claimed}`, "success", 4000);
+    } catch (err) {
+      console.error("claim_pending_invitations:", err);
+    }
+
+    // 2. Есть ли у юзера хоть одно членство?
+    const { data: memberships } = await supabase
+      .from("group_members")
+      .select("group_id")
+      .eq("user_id", state.user.id)
+      .limit(1);
+    if (memberships?.length) return true;
+
+    // 3. Нет — спрашиваем согласия на создание личной группы
+    const confirmed = await showCreateGroupConfirmation();
+    if (!confirmed) {
+      await handleSignOut();
+      return false;
+    }
+
+    // 4. Создаём
+    const { error } = await supabase.rpc("create_personal_group");
+    if (error) {
+      toast("Не удалось создать группу: " + error.message, "error", 6000);
+      await handleSignOut();
+      return false;
+    }
+    toast("Личная группа создана", "success");
+    return true;
+  } finally {
+    state.ensureInProgress = false;
+  }
 }
 
 async function refreshState() {
@@ -1547,12 +1726,15 @@ async function bootstrap() {
   if (session) {
     state.session = session;
     state.user = session.user;
-    await refreshState();
-    renderUserHeader();
-    renderGroupSwitcher();
-    showApp();
-    await loadHistory({ resetLimit: true });
-    setupRealtime();
+    const ok = await ensureUserHasGroup();
+    if (ok) {
+      await refreshState();
+      renderUserHeader();
+      renderGroupSwitcher();
+      showApp();
+      await loadHistory({ resetLimit: true });
+      setupRealtime();
+    }
   } else {
     showLogin();
   }
@@ -1562,6 +1744,8 @@ async function bootstrap() {
     if (event === "SIGNED_IN" && session) {
       state.session = session;
       state.user = session.user;
+      const ok = await ensureUserHasGroup();
+      if (!ok) return;
       await refreshState();
       renderUserHeader();
       renderGroupSwitcher();
