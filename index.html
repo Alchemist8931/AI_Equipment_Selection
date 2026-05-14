@@ -116,7 +116,10 @@
     @supports (background: color-mix(in srgb, white, black)) {
       .header-blur { background: color-mix(in srgb, var(--bg) 82%, transparent); }
     }
-    .header-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; padding: 0 24px; box-sizing: border-box; }
+    .header-inner { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; height: 64px; padding: 0 24px; box-sizing: border-box; }
+    .header-zone-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+    .header-zone-center { display: flex; align-items: center; justify-content: center; }
+    .header-zone-right { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
 
     .ctrl { height: var(--ctrl-h); border-radius: var(--ctrl-radius); border: 1px solid var(--line); background: var(--bg); display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; font-size: 13px; color: var(--fg); transition: all 0.2s; cursor: pointer; font-family: inherit; }
     .ctrl:hover { border-color: var(--fg-muted); }
@@ -124,7 +127,8 @@
     .group-switcher-wrap { position: relative; margin-left: 4px; }
 
     /* Переключатель страниц приложения (Подбор / Пользователи / Биллинг) */
-    .page-switcher { display: inline-flex; gap: 4px; margin-left: 16px; padding: 3px; background: var(--bg-card); border: 1px solid var(--line); border-radius: 10px; }
+    .page-switcher { display: inline-flex; gap: 4px; padding: 3px; background: var(--bg-card); border: 1px solid var(--line); border-radius: 10px; }
+    .page-switcher.hidden { display: none; }
     .page-switcher-btn { background: transparent; border: none; color: var(--fg-secondary); padding: 0 14px; height: 30px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
     .page-switcher-btn:hover { color: var(--fg); }
     .page-switcher-btn.active { background: var(--bg); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.06); }
@@ -209,26 +213,33 @@
     .toggle-text { color: var(--fg-secondary); font-size: 12px; white-space: nowrap; }
 
     .modal9-window { width: 100%; max-width: 1400px; padding: 20px 24px; box-sizing: border-box; margin: 0 auto 20px; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-    /* Карточки и таблицы внутри страниц «Пользователи» / «Биллинг» */
-    .page-section { width: 100%; max-width: 1400px; padding: 20px 24px; box-sizing: border-box; margin: 20px auto; overflow-y: auto; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 16px; }
-    .page-section h2 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
-    .page-card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 16px; padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; }
-    .page-card-title { font-size: 12px; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-    .page-card-big { font-size: 28px; font-weight: 700; }
 
-    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .data-table th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--line); }
-    .data-table td { padding: 12px; border-bottom: 1px solid var(--line-light); }
-    .data-table tr:last-child td { border-bottom: none; }
-    .data-table .role-pill { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: var(--bg); border: 1px solid var(--line); color: var(--fg-secondary); }
-    .data-table .role-pill.role-owner { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-    .data-table .role-pill.role-admin { background: var(--bg); color: var(--fg); border-color: var(--fg-muted); }
-    .data-table .row-actions button { background: none; border: 1px solid var(--line); color: var(--fg-secondary); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-    .data-table .row-actions button:hover { background: var(--bg-alt); color: var(--fg); border-color: var(--fg-muted); }
-    .data-table .row-actions button.danger:hover { background: var(--error); color: #fff; border-color: var(--error); }
-    .data-table .row-actions { display: flex; gap: 6px; }
+    /* Общий контейнер страниц members/billing — структурно как Подбор */
+    .page-shell { display: flex; flex-direction: column; align-items: center; width: 100%; height: 100%; }
+    .page-empty-state { padding: 32px; text-align: center; color: var(--fg-muted); font-size: 13px; }
 
-    .empty-state { padding: 32px; text-align: center; color: var(--fg-muted); font-size: 13px; }
+    /* Карточки-метрики в верхнем окне (биллинг) */
+    .billing-metrics { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+    .billing-metric { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; border-left: 1px solid var(--line); }
+    .billing-metric:first-child { border-left: none; padding-left: 0; }
+    .billing-metric-label { font-size: 11px; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+    .billing-metric-value { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .billing-metric-value.big { font-size: 26px; }
+
+    /* Запись участника группы в нижнем окне */
+    .member-item { display: flex; flex-direction: row; padding: 5px 8px; gap: 6px; align-items: center; transition: background 0.2s; border-radius: 6px; }
+    .member-item:hover { background: var(--bg-alt); }
+    .member-item.is-blocked { opacity: 0.55; }
+    .member-item.is-invite { background: var(--bg-alt); }
+    .member-action-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; color: var(--fg-secondary); transition: all 0.2s; flex-shrink: 0; padding: 0; font-family: inherit; }
+    .member-action-btn:hover { background: var(--bg-alt); color: var(--fg); border-color: var(--fg-muted); }
+    .member-action-btn.danger:hover { background: var(--error); color: #fff; border-color: var(--error); }
+    .member-action-btn.success { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .member-action-btn.success:hover { background: var(--accent-hover); }
+    .member-action-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+    .member-role-pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; background: var(--bg); border: 1px solid var(--line); color: var(--fg-secondary); height: 32px; box-sizing: border-box; }
+    .member-role-pill.owner { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .member-role-pill.admin { background: var(--bg); color: var(--fg); border-color: var(--fg-muted); }
     
     .modal9-content { width: 100%; flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
     .modal9-content::-webkit-scrollbar { height: 6px; }
@@ -467,8 +478,8 @@
   <header class="header-blur">
     <div class="header-inner">
       <!-- Left zone -->
-      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <span class="ctrl ctrl-square ctrl-logo" aria-label="Equipment Selection">AI</span>
+      <div class="header-zone-left">
+        <span class="ctrl ctrl-square ctrl-logo" aria-label="AI Equipment Selection">AI</span>
         <span style="font-weight:600; font-size:14px; letter-spacing:-0.01em;" class="brand-name">Equipment Selection</span>
 
         <!-- Group switcher -->
@@ -485,8 +496,11 @@
           <div id="group-switcher-menu" class="group-switcher-menu"></div>
         </div>
 
-        <!-- Page switcher -->
-        <div class="page-switcher" id="page-switcher">
+        </div>
+
+      <!-- Center zone -->
+      <div class="header-zone-center">
+        <div class="page-switcher hidden" id="page-switcher">
           <button class="page-switcher-btn active" data-page="specs">
             <span class="material-symbols-outlined">inventory_2</span>
             <span>Подбор</span>
@@ -503,7 +517,7 @@
       </div>
 
       <!-- Right zone -->
-      <div style="display:flex; align-items:center; gap:8px;">
+      <div class="header-zone-right">
         <div class="profile-wrap">
           <button id="btn-profile" class="ctrl" style="padding:0 8px 0 4px;">
             <span style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:6px; background:var(--bg-alt); overflow:hidden;" id="header-avatar">
@@ -739,27 +753,53 @@
       </div>
     </div>
   </div>
-  </div><!-- /#page-specs -->
+  </div>
+  <!-- /#page-specs -->
 
   <!-- ============================================
        PAGE: MEMBERS (пользователи группы)
        ============================================ -->
   <div id="page-members" class="app-page">
-    <div class="page-section">
-      <h2>Пользователи группы</h2>
-      <div class="page-card">
-        <div class="page-card-title">Участники</div>
-        <table class="data-table" id="members-table">
-          <thead>
-            <tr><th>EMAIL</th><th>ИМЯ</th><th>РОЛЬ</th><th>СТАТУС</th><th>ВСТУПИЛ</th><th></th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div class="empty-state" id="members-empty" style="display:none">В группе пока никого нет.</div>
+    <div class="page-shell spec-modal visible">
+      <!-- Top: действия -->
+      <div class="modal9-top-window glass3d">
+        <div class="modal9-top-body">
+          <button type="button" class="upload-btn-main" id="btn-invite-member">
+            <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
+            <span class="button-text">добавить пользователя</span>
+          </button>
+          <div style="flex:1;"></div>
+        </div>
       </div>
-      <div class="page-card">
-        <div class="page-card-title">Действия (скоро)</div>
-        <p style="font-size:12px; color:var(--fg-muted); line-height:1.5;">Приглашение по email, удаление участника (с переносом его файлов на администратора), блокировка учётной записи появятся на следующем этапе.</p>
+      <!-- Main: список участников -->
+      <div class="modal9-window glass3d">
+        <div class="modal9-content">
+          <div class="history-list" id="members-list"></div>
+          <div class="page-empty-state" id="members-empty" style="display:none">В группе пока никого нет.</div>
+
+          <template id="member-row-template">
+            <div class="history-item member-item">
+              <div class="input-container"><input type="text" data-mf="email" class="styled_input_bar" readonly style="width:280px;" placeholder=" "><label class="input-label">email</label></div>
+              <div class="input-container"><input type="text" data-mf="name" class="styled_input_bar" readonly style="width:200px;" placeholder=" "><label class="input-label">имя</label></div>
+              <span class="member-role-pill" data-mf="role">—</span>
+              <div class="input-container"><input type="text" data-mf="status" class="styled_input_bar" readonly style="width:120px; text-transform:uppercase; text-align:center;" placeholder=" "><label class="input-label">статус</label></div>
+              <div class="input-container"><input type="text" data-mf="joined" class="styled_input_bar" readonly style="width:150px; text-align:center;" placeholder=" "><label class="input-label">принят</label></div>
+              <div style="flex:1;"></div>
+              <button type="button" class="member-action-btn" data-action="block" title="Заблокировать"><span class="material-symbols-outlined">block</span></button>
+              <button type="button" class="member-action-btn danger" data-action="remove" title="Удалить учётную запись из группы"><span class="material-symbols-outlined">delete</span></button>
+            </div>
+          </template>
+
+          <template id="member-invite-template">
+            <div class="history-item member-item is-invite">
+              <div class="input-container" style="width:280px;"><input type="email" data-mf="invite-email" class="styled_input_bar" placeholder=" " style="width:100%;" autocomplete="off"><label class="input-label">email (gmail)</label></div>
+              <div style="font-size:11px; color:var(--fg-muted); padding:0 8px;">только @gmail.com — иные провайдеры пока не поддерживаются</div>
+              <div style="flex:1;"></div>
+              <button type="button" class="member-action-btn success" data-action="save" title="Отправить приглашение"><span class="material-symbols-outlined">check</span></button>
+              <button type="button" class="member-action-btn" data-action="cancel" title="Отмена"><span class="material-symbols-outlined">close</span></button>
+            </div>
+          </template>
+        </div>
       </div>
     </div>
   </div>
@@ -768,30 +808,44 @@
        PAGE: BILLING (биллинг)
        ============================================ -->
   <div id="page-billing" class="app-page">
-    <div class="page-section">
-      <h2>Биллинг</h2>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-        <div class="page-card">
-          <div class="page-card-title">Баланс группы</div>
-          <div class="page-card-big" id="billing-balance">—</div>
-          <p style="font-size:11px; color:var(--fg-muted);">Обновлено: <span id="billing-balance-updated">—</span></p>
-        </div>
-        <div class="page-card">
-          <div class="page-card-title">Тариф</div>
-          <div style="display:flex; gap:24px; flex-wrap:wrap;">
-            <div><div style="font-size:11px; color:var(--fg-muted);">за пользователя/мес</div><div style="font-size:18px; font-weight:700;" id="billing-user-price">—</div></div>
-            <div><div style="font-size:11px; color:var(--fg-muted);">наценка на AI</div><div style="font-size:18px; font-weight:700;" id="billing-markup">—</div></div>
-            <div><div style="font-size:11px; color:var(--fg-muted);">порог уведомления</div><div style="font-size:18px; font-weight:700;" id="billing-threshold">—</div></div>
+    <div class="page-shell spec-modal visible">
+      <!-- Top: метрики -->
+      <div class="modal9-top-window glass3d">
+        <div class="billing-metrics">
+          <div class="billing-metric">
+            <span class="billing-metric-label">Баланс группы</span>
+            <span class="billing-metric-value big" id="billing-balance">—</span>
+          </div>
+          <div class="billing-metric">
+            <span class="billing-metric-label">Тариф / польз.&nbsp;/&nbsp;мес</span>
+            <span class="billing-metric-value" id="billing-user-price">—</span>
+          </div>
+          <div class="billing-metric">
+            <span class="billing-metric-label">Активных участников</span>
+            <span class="billing-metric-value" id="billing-members-count">—</span>
+          </div>
+          <div class="billing-metric">
+            <span class="billing-metric-label">Итог за подписку / мес</span>
+            <span class="billing-metric-value" id="billing-subscription-total">—</span>
           </div>
         </div>
       </div>
-      <div class="page-card">
-        <div class="page-card-title">История транзакций</div>
-        <table class="data-table" id="billing-table">
-          <thead><tr><th>ДАТА</th><th>ТИП</th><th>СУММА USD</th><th>БАЛАНС ПОСЛЕ</th><th>КОММЕНТАРИЙ</th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="empty-state" id="billing-empty" style="display:none">Транзакций пока нет.</div>
+      <!-- Main: история -->
+      <div class="modal9-window glass3d">
+        <div class="modal9-content">
+          <div class="history-list" id="billing-list"></div>
+          <div class="page-empty-state" id="billing-empty" style="display:none">Транзакций пока нет.</div>
+
+          <template id="billing-row-template">
+            <div class="history-item">
+              <div class="input-container"><input type="text" data-bf="date" class="styled_input_bar" readonly style="width:160px; text-align:center;" placeholder=" "><label class="input-label">дата</label></div>
+              <div class="input-container"><input type="text" data-bf="kind" class="styled_input_bar" readonly style="width:180px; text-transform:uppercase; text-align:center;" placeholder=" "><label class="input-label">тип</label></div>
+              <div class="input-container"><input type="text" data-bf="amount" class="styled_input_bar" readonly style="width:140px; text-align:right; font-variant-numeric:tabular-nums;" placeholder=" "><label class="input-label">сумма USD</label></div>
+              <div class="input-container"><input type="text" data-bf="balance" class="styled_input_bar" readonly style="width:140px; text-align:right; font-variant-numeric:tabular-nums;" placeholder=" "><label class="input-label">баланс после</label></div>
+              <div class="input-container" style="flex:1; min-width:200px;"><input type="text" data-bf="notes" class="styled_input_bar" readonly style="width:100%;" placeholder=" "><label class="input-label">комментарий</label></div>
+            </div>
+          </template>
+        </div>
       </div>
     </div>
   </div>
@@ -1079,6 +1133,7 @@ async function refreshState() {
 }
 
 function renderUserHeader() {
+  applyAdminVisibility();
   const name = state.profile?.full_name || state.user?.email || "";
   $("header-name").textContent = name;
   $("menu-name").textContent = name;
@@ -1481,8 +1536,8 @@ if (slide1) {
           setPick("model_name", pk.model_name);
           setPick("qty", pk.qty);
           setPick("unit", pk.unit);
-          setPick("price", pk.price ? formatNumeric(pk.price) + " ₽" : "");
-          setPick("sum", pk.sum ? formatNumeric(pk.sum) + " ₽" : "");
+          setPick("price", pk.price ? formatNumeric(pk.price) : "");
+          setPick("sum", pk.sum ? formatNumeric(pk.sum) : "");
           slide2.appendChild(bf);
         });
       } else {
@@ -1500,7 +1555,7 @@ if (slide1) {
             const p = bf.querySelector(`[data-offer="${n}-price"]`);
             const s = bf.querySelector(`[data-offer="${n}-store"]`);
             const u = bf.querySelector(`[data-offer="${n}-url"]`);
-            if (p) p.value = amt ? `${formatNumeric(amt)}${curr ? ' ' + curr : ''}` : "";
+            if (p) p.value = amt ? formatNumeric(amt) : "";
             if (s) s.value = store || "";
             if (u) {
               if (url) { u.href = url; u.style.opacity = "1"; u.style.pointerEvents = "auto"; }
@@ -2001,6 +2056,9 @@ function wireUI() {
   // ============================================================
   // Page switcher
   // ============================================================
+  // ============================================================
+  // Page switcher
+  // ============================================================
   document.querySelectorAll(".page-switcher-btn").forEach(btn => {
     btn.addEventListener("click", e => {
       e.stopPropagation();
@@ -2008,61 +2066,186 @@ function wireUI() {
       setActivePage(pageId);
     });
   });
+
+  // Кнопка «добавить пользователя» на странице Members
+  $("btn-invite-member")?.addEventListener("click", e => {
+    e.stopPropagation();
+    startInviteMember();
+  });
 }
 
   // ============================================================
 // PAGES / NAVIGATION
 // ============================================================
 function setActivePage(pageId) {
+  // Защита: если страница доступна только админу — не пускаем member'а
+  const myRole = state.groups.find(g => g.id === state.groupId)?.role || "member";
+  const canManage = myRole === "owner" || myRole === "admin";
+  if (!canManage && (pageId === "members" || pageId === "billing")) {
+    pageId = "specs";
+  }
   document.querySelectorAll(".page-switcher-btn").forEach(b => {
     b.classList.toggle("active", b.dataset.page === pageId);
   });
   document.querySelectorAll(".app-page").forEach(p => {
     p.classList.toggle("active", p.id === `page-${pageId}`);
   });
-  // Lazy-загрузка
   if (pageId === "members") loadMembersPage();
   else if (pageId === "billing") loadBillingPage();
 }
 
+function applyAdminVisibility() {
+  const myRole = state.groups.find(g => g.id === state.groupId)?.role || "member";
+  const canManage = myRole === "owner" || myRole === "admin";
+  const sw = $("page-switcher");
+  if (sw) sw.classList.toggle("hidden", !canManage);
+  // Если не админ и сейчас открыта members/billing — сбросить на specs
+  const active = document.querySelector(".page-switcher-btn.active")?.dataset.page;
+  if (!canManage && (active === "members" || active === "billing")) {
+    setActivePage("specs");
+  }
+}
+
 async function loadMembersPage() {
   if (!state.groupId) return;
-  const tbody = document.querySelector("#members-table tbody");
+  const list = $("members-list");
   const emptyEl = $("members-empty");
-  tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Загрузка...</td></tr>';
+  if (!list) return;
+  list.innerHTML = '<div class="page-empty-state">Загрузка…</div>';
 
   const { data, error } = await supabase
     .from("group_members")
-    .select("id, role, joined_at, invited_at, invited_email, user_id, profile:profiles!group_members_user_id_fkey(email, full_name)")
+    .select("id, role, joined_at, invited_at, invited_email, is_blocked, user_id, profile:profiles!group_members_user_id_fkey(email, full_name)")
     .eq("group_id", state.groupId)
     .order("role", { ascending: true });
 
   if (error) {
-    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Ошибка: ${escapeHtml(error.message)}</td></tr>`;
+    list.innerHTML = `<div class="page-empty-state">Ошибка: ${escapeHtml(error.message)}</div>`;
     return;
   }
-  if (!data?.length) {
-    tbody.innerHTML = "";
-    emptyEl.style.display = "block";
-    return;
-  }
+  list.innerHTML = "";
+  if (!data?.length) { emptyEl.style.display = "block"; return; }
   emptyEl.style.display = "none";
 
   const myRole = state.groups.find(g => g.id === state.groupId)?.role || "member";
   const canManage = myRole === "owner" || myRole === "admin";
 
-  tbody.innerHTML = data.map(m => {
-    const email = m.profile?.email || m.invited_email || "—";
-    const name = m.profile?.full_name || "—";
-    const role = m.role || "member";
-    const status = m.joined_at ? "активен" : (m.invited_at ? "приглашён" : "—");
-    const joined = m.joined_at ? fmtDate(m.joined_at) : "—";
-    const rolePill = `<span class="role-pill role-${role}">${role}</span>`;
-    const actions = canManage && role !== "owner"
-      ? `<div class="row-actions"><button class="danger" data-action="remove" data-id="${m.id}" disabled title="Доступно на следующем этапе">Удалить</button><button data-action="block" data-id="${m.id}" disabled title="Доступно на следующем этапе">Блок.</button></div>`
-      : "";
-    return `<tr><td>${escapeHtml(email)}</td><td>${escapeHtml(name)}</td><td>${rolePill}</td><td>${escapeHtml(status)}</td><td>${escapeHtml(joined)}</td><td>${actions}</td></tr>`;
-  }).join("");
+  data.forEach(m => list.appendChild(buildMemberRow(m, canManage)));
+}
+
+function buildMemberRow(m, canManage) {
+  const tpl = $("member-row-template").content.cloneNode(true);
+  const row = tpl.querySelector(".member-item");
+  row.dataset.memberId = m.id;
+  if (m.is_blocked) row.classList.add("is-blocked");
+
+  const email = m.profile?.email || m.invited_email || "—";
+  const name  = m.profile?.full_name || "—";
+  const role  = m.role || "member";
+  const status = m.is_blocked ? "заблокирован" : (m.joined_at ? "активен" : (m.invited_at ? "приглашён" : "—"));
+  const joined = m.joined_at ? fmtDate(m.joined_at) : "—";
+
+  const setF = (f, v) => { const el = row.querySelector(`[data-mf="${f}"]`); if (!el) return; if (el.tagName === "INPUT") el.value = v; else el.textContent = v; };
+  setF("email", email);
+  setF("name", name);
+  setF("role", role.toUpperCase());
+  setF("status", status);
+  setF("joined", joined);
+
+  const rolePill = row.querySelector('[data-mf="role"]');
+  rolePill.classList.add(role);
+
+  // Кнопки действий
+  const btnBlock = row.querySelector('[data-action="block"]');
+  const btnRemove = row.querySelector('[data-action="remove"]');
+  const isSelf = m.user_id && m.user_id === state.user?.id;
+  const isOwner = role === "owner";
+
+  if (!canManage || isOwner || isSelf) {
+    btnBlock?.remove(); btnRemove?.remove();
+  } else {
+    // Состояние кнопки block
+    if (m.is_blocked) {
+      btnBlock.title = "Разблокировать";
+      btnBlock.classList.add("success");
+      btnBlock.querySelector(".material-symbols-outlined").textContent = "lock_open";
+    }
+    btnBlock.addEventListener("click", e => { e.stopPropagation(); handleMemberBlock(m.id, !m.is_blocked, email); });
+    btnRemove.addEventListener("click", e => { e.stopPropagation(); handleMemberRemove(m.id, email); });
+  }
+  return row;
+}
+
+function startInviteMember() {
+  const list = $("members-list");
+  if (!list) return;
+  if (list.querySelector(".member-invite-row")) {
+    list.querySelector('[data-mf="invite-email"]')?.focus();
+    return;
+  }
+  const tpl = $("member-invite-template").content.cloneNode(true);
+  const row = tpl.querySelector(".member-item");
+  row.classList.add("member-invite-row");
+
+  const input = row.querySelector('[data-mf="invite-email"]');
+  const btnSave = row.querySelector('[data-action="save"]');
+  const btnCancel = row.querySelector('[data-action="cancel"]');
+
+  const cancel = () => row.remove();
+  const save = async () => {
+    const email = (input.value || "").trim();
+    if (!email) { toast("Введите email", "error"); input.focus(); return; }
+    btnSave.disabled = true; btnCancel.disabled = true;
+    try {
+      const { error } = await supabase.rpc("invite_member", { p_group_id: state.groupId, p_email: email, p_role: "member" });
+      if (error) throw error;
+      toast(`Приглашение отправлено: ${email}`, "success");
+      row.remove();
+      await loadMembersPage();
+    } catch (err) {
+      const msg = err?.message || String(err);
+      const human = msg.includes("already_member") ? "Этот email уже в группе"
+                  : msg.includes("email_required") ? "Email обязателен"
+                  : msg.includes("only_owner_or_admin") ? "Нет прав на приглашения"
+                  : msg;
+      toast("Ошибка: " + human, "error", 6000);
+      btnSave.disabled = false; btnCancel.disabled = false;
+    }
+  };
+
+  btnSave.addEventListener("click", e => { e.stopPropagation(); save(); });
+  btnCancel.addEventListener("click", e => { e.stopPropagation(); cancel(); });
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); save(); }
+    else if (e.key === "Escape") { e.preventDefault(); cancel(); }
+  });
+
+  list.insertBefore(tpl, list.firstChild);
+  setTimeout(() => input.focus(), 50);
+}
+
+async function handleMemberBlock(memberId, block, email) {
+  try {
+    const { error } = await supabase.rpc("block_member", { p_member_id: memberId, p_block: block });
+    if (error) throw error;
+    toast(block ? `Заблокирован: ${email}` : `Разблокирован: ${email}`, "success");
+    await loadMembersPage();
+  } catch (err) {
+    toast("Ошибка: " + (err.message || err), "error", 6000);
+  }
+}
+
+async function handleMemberRemove(memberId, email) {
+  if (!confirm(`Удалить пользователя ${email} из группы?\nВсе его загруженные ТЗ перейдут на владельца группы.`)) return;
+  try {
+    const { error } = await supabase.rpc("remove_member", { p_member_id: memberId });
+    if (error) throw error;
+    toast(`Удалён: ${email}`, "success");
+    await loadMembersPage();
+    await loadHistory();
+  } catch (err) {
+    toast("Ошибка: " + (err.message || err), "error", 6000);
+  }
 }
 
 async function loadBillingPage() {
@@ -2071,49 +2254,124 @@ async function loadBillingPage() {
   // Баланс
   const { data: bal } = await supabase.from("billing_balance").select("*").eq("group_id", state.groupId).maybeSingle();
   $("billing-balance").textContent = bal?.balance_usd != null ? "$" + ceilToFixed(bal.balance_usd, 2) : "—";
-  $("billing-balance-updated").textContent = bal?.updated_at ? fmtDate(bal.updated_at) : "—";
 
   // Тарифные настройки
-  const { data: settings } = await supabase.from("app_settings").select("monthly_user_price_usd, markup_pct, upload_threshold_usd").eq("id", 1).maybeSingle();
-  if (settings) {
-    $("billing-user-price").textContent = settings.monthly_user_price_usd ? "$" + parseFloat(settings.monthly_user_price_usd).toFixed(2) : "—";
-    $("billing-markup").textContent = settings.markup_pct ? parseFloat(settings.markup_pct).toFixed(1) + " %" : "—";
-    $("billing-threshold").textContent = settings.upload_threshold_usd ? "$" + parseFloat(settings.upload_threshold_usd).toFixed(2) : "—";
-  }
+  const { data: settings } = await supabase.from("app_settings").select("monthly_user_price_usd").eq("id", 1).maybeSingle();
+  const userPrice = settings?.monthly_user_price_usd ? parseFloat(settings.monthly_user_price_usd) : null;
+  $("billing-user-price").textContent = userPrice != null ? "$" + userPrice.toFixed(2) : "—";
 
-  // Транзакции
-  const tbody = document.querySelector("#billing-table tbody");
+  // Количество активных участников (включая admin/owner, исключая заблокированных)
+  const { count: membersCount } = await supabase
+    .from("group_members")
+    .select("id", { count: "exact", head: true })
+    .eq("group_id", state.groupId)
+    .eq("is_blocked", false);
+  $("billing-members-count").textContent = membersCount != null ? String(membersCount) : "—";
+
+  // Итог за подписку = users × price
+  const subTotal = (userPrice != null && membersCount != null) ? (userPrice * membersCount) : null;
+  $("billing-subscription-total").textContent = subTotal != null ? "$" + subTotal.toFixed(2) : "—";
+
+  // История транзакций
+  const list = $("billing-list");
   const emptyEl = $("billing-empty");
-  const { data: txns, error: txnErr } = await supabase
+  list.innerHTML = '<div class="page-empty-state">Загрузка…</div>';
+
+  const { data: txns, error } = await supabase
     .from("billing_transactions")
     .select("id, amount_usd, kind, balance_after_usd, notes, created_at")
     .eq("group_id", state.groupId)
     .order("created_at", { ascending: false })
-    .limit(50);
-  if (txnErr) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">Ошибка: ${escapeHtml(txnErr.message)}</td></tr>`;
+    .limit(300);
+
+  if (error) {
+    list.innerHTML = `<div class="page-empty-state">Ошибка: ${escapeHtml(error.message)}</div>`;
     return;
   }
-  if (!txns?.length) {
-    tbody.innerHTML = "";
-    emptyEl.style.display = "block";
-    return;
-  }
+  list.innerHTML = "";
+  if (!txns?.length) { emptyEl.style.display = "block"; return; }
   emptyEl.style.display = "none";
 
-  const kindLabels = { payment: "пополнение", subscription: "подписка", ai_request: "AI-запрос", manual_adjustment: "ручная корр.", refund: "возврат" };
-  tbody.innerHTML = txns.map(t => {
-    const amt = parseFloat(t.amount_usd);
-    const amtStr = (amt >= 0 ? "+" : "") + "$" + amt.toFixed(4);
-    const color = amt >= 0 ? "var(--success)" : "var(--error)";
-    return `<tr>
-      <td>${escapeHtml(fmtDate(t.created_at))}</td>
-      <td>${escapeHtml(kindLabels[t.kind] || t.kind || "—")}</td>
-      <td style="color:${color}; font-variant-numeric:tabular-nums;">${amtStr}</td>
-      <td style="font-variant-numeric:tabular-nums;">$${parseFloat(t.balance_after_usd ?? 0).toFixed(2)}</td>
-      <td style="color:var(--fg-muted); font-size:12px;">${escapeHtml(t.notes || "")}</td>
-    </tr>`;
-  }).join("");
+  // Агрегация: AI-запросы сворачиваются в одну строку на каждый календарный день.
+  // Все остальные виды (payment, subscription, manual_adjustment, refund) — отдельными строками.
+  const aggregated = [];
+  const aiByDay = new Map(); // dateKey → { sum, lastDate, lastBalance, count }
+
+  for (const t of txns) {
+    const isAi = t.kind === "ai_request";
+    if (!isAi) {
+      aggregated.push({
+        date: new Date(t.created_at),
+        kind: t.kind,
+        amount: parseFloat(t.amount_usd) || 0,
+        balance: parseFloat(t.balance_after_usd) || 0,
+        notes: t.notes || "",
+        isGroup: false,
+      });
+      continue;
+    }
+    const d = new Date(t.created_at);
+    const dayKey = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    const acc = aiByDay.get(dayKey);
+    if (!acc) {
+      aiByDay.set(dayKey, {
+        date: d,                                  // самая поздняя транзакция дня (txns отсортированы DESC)
+        lastBalance: parseFloat(t.balance_after_usd) || 0,
+        sum: parseFloat(t.amount_usd) || 0,
+        count: 1,
+      });
+    } else {
+      acc.sum += parseFloat(t.amount_usd) || 0;
+      acc.count += 1;
+    }
+  }
+  // Конвертируем агрегаты в записи
+  for (const [, acc] of aiByDay) {
+    aggregated.push({
+      date: acc.date,
+      kind: "ai_request",
+      amount: acc.sum,
+      balance: acc.lastBalance,
+      notes: `${acc.count} AI-запросов за день`,
+      isGroup: true,
+    });
+  }
+  // Сортируем результат по дате DESC
+  aggregated.sort((a, b) => b.date - a.date);
+
+  const tpl = $("billing-row-template");
+  const kindLabels = {
+    payment: "пополнение",
+    subscription: "подписка",
+    ai_request: "AI-расход за день",
+    manual_adjustment: "ручная корр.",
+    refund: "возврат",
+  };
+
+  const fmtDay = (d) => {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    return `${dd}.${mm}.${d.getFullYear()}`;
+  };
+
+  aggregated.forEach(item => {
+    const frag = tpl.content.cloneNode(true);
+    const row = frag.querySelector(".history-item");
+    const set = (f, v) => { const el = row.querySelector(`[data-bf="${f}"]`); if (el) el.value = v; };
+    // Для AI-расходов показываем только дату, для остальных — дату+время
+    set("date", item.isGroup ? fmtDay(item.date) : fmtDate(item.date));
+    set("kind", kindLabels[item.kind] || item.kind);
+    const sign = item.amount >= 0 ? "+" : "";
+    set("amount", sign + "$" + item.amount.toFixed(item.isGroup ? 4 : 2));
+    set("balance", "$" + item.balance.toFixed(2));
+    set("notes", item.notes);
+
+    // Цвет суммы
+    const amtEl = row.querySelector('[data-bf="amount"]');
+    if (amtEl) amtEl.style.color = item.amount >= 0 ? "var(--success)" : "var(--error)";
+
+    list.appendChild(frag);
+  });
 }
 
 // ============================================================
