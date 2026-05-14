@@ -364,6 +364,38 @@
   transition: transform 0.25s;
 }
 .confirm-overlay.visible .confirm-modal { transform: none; }
+    
+    /* Запись режима подбора */
+    .mode-item { display: flex; flex-direction: row; padding: 5px 8px; gap: 6px; align-items: center; transition: background 0.2s; border-radius: 6px; }
+    .mode-item:hover { background: var(--bg-alt); }
+    .mode-item.is-system { opacity: 0.85; }
+    .mode-item .switch { flex-shrink: 0; margin-right: 4px; }
+    .mode-creator-pill { display: inline-flex; align-items: center; padding: 4px 10px; height: 32px; box-sizing: border-box; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; background: var(--bg); border: 1px solid var(--line); color: var(--fg-secondary); white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+    .mode-creator-pill.system { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+    /* Развёрнутая форма создания/редактирования мода */
+    .mode-form-container { padding: 14px 8px; background: var(--bg-alt); border: 1px solid var(--line); border-radius: 10px; margin: 6px 0; display: flex; flex-direction: column; gap: 10px; }
+    .mode-form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .mode-form-row .input-container { flex: 1; min-width: 200px; }
+    .mode-form-row .input-container.full { flex: 1 1 100%; }
+    .mode-form textarea {
+      width: 100%; min-height: 70px; padding: 10px 12px;
+      font: inherit; font-size: 13px;
+      border: 1px solid var(--line); border-radius: 8px;
+      background: var(--bg); color: var(--fg); outline: none;
+      resize: vertical; transition: border-color 0.2s;
+      font-family: inherit;
+    }
+    .mode-form textarea:focus { border-color: var(--accent); }
+    .mode-form .field-label { font-size: 11px; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 4px; display: block; }
+    .mode-form-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .mode-form-actions .btn-save { background: var(--accent); color: var(--bg); border: none; padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .mode-form-actions .btn-save:hover { background: var(--accent-hover); }
+    .mode-form-actions .btn-save:disabled { opacity: 0.6; cursor: default; }
+    .mode-form-actions .btn-cancel { background: var(--bg); color: var(--fg-secondary); border: 1px solid var(--line); padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .mode-form-actions .btn-cancel:hover { background: var(--bg-card); color: var(--fg); }
+    .mode-form-hint { font-size: 11px; color: var(--fg-muted); }
+    
 .confirm-modal h3 {
   font-size: 15px; font-weight: 700; margin-bottom: 14px;
   text-transform: uppercase; letter-spacing: 0.02em;
@@ -500,16 +532,20 @@
 
       <!-- Center zone -->
       <div class="header-zone-center">
-        <div class="page-switcher hidden" id="page-switcher">
+        <div class="page-switcher" id="page-switcher">
           <button class="page-switcher-btn active" data-page="specs">
             <span class="material-symbols-outlined">inventory_2</span>
             <span>Подбор</span>
           </button>
-          <button class="page-switcher-btn" data-page="members">
+          <button class="page-switcher-btn" data-page="modes">
+            <span class="material-symbols-outlined">tune</span>
+            <span>Моды подбора</span>
+          </button>
+          <button class="page-switcher-btn admin-only" data-page="members">
             <span class="material-symbols-outlined">group</span>
             <span>Пользователи</span>
           </button>
-          <button class="page-switcher-btn" data-page="billing">
+          <button class="page-switcher-btn admin-only" data-page="billing">
             <span class="material-symbols-outlined">payments</span>
             <span>Биллинг</span>
           </button>
@@ -757,8 +793,75 @@
   <!-- /#page-specs -->
 
   <!-- ============================================
-       PAGE: MEMBERS (пользователи группы)
+       PAGE: MODES (моды подбора)
        ============================================ -->
+  <div id="page-modes" class="app-page">
+    <div class="page-shell spec-modal visible">
+      <!-- Top: действия -->
+      <div class="modal9-top-window glass3d">
+        <div class="modal9-top-body">
+          <button type="button" class="upload-btn-main" id="btn-create-mode">
+            <span class="material-symbols-outlined" style="font-size:18px;">add</span>
+            <span class="button-text">создать мод подбора</span>
+          </button>
+          <div style="flex:1;"></div>
+          <div style="font-size:11px; color:var(--fg-muted); text-align:right; max-width:340px;">
+            Системные моды (отмечены меткой) могут быть только активированы. Свои моды можно редактировать и удалять.
+          </div>
+        </div>
+      </div>
+      <!-- Main: список модов -->
+      <div class="modal9-window glass3d">
+        <div class="modal9-content">
+          <div class="history-list" id="modes-list"></div>
+          <div class="page-empty-state" id="modes-empty" style="display:none">Модов ещё нет.</div>
+
+          <template id="mode-row-template">
+            <div class="history-item mode-item">
+              <label class="switch" title="Активировать для своих файлов">
+                <input type="checkbox" data-mode-toggle>
+                <span class="toggle-slider"></span>
+              </label>
+              <div class="input-container"><input type="text" data-mf="code" class="styled_input_bar" readonly style="width:140px; text-transform:uppercase; text-align:center;" placeholder=" "><label class="input-label">код</label></div>
+              <div class="input-container"><input type="text" data-mf="title" class="styled_input_bar" readonly style="width:280px;" placeholder=" "><label class="input-label">название</label></div>
+              <span class="mode-creator-pill" data-mf="creator">—</span>
+              <div style="flex:1;"></div>
+              <button type="button" class="member-action-btn" data-action="edit" title="Редактировать"><span class="material-symbols-outlined">edit</span></button>
+              <button type="button" class="member-action-btn danger" data-action="delete" title="Удалить"><span class="material-symbols-outlined">delete</span></button>
+            </div>
+          </template>
+
+          <template id="mode-form-template">
+            <div class="mode-form-container mode-form">
+              <div class="mode-form-row">
+                <div class="input-container"><input type="text" data-ff="code" class="styled_input_bar" placeholder=" " style="width:100%; text-transform:uppercase;"><label class="input-label">код (CODE)</label></div>
+                <div class="input-container" style="flex:2;"><input type="text" data-ff="title" class="styled_input_bar" placeholder=" " style="width:100%;"><label class="input-label">название</label></div>
+              </div>
+              <div>
+                <span class="field-label">инструкции (instructions)</span>
+                <textarea data-ff="instructions" rows="6" placeholder="что должен делать селектор: как искать, какие параметры важны, что предпочитать"></textarea>
+              </div>
+              <div>
+                <span class="field-label">запреты (bans)</span>
+                <textarea data-ff="bans" rows="3" placeholder="что недопустимо: аналоги, конкретные бренды, формфакторы"></textarea>
+              </div>
+              <div>
+                <span class="field-label">источники (по одному на строку)</span>
+                <textarea data-ff="sources" rows="4" placeholder="onlinetrade.ru&#10;citilink.ru&#10;dns-shop.ru"></textarea>
+              </div>
+              <div class="mode-form-actions">
+                <span class="mode-form-hint" data-ff="hint"></span>
+                <div style="flex:1;"></div>
+                <button type="button" class="btn-cancel" data-ff-action="cancel">Отмена</button>
+                <button type="button" class="btn-save" data-ff-action="save">Сохранить</button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <div id="page-members" class="app-page">
     <div class="page-shell spec-modal visible">
       <!-- Top: действия -->
@@ -1164,6 +1267,7 @@ function renderGroupSwitcher() {
       const activePage = document.querySelector(".page-switcher-btn.active")?.dataset.page;
       if (activePage === "members") loadMembersPage();
       else if (activePage === "billing") loadBillingPage();
+      else if (activePage === "modes") loadModesPage();
     });
   });
 }
@@ -2072,13 +2176,18 @@ function wireUI() {
     e.stopPropagation();
     startInviteMember();
   });
+
+  // Кнопка «создать мод подбора» на странице Modes
+  $("btn-create-mode")?.addEventListener("click", e => {
+    e.stopPropagation();
+    startCreateMode();
+  });
 }
 
   // ============================================================
 // PAGES / NAVIGATION
 // ============================================================
 function setActivePage(pageId) {
-  // Защита: если страница доступна только админу — не пускаем member'а
   const myRole = state.groups.find(g => g.id === state.groupId)?.role || "member";
   const canManage = myRole === "owner" || myRole === "admin";
   if (!canManage && (pageId === "members" || pageId === "billing")) {
@@ -2092,14 +2201,17 @@ function setActivePage(pageId) {
   });
   if (pageId === "members") loadMembersPage();
   else if (pageId === "billing") loadBillingPage();
+  else if (pageId === "modes") loadModesPage();
 }
 
 function applyAdminVisibility() {
   const myRole = state.groups.find(g => g.id === state.groupId)?.role || "member";
   const canManage = myRole === "owner" || myRole === "admin";
   const sw = $("page-switcher");
-  if (sw) sw.classList.toggle("hidden", !canManage);
-  // Если не админ и сейчас открыта members/billing — сбросить на specs
+  if (sw) sw.classList.remove("hidden");
+  document.querySelectorAll(".page-switcher-btn.admin-only").forEach(btn => {
+    btn.style.display = canManage ? "" : "none";
+  });
   const active = document.querySelector(".page-switcher-btn.active")?.dataset.page;
   if (!canManage && (active === "members" || active === "billing")) {
     setActivePage("specs");
@@ -2243,6 +2355,201 @@ async function handleMemberRemove(memberId, email) {
     toast(`Удалён: ${email}`, "success");
     await loadMembersPage();
     await loadHistory();
+  } catch (err) {
+    toast("Ошибка: " + (err.message || err), "error", 6000);
+  }
+}
+
+  // ============================================================
+// MODES PAGE
+// ============================================================
+async function loadModesPage() {
+  if (!state.groupId) return;
+  const list = $("modes-list");
+  const emptyEl = $("modes-empty");
+  if (!list) return;
+  list.innerHTML = '<div class="page-empty-state">Загрузка…</div>';
+
+  // Параллельно: моды (system + group) и активные у текущего пользователя
+  const [modesRes, activeRes] = await Promise.all([
+    supabase
+      .from("selector_modes")
+      .select("id, group_id, is_system_template, code, title, category, instructions, bans, sources, created_by, created_at, author:profiles!selector_modes_created_by_fkey(email, full_name)")
+      .or(`is_system_template.eq.true,group_id.eq.${state.groupId}`)
+      .order("is_system_template", { ascending: false })
+      .order("code", { ascending: true }),
+    supabase
+      .from("user_active_modes")
+      .select("mode_id, enabled")
+      .eq("user_id", state.user.id)
+      .eq("group_id", state.groupId),
+  ]);
+
+  if (modesRes.error) {
+    list.innerHTML = `<div class="page-empty-state">Ошибка: ${escapeHtml(modesRes.error.message)}</div>`;
+    return;
+  }
+  const modes = modesRes.data || [];
+  const activeMap = new Map();
+  (activeRes.data || []).forEach(r => activeMap.set(r.mode_id, r.enabled !== false));
+
+  list.innerHTML = "";
+  if (!modes.length) { emptyEl.style.display = "block"; return; }
+  emptyEl.style.display = "none";
+
+  modes.forEach(m => list.appendChild(buildModeRow(m, activeMap.get(m.id) === true)));
+}
+
+function buildModeRow(mode, isActive) {
+  const tpl = $("mode-row-template").content.cloneNode(true);
+  const row = tpl.querySelector(".mode-item");
+  row.dataset.modeId = mode.id;
+  if (mode.is_system_template) row.classList.add("is-system");
+
+  const setF = (f, v) => {
+    const el = row.querySelector(`[data-mf="${f}"]`);
+    if (!el) return;
+    if (el.tagName === "INPUT") el.value = v; else el.textContent = v;
+  };
+  setF("code", mode.code || "—");
+  setF("title", mode.title || "—");
+
+  const creatorPill = row.querySelector('[data-mf="creator"]');
+  if (mode.is_system_template) {
+    creatorPill.textContent = "СИСТЕМНЫЙ";
+    creatorPill.classList.add("system");
+  } else {
+    const creator = mode.author?.full_name || mode.author?.email || "—";
+    creatorPill.textContent = creator;
+  }
+
+  // Тогл активности (для текущего пользователя)
+  const toggle = row.querySelector("[data-mode-toggle]");
+  toggle.checked = !!isActive;
+  toggle.addEventListener("change", e => {
+    e.stopPropagation();
+    toggleModeActive(mode.id, e.target.checked, toggle);
+  });
+
+  // Кнопки edit/delete — только для своих модов
+  const isMine = !mode.is_system_template && mode.created_by === state.user?.id;
+  const btnEdit = row.querySelector('[data-action="edit"]');
+  const btnDelete = row.querySelector('[data-action="delete"]');
+  if (!isMine) {
+    btnEdit?.remove();
+    btnDelete?.remove();
+  } else {
+    btnEdit.addEventListener("click", e => { e.stopPropagation(); startEditMode(mode); });
+    btnDelete.addEventListener("click", e => { e.stopPropagation(); deleteModeAction(mode); });
+  }
+  return row;
+}
+
+async function toggleModeActive(modeId, enabled, toggleEl) {
+  try {
+    const payload = { user_id: state.user.id, mode_id: modeId, group_id: state.groupId, enabled };
+    const { error } = await supabase
+      .from("user_active_modes")
+      .upsert(payload, { onConflict: "user_id,mode_id" });
+    if (error) throw error;
+  } catch (err) {
+    toast("Ошибка: " + (err.message || err), "error", 6000);
+    if (toggleEl) toggleEl.checked = !enabled; // откатить визуально
+  }
+}
+
+function startCreateMode() {
+  const list = $("modes-list");
+  if (!list) return;
+  // Уже открытую форму не дублируем
+  if (list.querySelector(".mode-form-container[data-form-mode='create']")) {
+    list.querySelector(".mode-form-container[data-form-mode='create'] [data-ff='code']")?.focus();
+    return;
+  }
+  const formEl = createModeFormElement(null);
+  formEl.dataset.formMode = "create";
+  list.insertBefore(formEl, list.firstChild);
+  setTimeout(() => formEl.querySelector('[data-ff="code"]')?.focus(), 50);
+}
+
+function startEditMode(mode) {
+  const list = $("modes-list");
+  if (!list) return;
+  const existingRow = list.querySelector(`.mode-item[data-mode-id="${mode.id}"]`);
+  if (!existingRow) return;
+  const formEl = createModeFormElement(mode);
+  formEl.dataset.formMode = "edit";
+  formEl.dataset.modeId = mode.id;
+  list.replaceChild(formEl, existingRow);
+  setTimeout(() => formEl.querySelector('[data-ff="code"]')?.focus(), 50);
+}
+
+function createModeFormElement(mode) {
+  const tpl = $("mode-form-template").content.cloneNode(true);
+  const formEl = tpl.querySelector(".mode-form-container");
+
+  if (mode) {
+    formEl.querySelector('[data-ff="code"]').value = mode.code || "";
+    formEl.querySelector('[data-ff="title"]').value = mode.title || "";
+    formEl.querySelector('[data-ff="instructions"]').value = mode.instructions || "";
+    formEl.querySelector('[data-ff="bans"]').value = mode.bans || "";
+    formEl.querySelector('[data-ff="sources"]').value = (mode.sources || []).join("\n");
+  }
+
+  const btnSave = formEl.querySelector('[data-ff-action="save"]');
+  const btnCancel = formEl.querySelector('[data-ff-action="cancel"]');
+  const hintEl = formEl.querySelector('[data-ff="hint"]');
+
+  btnCancel.addEventListener("click", e => { e.stopPropagation(); loadModesPage(); });
+  btnSave.addEventListener("click", async e => {
+    e.stopPropagation();
+    const code = formEl.querySelector('[data-ff="code"]').value.trim();
+    const title = formEl.querySelector('[data-ff="title"]').value.trim();
+    const instructions = formEl.querySelector('[data-ff="instructions"]').value.trim();
+    const bans = formEl.querySelector('[data-ff="bans"]').value.trim();
+    const sources = formEl.querySelector('[data-ff="sources"]').value
+      .split("\n").map(s => s.trim()).filter(Boolean);
+
+    if (!code) { hintEl.textContent = "Код обязателен"; return; }
+    if (!title) { hintEl.textContent = "Название обязательно"; return; }
+    if (!instructions) { hintEl.textContent = "Инструкции обязательны"; return; }
+
+    btnSave.disabled = true; btnCancel.disabled = true; hintEl.textContent = "Сохранение…";
+    try {
+      const { error } = await supabase.rpc("upsert_mode", {
+        p_group_id: state.groupId,
+        p_mode_id: mode?.id || null,
+        p_code: code,
+        p_title: title,
+        p_instructions: instructions,
+        p_bans: bans || null,
+        p_sources: sources,
+      });
+      if (error) throw error;
+      toast(mode ? "Мод обновлён" : "Мод создан", "success");
+      await loadModesPage();
+    } catch (err) {
+      const msg = err?.message || String(err);
+      const human = msg.includes("not_a_member") ? "Вы не участник группы"
+                  : msg.includes("not_mode_author") ? "Этот мод создан другим пользователем"
+                  : msg.includes("cannot_edit_system_template") ? "Системные шаблоны нельзя редактировать"
+                  : msg.includes("required") ? "Заполните обязательные поля"
+                  : msg;
+      hintEl.textContent = "Ошибка: " + human;
+      btnSave.disabled = false; btnCancel.disabled = false;
+    }
+  });
+
+  return formEl;
+}
+
+async function deleteModeAction(mode) {
+  if (!confirm(`Удалить мод "${mode.title}"?\nАктивации этого мода у всех пользователей будут сняты.`)) return;
+  try {
+    const { error } = await supabase.rpc("delete_mode", { p_mode_id: mode.id });
+    if (error) throw error;
+    toast("Мод удалён", "success");
+    await loadModesPage();
   } catch (err) {
     toast("Ошибка: " + (err.message || err), "error", 6000);
   }
