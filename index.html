@@ -522,10 +522,10 @@
         </div>
 
         <label class="switch">
-          <input type="checkbox" id="my-files-toggle">
-          <span class="toggle-slider"></span>
-        </label>
-        <span class="toggle-text" id="toggle-text">все файлы</span>
+  <input type="checkbox" id="my-files-toggle" checked>
+  <span class="toggle-slider"></span>
+</label>
+<span class="toggle-text" id="toggle-text">только мои файлы</span>
       </div>
     </div>
 
@@ -699,7 +699,6 @@ const PICK_TABLE = "spec_position_picks";
 const ALLOWED_EXTS = ["pdf","docx","xlsx","xls","txt","csv","rtf","doc","ods"];
 const HISTORY_LIMIT_DEFAULT = 30;
 const HISTORY_LIMIT_STEP = 30;
-const REALTIME_ROW_LIMIT = 8;
 const STORAGE_KEY_THEME = "ai-eq-theme";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -1021,18 +1020,51 @@ async function loadHistory(options = {}) {
   state.history.forEach(h => {
     state.lastStatuses[h.id] = { status_parser: h.status_parser, status_selector: h.status_selector, status_pricer: h.status_pricer };
   });
-  recomputeWatched();
   renderHistory(oldMap);
   updateLoadMoreVisibility();
   await loadSpecData();
+  // Сначала загружаем picks/positions, потом считаем watched и обновляем триплеты в строках
+  recomputeWatched();
+  state.history.forEach(h => updateRowTriples(h.id));
+}
+
+  // Считает по локальному state, сколько селектор/прайсер обработал
+function computeTriples(specId) {
+  const idStr = String(specId);
+  const positions = state.specGroups[idStr] || [];
+  const allPicks = positions.flatMap(p => state.picksByPos[p.id] || []);
+
+  // Селектор: total = позиций, received = позиций, у которых есть хоть один pick
+  const selTotal = positions.length;
+  const selReceived = positions.filter(p => (state.picksByPos[p.id] || []).length > 0).length;
+
+  // Прайсер: total = picks, received = picks с финальным статусом
+  const priTotal = allPicks.length;
+  const priReceived = allPicks.filter(pk => pk.pricer_status === 'done' || pk.pricer_status === 'error').length;
+
+  return { selTotal, selReceived, priTotal, priReceived };
+}
+
+// Файл "ещё в работе" — нужно подписываться на realtime
+function isPending(specId) {
+  const item = state.history.find(h => String(h.id) === String(specId));
+  if (!item) return false;
+  // Парсер ещё идёт или висит на черте
+  if (item.status_parser !== 'done' && item.status_parser !== 'error') return true;
+  if (item.status_parser === 'error') return false;
+  const t = computeTriples(specId);
+  if (t.selTotal === 0) return true;                       // парсер done, но позиций ещё нет
+  if (t.selReceived < t.selTotal) return true;             // селектор не завершён
+  if (t.priTotal > 0 && t.priReceived < t.priTotal) return true; // прайсер не завершён
+  return false;
 }
 
 function recomputeWatched() {
   state.watchedSpecIds.clear();
-  state.history.slice(0, REALTIME_ROW_LIMIT).forEach(h => state.watchedSpecIds.add(String(h.id)));
+  state.history.forEach(h => { if (isPending(h.id)) state.watchedSpecIds.add(String(h.id)); });
   if (state.openedSpecId) state.watchedSpecIds.add(String(state.openedSpecId));
 }
-
+  
 function updateLoadMoreVisibility() {
   const btn = $("history-load-more");
   if (!btn) return;
@@ -1057,19 +1089,28 @@ function applyStatusIcon(scope, field, value) {
   icon.style.textShadow = s.glow ? "0 0 8px rgba(16,185,129,.5)" : "none";
 }
 
+// Иконка по триплету (received/total), без оглядки на status_*-поле из БД
+function applyComputedStatusIcon(scope, field, received, total, errorFlag) {
+  const icon = scope.querySelector(`[data-status-icon="${field}"]`);
+  if (!icon) return;
+  let s;
+  if (errorFlag) s = { icon: 'error', color: 'var(--error)', glow: false };
+  else if (total === 0) s = { icon: 'clear_all', color: 'var(--fg-muted)', glow: false };
+  else if (received >= total) s = { icon: 'done_all', color: 'var(--success)', glow: true };
+  else s = { icon: 'autorenew', color: 'var(--warning)', glow: false };
+  icon.textContent = s.icon;
+  icon.style.color = s.color;
+  icon.style.textShadow = s.glow ? '0 0 8px rgba(16,185,129,.5)' : 'none';
+}
+
 const STATUS_LABELS = { "-": "—", "queued": "ОЧЕРЕДЬ", "in_progress": "В РАБОТЕ", "done": "ГОТОВО", "error": "ОШИБКА" };
 
 function renderHistory(oldMap = {}) {
   const list = $("history-list");
   const template = $("history-row-template");
-  const existing = new Map();
-  list.querySelectorAll(".history-item, .spec-container").forEach(el => {
-    const id = el.dataset.specId;
-    if (id) existing.set(id + (el.classList.contains("spec-container") ? "-cont" : ""), el);
-  });
-
   const processed = new Set();
   let anchor = list.firstChild;
+
   state.history.forEach(item => {
     const idStr = String(item.id);
     processed.add(idStr);
@@ -1082,7 +1123,7 @@ function renderHistory(oldMap = {}) {
       rowEl.addEventListener("click", () => toggleSpecOpen(item.id));
       rowEl.querySelectorAll("[data-field]").forEach(el => {
         el.addEventListener("click", e => {
-          if (el.dataset.field === "id") return; // handled by row click
+          if (el.dataset.field === "id") return;
           e.stopPropagation();
           navigator.clipboard.writeText(el.value || el.textContent || "");
           showCopyTip(el);
@@ -1092,22 +1133,39 @@ function renderHistory(oldMap = {}) {
       rowEl = list.querySelector(`.history-item[data-spec-id="${idStr}"]`);
     }
 
+    // Триплеты считаем локально для селектора и прайсера
+    const triples = computeTriples(item.id);
+
     rowEl.querySelectorAll("[data-field]").forEach(el => {
       const f = el.dataset.field;
       let v = item[f];
-      if (f === "created_at") v = fmtDate(item.created_at);
-      if (f === "cost") v = item.total_cost_usd_billed ? "$" + parseFloat(item.total_cost_usd_billed).toFixed(4) : "—";
-      if (f === "user_login") v = item.uploader?.full_name || item.uploader?.email || "—";
-      const display = (["status_parser","status_selector","status_pricer"].includes(f)) ? (STATUS_LABELS[v] || v || "—") : (v ?? "");
+      let display;
+
+      if (f === "created_at") { display = fmtDate(item.created_at); }
+      else if (f === "cost") { display = item.total_cost_usd_billed ? "$" + parseFloat(item.total_cost_usd_billed).toFixed(4) : "—"; }
+      else if (f === "user_login") { display = item.uploader?.full_name || item.uploader?.email || "—"; }
+      else if (f === "status_parser") { display = STATUS_LABELS[v] || v || "—"; }
+      else if (f === "status_selector") { display = triples.selTotal > 0 ? `${triples.selReceived} / ${triples.selTotal}` : "—"; }
+      else if (f === "status_pricer")  { display = triples.priTotal > 0 ? `${triples.priReceived} / ${triples.priTotal}` : "—"; }
+      else { display = (v ?? ""); }
+
       if (el.tagName === "INPUT") {
         if (el.value !== display) el.value = display;
-      } else if (el.textContent !== display) el.textContent = display;
-      if (["status_parser","status_selector","status_pricer"].includes(f)) {
+      } else if (el.textContent !== display) {
+        el.textContent = display;
+      }
+
+      // Иконки
+      if (f === "status_parser") {
         applyStatusIcon(rowEl, f, v);
         if (oldMap[item.id] && oldMap[item.id][f] !== v) {
           el.classList.add("fade");
           setTimeout(() => el.classList.remove("fade"), 500);
         }
+      } else if (f === "status_selector") {
+        applyComputedStatusIcon(rowEl, f, triples.selReceived, triples.selTotal, false);
+      } else if (f === "status_pricer") {
+        applyComputedStatusIcon(rowEl, f, triples.priReceived, triples.priTotal, false);
       }
     });
 
@@ -1117,7 +1175,7 @@ function renderHistory(oldMap = {}) {
     anchor = specContainer ? specContainer.nextSibling : rowEl.nextSibling;
   });
 
-  // Remove orphans
+  // Удалить осиротевшие
   list.querySelectorAll(".history-item").forEach(el => {
     if (!processed.has(el.dataset.specId)) {
       el.remove();
@@ -1344,6 +1402,28 @@ function setupSlideshow(container) {
   dots.forEach(d => d.addEventListener("click", () => show(parseInt(d.dataset.index))));
 }
 
+// Точечный апдейт одной строки истории: триплеты селектор/прайсер + прогресс-бар
+function updateRowTriples(specId) {
+  const rowEl = document.querySelector(`.history-item[data-spec-id="${specId}"]`);
+  if (!rowEl) return;
+  const t = computeTriples(specId);
+
+  const setTriple = (field, received, total) => {
+    const el = rowEl.querySelector(`[data-field="${field}"]`);
+    if (!el) return;
+    const newVal = total > 0 ? `${received} / ${total}` : '—';
+    if (el.value !== newVal) {
+      el.classList.add('fade');
+      setTimeout(() => { el.value = newVal; el.classList.remove('fade'); }, 200);
+    }
+    applyComputedStatusIcon(rowEl, field, received, total, false);
+  };
+  setTriple('status_selector', t.selReceived, t.selTotal);
+  setTriple('status_pricer',  t.priReceived, t.priTotal);
+
+  updateSpecProgress(specId);
+}
+
 // ============================================================
 // PROGRESS / RE-RUN STAGES
 // ============================================================
@@ -1351,19 +1431,21 @@ function updateSpecProgress(specId) {
   const idStr = String(specId);
   const item = state.history.find(h => String(h.id) === idStr);
   if (!item) return;
+  const t = computeTriples(idStr);
+
   document.querySelectorAll(`.spec-progress[data-spec-id="${idStr}"]`).forEach(el => {
     const steps = el.querySelectorAll(".step");
-    const apply = (step, status) => {
+    const apply = (step, isDone, isActive) => {
       const icon = step.querySelector(".status");
-      const done = status === "done";
-      const prog = status === "in_progress" || status === "queued";
-      if (done) { step.classList.add("active"); if (icon) icon.textContent = "done_all"; }
-      else if (prog) { step.classList.add("active"); if (icon) icon.textContent = "autorenew"; }
-      else { step.classList.remove("active"); if (icon) icon.textContent = "indeterminate_check_box"; }
+      if (isDone)      { step.classList.add("active");    if (icon) icon.textContent = "done_all"; }
+      else if (isActive){ step.classList.add("active");   if (icon) icon.textContent = "autorenew"; }
+      else              { step.classList.remove("active"); if (icon) icon.textContent = "indeterminate_check_box"; }
     };
-    apply(steps[0], item.status_parser);
-    apply(steps[1], item.status_selector);
-    apply(steps[2], item.status_pricer);
+    // Парсер — из БД (одиночное значение)
+    apply(steps[0], item.status_parser === "done", item.status_parser === "in_progress" || item.status_parser === "queued");
+    // Селектор и прайсер — из локального state
+    apply(steps[1], t.selTotal > 0 && t.selReceived >= t.selTotal, t.selTotal > 0 && t.selReceived < t.selTotal);
+    apply(steps[2], t.priTotal > 0 && t.priReceived >= t.priTotal, t.priTotal > 0 && t.priReceived < t.priTotal);
   });
 }
 
@@ -1600,15 +1682,57 @@ function setupRealtime() {
           loadHistory();
         }
       })
-    .on("postgres_changes", { event: "*", schema: "public", table: POS_TABLE },
+    .on("postgres_changes", { event: "*", schema: "public", table: POS_TABLE, filter: `group_id=eq.${state.groupId}` },
       (payload) => {
-        const id = payload.new?.spec_id ?? payload.old?.spec_id;
-        if (state.watchedSpecIds.has(String(id))) scheduleSpecReload(id);
+        const row = payload.new || payload.old;
+        if (!row) return;
+        const specId = String(row.spec_id);
+        if (!state.watchedSpecIds.has(specId)) return;
+
+        // Точечно обновляем state.specGroups
+        const arr = state.specGroups[specId] || (state.specGroups[specId] = []);
+        const idx = arr.findIndex(p => p.id === row.id);
+        if (payload.eventType === "DELETE") {
+          if (idx !== -1) arr.splice(idx, 1);
+          delete state.picksByPos[row.id];
+        } else if (idx === -1) {
+          arr.push(payload.new);
+        } else {
+          arr[idx] = { ...arr[idx], ...payload.new };
+        }
+
+        updateRowTriples(specId);
+        if (state.openedSpecId && String(state.openedSpecId) === specId) {
+          const content = document.querySelector(`.spec-container[data-spec-id="${specId}"] .spec-content`);
+          if (content) renderSpecContent(content, specId);
+        }
+        recomputeWatched();
       })
-    .on("postgres_changes", { event: "*", schema: "public", table: PICK_TABLE },
+    .on("postgres_changes", { event: "*", schema: "public", table: PICK_TABLE, filter: `group_id=eq.${state.groupId}` },
       (payload) => {
-        const id = payload.new?.spec_id ?? payload.old?.spec_id;
-        if (state.watchedSpecIds.has(String(id))) scheduleSpecReload(id);
+        const row = payload.new || payload.old;
+        if (!row) return;
+        const specId = String(row.spec_id);
+        if (!state.watchedSpecIds.has(specId)) return;
+
+        // Точечно обновляем state.picksByPos
+        const posId = row.pos_id;
+        const list = state.picksByPos[posId] || (state.picksByPos[posId] = []);
+        const idx = list.findIndex(p => p.id === row.id);
+        if (payload.eventType === "DELETE") {
+          if (idx !== -1) list.splice(idx, 1);
+        } else if (idx === -1) {
+          list.push(payload.new);
+        } else {
+          list[idx] = { ...list[idx], ...payload.new };
+        }
+
+        updateRowTriples(specId);
+        if (state.openedSpecId && String(state.openedSpecId) === specId) {
+          const content = document.querySelector(`.spec-container[data-spec-id="${specId}"] .spec-content`);
+          if (content) renderSpecContent(content, specId);
+        }
+        recomputeWatched();
       })
     .subscribe();
 }
@@ -1619,33 +1743,32 @@ function applyRealtimeRegistryUpdate(row) {
   if (idx === -1) return;
   state.history[idx] = { ...state.history[idx], ...row };
   state.lastStatuses[row.id] = { status_parser: row.status_parser, status_selector: row.status_selector, status_pricer: row.status_pricer };
+
   const rowEl = document.querySelector(`.history-item[data-spec-id="${row.id}"]`);
   if (!rowEl) return;
+
+  // Обновляем поля, КРОМЕ status_selector / status_pricer — их считает updateRowTriples
   rowEl.querySelectorAll("[data-field]").forEach(el => {
     const f = el.dataset.field;
-    if (f === "user_login") return; // join'а нет в realtime-payload, сохраняем текущее значение
+    if (f === "user_login") return;            // данных нет в realtime-payload
+    if (f === "status_selector" || f === "status_pricer") return; // переезжают в updateRowTriples
     let v = row[f];
-    if (f === "created_at") v = fmtDate(row.created_at);
-    if (f === "cost") v = row.total_cost_usd_billed ? "$" + parseFloat(row.total_cost_usd_billed).toFixed(4) : "—";
-    const display = (["status_parser","status_selector","status_pricer"].includes(f)) ? (STATUS_LABELS[v] || v || "—") : (v ?? "");
-    if (el.tagName === "INPUT" && el.value !== display) { el.classList.add("fade"); setTimeout(() => { el.value = display; el.classList.remove("fade"); }, 250); }
-    if (["status_parser","status_selector","status_pricer"].includes(f)) applyStatusIcon(rowEl, f, v);
-  });
-  updateSpecProgress(row.id);
-}
-
-function scheduleSpecReload(specId) {
-  const key = String(specId);
-  if (state.reloadTimers.has(key)) return;
-  const t = setTimeout(async () => {
-    state.reloadTimers.delete(key);
-    await loadSpecData();
-    if (state.openedSpecId === specId || String(state.openedSpecId) === key) {
-      const content = document.querySelector(`.spec-container[data-spec-id="${key}"] .spec-content`);
-      if (content) renderSpecContent(content, key);
+    let display;
+    if (f === "created_at") display = fmtDate(row.created_at);
+    else if (f === "cost") display = row.total_cost_usd_billed ? "$" + parseFloat(row.total_cost_usd_billed).toFixed(4) : "—";
+    else if (f === "status_parser") display = STATUS_LABELS[v] || v || "—";
+    else display = (v ?? "");
+    if (el.tagName === "INPUT" && el.value !== display) {
+      el.classList.add("fade");
+      setTimeout(() => { el.value = display; el.classList.remove("fade"); }, 250);
     }
-  }, 500);
-  state.reloadTimers.set(key, t);
+    if (f === "status_parser") applyStatusIcon(rowEl, f, v);
+  });
+
+  // Триплеты + прогресс-бар через единую точку
+  updateRowTriples(row.id);
+  // Файл мог "дозавершиться" — пересчитываем подписку
+  recomputeWatched();
 }
 
 // ============================================================
@@ -1712,9 +1835,9 @@ function wireUI() {
 
   // My files toggle
   $("my-files-toggle").addEventListener("change", e => {
-    $("toggle-text").textContent = e.target.checked ? "только мои файлы" : "все файлы";
-    loadHistory({ resetLimit: true });
-  });
+  $("toggle-text").textContent = e.target.checked ? "только мои файлы" : "все файлы группы";
+  loadHistory({ resetLimit: true });
+});
 
   // Load more
   $("history-load-more").addEventListener("click", async () => {
