@@ -1586,7 +1586,10 @@ function setupContextMenu() {
 // REALTIME
 // ============================================================
 function setupRealtime() {
-  if (state.realtimeSub) { try { state.realtimeSub.unsubscribe(); } catch {} state.realtimeSub = null; }
+  if (state.realtimeSub) {
+    try { supabase.removeChannel(state.realtimeSub); } catch (e) { console.warn("removeChannel:", e); }
+    state.realtimeSub = null;
+  }
   state.realtimeSub = supabase.channel("ai-eq-realtime")
     .on("postgres_changes", { event: "*", schema: "public", table: TABLE, filter: `group_id=eq.${state.groupId}` },
       (payload) => {
@@ -1766,15 +1769,61 @@ async function bootstrap() {
     }
   });
 
-  // DB connection check (только когда юзер залогинен)
+  // DB connection check (только когда юзер залогинен И вкладка активна)
   setInterval(async () => {
-    if (!state.user) {
+    if (!state.user || document.visibilityState !== "visible") {
       $("db-disconnect-overlay").classList.remove("show");
       return;
     }
     const { error } = await supabase.from(TABLE).select("id", { count: "exact", head: true }).limit(1);
     $("db-disconnect-overlay").classList.toggle("show", !!error);
   }, 15000);
+
+  // ============================================================
+  // WAKE-UP RECOVERY: visibility / online / focus
+  // ============================================================
+  let lastWake = 0;
+  const handleWake = async () => {
+    if (document.visibilityState !== "visible" || !state.user) return;
+    // debounce — события могут прилететь пачкой (visibility + focus + online)
+    const now = Date.now();
+    if (now - lastWake < 2000) return;
+    lastWake = now;
+
+    console.log("[wake] tab visible, reconnecting…");
+
+    // 1. Проверяем сессию — за время сна токен мог истечь
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.warn("[wake] session lost during sleep");
+        const { data, error } = await supabase.auth.refreshSession();
+        if (error || !data.session) {
+          toast("Сессия истекла, требуется повторный вход", "error", 6000);
+          await handleSignOut();
+          return;
+        }
+      }
+    } catch (err) { console.error("[wake] session check:", err); }
+
+    // 2. Пересоздаём Realtime-канал (мёртвый WS будет переразвёрнут начисто)
+    if (state.groupId) {
+      try { setupRealtime(); } catch (e) { console.error("[wake] setupRealtime:", e); }
+    }
+
+    // 3. Догоняем пропущенные апдейты
+    try { await loadHistory(); } catch (e) { console.error("[wake] loadHistory:", e); }
+
+    // 4. Триггерим проверку коннекта прямо сейчас
+    try {
+      const { error } = await supabase.from(TABLE).select("id", { count: "exact", head: true }).limit(1);
+      $("db-disconnect-overlay").classList.toggle("show", !!error);
+    } catch {}
+  };
+
+  document.addEventListener("visibilitychange", handleWake);
+  window.addEventListener("focus", handleWake);
+  window.addEventListener("online", handleWake);
 }
 
 document.addEventListener("DOMContentLoaded", bootstrap);
