@@ -1190,7 +1190,7 @@ async function loadSpecData() {
   if (!specIds.length) { state.specGroups = {}; state.picksByPos = {}; return; }
   const { data: positions } = await supabase
     .from(POS_TABLE)
-    .select("id, spec_id, group_id, pos_number, pos_number_int, name, category, qty, qty_unit, attrs")
+    .select("id, spec_id, group_id, pos_number, pos_number_int, name, category, qty, qty_unit, attrs, attrs_json")
     .in("spec_id", specIds)
     .order("spec_id", { ascending: false })
     .order("pos_number_int", { ascending: true });
@@ -1308,10 +1308,15 @@ function renderSpecContent(content, specId) {
     setField("unit", pos.qty_unit);
 
     // Slide 1: attributes
-    const slide1 = rf.querySelector('.slide[data-slide="1"] .slide-content');
-    if (slide1) {
-      const pairs = parseAttrs(pos.attrs);
-      pairs.forEach(({ param, value }) => {
+    // Slide 1: attributes
+const slide1 = rf.querySelector('.slide[data-slide="1"] .slide-content');
+if (slide1) {
+  // Сначала пробуем структурированный attrs_json (новый парсер v20+),
+  // если пусто — fallback на parseAttrs(attrs) для старых spec.
+  const pairs = (Array.isArray(pos.attrs_json) && pos.attrs_json.length)
+    ? pos.attrs_json.map(x => ({ param: String(x?.p || ""), value: String(x?.v || "") }))
+    : parseAttrs(pos.attrs);
+  pairs.forEach(({ param, value }) => {
         const af = attrTpl.content.cloneNode(true);
         const inputs = af.querySelectorAll(".styled_input_bar");
         if (inputs[0]) inputs[0].value = param;
@@ -1576,13 +1581,15 @@ function collectSpecData(specId) {
       created_at: item?.created_at ? fmtDate(item.created_at) : "",
     },
     positions: positions.map(p => ({
-      pos_number: p.pos_number,
-      name: p.name,
-      qty: p.qty,
-      unit: p.qty_unit,
-      attrs: parseAttrs(p.attrs),
-      picks: state.picksByPos[p.id] || [],
-    })),
+  pos_number: p.pos_number,
+  name: p.name,
+  qty: p.qty,
+  unit: p.qty_unit,
+  attrs: (Array.isArray(p.attrs_json) && p.attrs_json.length)
+    ? p.attrs_json.map(x => ({ param: String(x?.p || ""), value: String(x?.v || "") }))
+    : parseAttrs(p.attrs),
+  picks: state.picksByPos[p.id] || [],
+})),
   };
 }
 
