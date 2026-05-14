@@ -1,5 +1,5 @@
 // =====================================================================
-// app.js — bootstrap, router, auth wiring
+// app.js — bootstrap,  router, auth wiring
 // =====================================================================
 import {
   sb, state, refreshAll,
