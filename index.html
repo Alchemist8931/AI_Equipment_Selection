@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>AI Equipment Selection</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%99%EF%B8%8F%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- Loading splash -->
+<div id="splash" class="splash"><div class="spinner"></div></div>
+
+<!-- Login screen -->
+<div id="login-screen" class="login-screen hidden">
+  <div class="login-card">
+    <h1 class="login-title">AI Equipment Selection</h1>
+    <p class="login-sub">Подбор оборудования по техническому заданию</p>
+
+    <button id="google-signin-btn" class="btn btn-google btn-block">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+        <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+        <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      Войти через Google
+    </button>
+
+    <div class="login-divider"><span>или</span></div>
+
+    <form id="login-form" class="login-form">
+      <input type="email" name="email" placeholder="Email" autocomplete="email" required>
+      <input type="password" name="password" placeholder="Пароль" autocomplete="current-password" minlength="6" required>
+      <div id="login-error" class="login-error hidden"></div>
+      <button type="submit" class="btn btn-primary btn-block">Войти</button>
+      <button type="button" id="show-signup-btn" class="btn btn-link btn-block">Регистрация</button>
+    </form>
+
+    <form id="signup-form" class="login-form hidden">
+      <input type="text" name="full_name" placeholder="Имя и фамилия" required>
+      <input type="email" name="email" placeholder="Email" autocomplete="email" required>
+      <input type="password" name="password" placeholder="Пароль (мин. 6 символов)" autocomplete="new-password" minlength="6" required>
+      <div id="signup-error" class="login-error hidden"></div>
+      <button type="submit" class="btn btn-primary btn-block">Создать аккаунт</button>
+      <button type="button" id="show-login-btn" class="btn btn-link btn-block">У меня уже есть аккаунт</button>
+    </form>
+  </div>
+</div>
+
+<!-- App shell -->
+<div id="app" class="app hidden">
+  <aside id="sidebar" class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">⚙️</span>
+      <span class="brand-name">AI Equipment</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-page="upload">📤 Подбор</button>
+      <button class="nav-item" data-page="modes">🎛 Режимы</button>
+      <button class="nav-item" data-page="billing">💳 Биллинг</button>
+    </nav>
+    <div class="user-box">
+      <div id="user-name" class="user-name"></div>
+      <div id="user-email" class="user-email"></div>
+      <button id="signout-btn" class="btn btn-ghost btn-block">Выйти</button>
+    </div>
+  </aside>
+
+  <header class="topbar">
+    <button id="burger-btn" class="burger" aria-label="Menu">☰</button>
+    <div id="page-title" class="page-title">Подбор</div>
+    <div id="balance-pill" class="balance-pill"></div>
+  </header>
+
+  <main id="page-content" class="page"></main>
+</div>
+
+<!-- Toast + modal containers -->
+<div id="toast-container" class="toast-container"></div>
+<div id="modal-container" class="modal-container hidden"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
