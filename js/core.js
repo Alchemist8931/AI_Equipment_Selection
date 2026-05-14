@@ -1,5 +1,5 @@
 // =====================================================================
-// core.js — Supabase client, state, auth, UI helpers
+// core.js — Supabase client,  state, auth, UI helpers
 // =====================================================================
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config.js";
