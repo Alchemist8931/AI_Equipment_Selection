@@ -158,15 +158,15 @@
     .btn-theme.active { background: var(--bg-alt); border-color: var(--fg-muted); }
 
     /* ============ MODAL9 ============ */
-    .spec-modal { display: none; flex-direction: column; align-items: center; position: relative; min-height: calc(100vh - 64px); }
+    .spec-modal { display: none; flex-direction: column; align-items: center; position: relative; height: calc(100vh - 64px); width: 100%; }
     .spec-modal.visible { display: flex; }
 
     .glass3d { background: var(--bg-card); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,.05); }
 
-    .modal9-top-window { width: 100%; max-width: 1400px; padding: 16px 24px; box-sizing: border-box; margin: 20px auto 12px; }
+    .modal9-top-window { width: 100%; max-width: 1400px; padding: 16px 24px; box-sizing: border-box; margin: 20px auto 12px; flex-shrink: 0; }
     .modal9-top-body { display: flex; flex-direction: row; align-items: center; gap: 12px; flex-wrap: wrap; }
 
-    .upload-btn-main { background: var(--accent); color: var(--bg); border: none; padding: 0 20px; height: 40px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; font-family: inherit; position: relative; }
+    .upload-btn-main { background: var(--accent); color: var(--bg); border: none; padding: 0 16px; height: 38px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; font-family: inherit; position: relative; flex-shrink: 0; }
     .upload-btn-main:hover { background: var(--accent-hover); }
     .upload-btn-main:disabled { opacity: 0.6; cursor: default; }
     .upload-btn-main .loader { display: none; position: absolute; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-top-color: var(--bg); border-radius: 50%; animation: spin 0.8s linear infinite; }
@@ -174,7 +174,8 @@
     .upload-btn-main.loading .button-text { visibility: hidden; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .upload-status-wrapper { display: flex; flex-direction: column; align-items: flex-start; color: var(--fg-secondary); font-size: 12px; min-width: 150px; flex: 1; }
+    .upload-status-wrapper { display: flex; flex-direction: column; align-items: flex-start; color: var(--fg-secondary); font-size: 12px; min-width: 0; flex: 1; }
+    .switch-group-right { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
     .upload-progress { width: 100%; height: 4px; }
 
     .input-container { position: relative; }
@@ -196,11 +197,11 @@
     input:checked + .toggle-slider:before { transform: translateX(18px); }
     .toggle-text { color: var(--fg-secondary); font-size: 12px; white-space: nowrap; }
 
-    .modal9-window { width: 100%; max-width: 1400px; padding: 20px 24px; box-sizing: border-box; margin: 0 auto 20px; min-height: 60vh; }
-    .modal9-content { width: 100%; overflow-x: auto; }
+    .modal9-window { width: 100%; max-width: 1400px; padding: 20px 24px; box-sizing: border-box; margin: 0 auto 20px; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+    .modal9-content { width: 100%; flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
     .modal9-content::-webkit-scrollbar { height: 6px; }
 
-    .history-list { display: flex; flex-direction: column; gap: 6px; min-width: max-content; }
+    .history-list { display: flex; flex-direction: column; gap: 6px; }
     .history-controls { width: 100%; display: flex; justify-content: center; margin-top: 12px; }
     .history-load-more { background: var(--accent); border: none; color: var(--bg); padding: 8px 24px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.2s; }
     .history-load-more:hover { background: var(--accent-hover); }
@@ -211,22 +212,33 @@
     .status-field-wrapper { display: inline-flex; align-items: center; gap: 4px; }
     .status-icon { font-size: 18px; color: var(--fg-muted); transition: color 0.3s, text-shadow 0.3s; }
 
-    .spec-container { margin: 4px 0 12px; padding: 0 8px; }
+    .spec-container { margin: 2px 0 12px; padding: 0 8px; }
     .spec-content { display: none; transition: opacity 0.4s; }
     .spec-content.visible { display: block; opacity: 1; }
     .fade-toggle { transition: opacity 0.4s; }
     .fade-toggle.hidden { opacity: 0; pointer-events: none; }
 
     /* Progress steps */
-    .spec-progress { display: flex; gap: 12px; margin: 12px 0; width: 100%; }
+    .spec-progress { display: flex; gap: 12px; margin: 6px 0; width: 100%; }
     .spec-progress .step { flex: 1; display: flex; flex-direction: column; gap: 4px; }
     .spec-progress .bar { width: 100%; height: 3px; background: var(--line); border-radius: 2px; transition: background 0.3s; }
-    .spec-progress .step.active .bar { background: var(--success); }
-    .spec-progress .step-body { display: flex; gap: 8px; align-items: center; padding-top: 4px; }
-    .spec-progress .label { font-size: 11px; color: var(--fg-muted); white-space: nowrap; font-weight: 500; }
-    .spec-progress .step.active .label { color: var(--fg); font-weight: 600; }
-    .spec-progress .icons .material-symbols-outlined { font-size: 14px; color: var(--fg-muted); }
-    .spec-progress .step.active .icons .material-symbols-outlined { color: var(--success); }
+    .spec-progress .step.is-done .bar,
+    .spec-progress .step.is-active .bar { background: var(--accent); }
+    .spec-progress .step-body { display: flex; gap: 8px; align-items: center; padding-top: 6px; }
+    .spec-progress .label {
+      display: inline-flex; align-items: center;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+      padding: 3px 10px; border-radius: 999px;
+      background: var(--bg); color: var(--fg-muted);
+      border: 1px solid var(--line);
+      transition: all 0.25s;
+    }
+    .spec-progress .step.is-done .label {
+      background: var(--accent); color: var(--bg); border-color: var(--accent);
+    }
+    .spec-progress .icons .material-symbols-outlined { font-size: 14px; color: var(--fg-muted); transition: color 0.25s; }
+    .spec-progress .step.is-done .icons .material-symbols-outlined { color: var(--accent); }
+    .spec-progress .step.is-active .icons .material-symbols-outlined { color: var(--warning); }
     .darkmatter-btn { background: var(--accent); border: none; color: var(--bg); padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: background 0.2s; font-weight: 500; font-family: inherit; height: 26px; position: relative; }
     .darkmatter-btn:hover { background: var(--accent-hover); }
     .darkmatter-btn:disabled { opacity: 0.5; cursor: default; }
@@ -251,14 +263,14 @@
     .slideshow-container { position: relative; flex: 1; min-width: 700px; display: grid; border-radius: 8px; }
     .slide { grid-area: 1 / 1; width: 100%; height: auto; opacity: 0; visibility: hidden; transition: opacity 0.4s, visibility 0.4s; }
     .slide.active { opacity: 1; visibility: visible; z-index: 2; }
-    .slide-content { padding: 24px 30px 8px 0; }
-    .caption { padding: 6px 12px; font-size: 11px; letter-spacing: 0.5px; text-align: right; color: var(--fg-muted); font-weight: 500; }
-    .prev, .next { cursor: pointer; position: absolute; top: 18px; color: var(--fg-muted); font-size: 16px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); transition: all 0.2s; opacity: 0.85; z-index: 3; user-select: none; font-weight: bold; }
-    .prev:hover, .next:hover { opacity: 1; background: var(--accent); color: var(--bg); border-color: var(--accent); }
-    .prev { left: 4px; } .next { right: 4px; }
-    .dots-container { position: absolute; bottom: 38px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 3; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--line); cursor: pointer; transition: all 0.3s; }
-    .dot.active { background: var(--accent); transform: scale(1.2); }
+    .slide-content { padding: 0 12px 8px 0; }
+    /* Ряд навигации по слайдам — над modalColumn+slideshow */
+    .slide-nav-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 8px 0; }
+    .slide-nav-btn { background: var(--accent); color: var(--bg); border: none; padding: 0 12px; height: 26px; border-radius: 6px; font-size: 11px; font-weight: 500; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 4px; transition: background 0.2s; white-space: nowrap; }
+    .slide-nav-btn:hover { background: var(--accent-hover); }
+    .slide-nav-btn .material-symbols-outlined { font-size: 16px; line-height: 1; }
+    .slide-caption { font-size: 11px; letter-spacing: 0.5px; color: var(--fg-muted); font-weight: 500; flex: 1; text-align: center; }
+    .slide-body-row { display: flex; gap: 8px; }
 
     .spec-close-btn-accent { background: var(--accent); color: var(--bg); border: none; border-radius: 6px; height: 30px; width: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: background 0.2s; position: absolute; right: -38px; top: 50%; transform: translateY(-50%); z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,.1); }
     .spec-close-btn-accent:hover { background: var(--accent-hover); }
@@ -507,8 +519,7 @@
     </div>
 
     <!-- Top: upload + search + toggle -->
-    <div class="modal9-top-window glass3d">
-      <div class="modal9-top-body">
+    <div class="modal9-top-body">
         <button type="button" class="upload-btn-main" id="upload-btn">
           <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
           <span class="button-text">загрузить техническое задание</span>
@@ -516,31 +527,32 @@
         </button>
         <input type="file" class="js-file-input" id="js-file-input" accept=".pdf,.docx,.xlsx,.xls,.txt,.csv,.rtf,.doc,.ods" style="display:none">
 
-        <div class="upload-status-wrapper">
-          <progress class="upload-progress" id="upload-progress" value="0" max="100" style="display:none;"></progress>
-          <div class="upload-status" id="upload-status"></div>
-        </div>
-
         <div class="input-container" style="width:240px;">
           <input id="file-filter-input" class="styled_input_bar" placeholder=" " style="width:100%;">
           <label class="input-label">поиск</label>
           <button class="group-close file-filter-clear" id="file-filter-clear" style="display:none; position:absolute; right:8px; top:50%; transform:translateY(-50%);">×</button>
         </div>
 
-        <label class="switch">
-  <input type="checkbox" id="my-files-toggle" checked>
-  <span class="toggle-slider"></span>
-</label>
-<span class="toggle-text" id="toggle-text">только мои файлы</span>
+        <div class="upload-status-wrapper">
+          <progress class="upload-progress" id="upload-progress" value="0" max="100" style="display:none;"></progress>
+          <div class="upload-status" id="upload-status"></div>
+        </div>
+
+        <div class="switch-group-right">
+          <label class="switch">
+            <input type="checkbox" id="my-files-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-text" id="toggle-text">только мои файлы</span>
+        </div>
       </div>
-    </div>
 
     <!-- Main content -->
     <div class="modal9-window glass3d">
       <div class="modal9-content">
         <div class="history-list" id="history-list"></div>
         <div class="history-controls">
-          <button type="button" class="history-load-more" id="history-load-more" style="display:none;">показать ещё</button>
+          <button type="button" class="history-load-more" id="history-load-more" style="display:none;">загрузить ещё</button>
         </div>
 
         <!-- Templates -->
@@ -597,9 +609,6 @@
               <div class="step-body">
                 <div class="label">ПАРСЕР</div>
                 <div class="icons"><span class="material-symbols-outlined status">indeterminate_check_box</span></div>
-                <button class="darkmatter-btn refresh" data-stage="parser" title="Перезапустить парсер">
-                  <span class="button-text">запуск</span><span class="loader"></span>
-                </button>
               </div>
             </div>
             <div class="step" data-step="2">
@@ -607,9 +616,6 @@
               <div class="step-body">
                 <div class="label">СЕЛЕКТОР</div>
                 <div class="icons"><span class="material-symbols-outlined status">indeterminate_check_box</span></div>
-                <button class="darkmatter-btn refresh" data-stage="selector" title="Перезапустить селектор">
-                  <span class="button-text">запуск</span><span class="loader"></span>
-                </button>
               </div>
             </div>
             <div class="step" data-step="3">
@@ -617,34 +623,37 @@
               <div class="step-body">
                 <div class="label">ПРАЙСЕР</div>
                 <div class="icons"><span class="material-symbols-outlined status">indeterminate_check_box</span></div>
-                <button class="darkmatter-btn refresh" data-stage="pricer" title="Перезапустить прайсер">
-                  <span class="button-text">запуск</span><span class="loader"></span>
-                </button>
               </div>
             </div>
           </div>
         </template>
 
         <template id="spec-row-template">
-          <div class="modalCONTEINERpost">
-            <div class="modalColumn">
-              <div class="modalRow">
-                <div class="input-container"><input type="text" class="styled_input_bar" data-field="pos_number" readonly style="width:60px; text-align:center;" placeholder=" "><label class="input-label">№</label></div>
-                <div class="input-container"><input type="text" class="styled_input_bar" data-field="name" readonly style="width:300px;" placeholder=" "><label class="input-label">наименование</label></div>
-                <div class="input-container"><input type="text" class="styled_input_bar" data-field="qty" readonly style="width:60px; text-align:center;" placeholder=" "><label class="input-label">кол-во</label></div>
-                <div class="input-container"><input type="text" class="styled_input_bar" data-field="unit" readonly style="width:60px; text-align:center;" placeholder=" "><label class="input-label">ед.</label></div>
-              </div>
+          <div class="modalCONTEINERpost" style="flex-direction:column;">
+            <div class="slide-nav-row">
+              <button type="button" class="slide-nav-btn slide-nav-prev">
+                <span class="material-symbols-outlined">chevron_left</span>
+                <span>пред</span>
+              </button>
+              <div class="slide-caption">Блок 1, требования ТЗ</div>
+              <button type="button" class="slide-nav-btn slide-nav-next">
+                <span>след</span>
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
             </div>
-            <div class="slideshow-container">
-              <div class="slide active" data-slide="1"><div class="slide-content"></div><div class="caption">Блок 1, требования ТЗ</div></div>
-              <div class="slide" data-slide="2"><div class="slide-content"></div><div class="caption">Блок 2, подобранная позиция</div></div>
-              <div class="slide" data-slide="3"><div class="slide-content"></div><div class="caption">Блок 3, ценовые источники</div></div>
-              <a class="prev">&#10094;</a>
-              <a class="next">&#10095;</a>
-              <div class="dots-container">
-                <div class="dot active" data-index="0"></div>
-                <div class="dot" data-index="1"></div>
-                <div class="dot" data-index="2"></div>
+            <div class="slide-body-row">
+              <div class="modalColumn">
+                <div class="modalRow">
+                  <div class="input-container"><input type="text" class="styled_input_bar" data-field="pos_number" readonly style="width:60px; text-align:center;" placeholder=" "><label class="input-label">№</label></div>
+                  <div class="input-container"><input type="text" class="styled_input_bar" data-field="name" readonly style="width:300px;" placeholder=" "><label class="input-label">наименование</label></div>
+                  <div class="input-container"><input type="text" class="styled_input_bar" data-field="qty" readonly style="width:60px; text-align:center;" placeholder=" "><label class="input-label">кол-во</label></div>
+                  <div class="input-container"><input type="text" class="styled_input_bar" data-field="unit" readonly style="width:60px; text-align:center;" placeholder=" "><label class="input-label">ед.</label></div>
+                </div>
+              </div>
+              <div class="slideshow-container">
+                <div class="slide active" data-slide="1"><div class="slide-content"></div></div>
+                <div class="slide" data-slide="2"><div class="slide-content"></div></div>
+                <div class="slide" data-slide="3"><div class="slide-content"></div></div>
               </div>
             </div>
           </div>
@@ -706,7 +715,7 @@ const TABLE = "spec_uploads";
 const POS_TABLE = "spec_positions";
 const PICK_TABLE = "spec_position_picks";
 const ALLOWED_EXTS = ["pdf","docx","xlsx","xls","txt","csv","rtf","doc","ods"];
-const HISTORY_LIMIT_DEFAULT = 30;
+const HISTORY_LIMIT_DEFAULT = 36;
 const HISTORY_LIMIT_STEP = 30;
 const STORAGE_KEY_THEME = "ai-eq-theme";
 
@@ -1085,7 +1094,13 @@ function recomputeWatched() {
 function updateLoadMoreVisibility() {
   const btn = $("history-load-more");
   if (!btn) return;
-  btn.style.display = (state.history.length > 0 && state.history.length < state.historyTotalCount) ? "inline-flex" : "none";
+  if (state.history.length === 0) {
+    btn.style.display = "none";
+    return;
+  }
+  btn.style.display = "inline-flex";
+  const hasMore = state.history.length < state.historyTotalCount;
+  btn.disabled = !hasMore;
 }
 
 function statusIconState(raw) {
@@ -1400,7 +1415,8 @@ if (slide1) {
   });
 
   // Wire slideshows
-  content.querySelectorAll(".slideshow-container").forEach(setupSlideshow);
+  // Wire slideshows
+  content.querySelectorAll(".modalCONTEINERpost").forEach(setupSlideshow);
 }
 
 function parseAttrs(s) {
@@ -1414,19 +1430,19 @@ function parseAttrs(s) {
 }
 
 function setupSlideshow(container) {
+  // container = .modalCONTEINERpost (новая структура)
   const slides = container.querySelectorAll(".slide");
-  const dots = container.querySelectorAll(".dot");
+  const captionEl = container.querySelector(".slide-caption");
+  const captions = ["Блок 1, требования ТЗ", "Блок 2, подобранная позиция", "Блок 3, ценовые источники"];
   let idx = 0;
   const show = (n) => {
-    slides[idx].classList.remove("active");
-    dots[idx].classList.remove("active");
+    slides[idx]?.classList.remove("active");
     idx = (n + slides.length) % slides.length;
-    slides[idx].classList.add("active");
-    dots[idx].classList.add("active");
+    slides[idx]?.classList.add("active");
+    if (captionEl) captionEl.textContent = captions[idx] || "";
   };
-  container.querySelector(".prev")?.addEventListener("click", () => show(idx - 1));
-  container.querySelector(".next")?.addEventListener("click", () => show(idx + 1));
-  dots.forEach(d => d.addEventListener("click", () => show(parseInt(d.dataset.index))));
+  container.querySelector(".slide-nav-prev")?.addEventListener("click", e => { e.stopPropagation(); show(idx - 1); });
+  container.querySelector(".slide-nav-next")?.addEventListener("click", e => { e.stopPropagation(); show(idx + 1); });
 }
 
 // Точечный апдейт одной строки истории: триплеты селектор/прайсер + прогресс-бар
@@ -1464,13 +1480,15 @@ function updateSpecProgress(specId) {
     const steps = el.querySelectorAll(".step");
     const apply = (step, isDone, isActive) => {
       const icon = step.querySelector(".status");
-      if (isDone)      { step.classList.add("active");    if (icon) icon.textContent = "done_all"; }
-      else if (isActive){ step.classList.add("active");   if (icon) icon.textContent = "autorenew"; }
-      else              { step.classList.remove("active"); if (icon) icon.textContent = "indeterminate_check_box"; }
+      step.classList.toggle("is-done", !!isDone);
+      step.classList.toggle("is-active", !!isActive && !isDone);
+      if (icon) {
+        if (isDone) icon.textContent = "done_all";
+        else if (isActive) icon.textContent = "autorenew";
+        else icon.textContent = "indeterminate_check_box";
+      }
     };
-    // Парсер — из БД (одиночное значение)
     apply(steps[0], item.status_parser === "done", item.status_parser === "in_progress" || item.status_parser === "queued");
-    // Селектор и прайсер — из локального state
     apply(steps[1], t.selTotal > 0 && t.selReceived >= t.selTotal, t.selTotal > 0 && t.selReceived < t.selTotal);
     apply(steps[2], t.priTotal > 0 && t.priReceived >= t.priTotal, t.priTotal > 0 && t.priReceived < t.priTotal);
   });
