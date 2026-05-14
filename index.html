@@ -1760,8 +1760,12 @@ async function bootstrap() {
     }
   });
 
-  // DB connection check
+  // DB connection check (только когда юзер залогинен)
   setInterval(async () => {
+    if (!state.user) {
+      $("db-disconnect-overlay").classList.remove("show");
+      return;
+    }
     const { error } = await supabase.from(TABLE).select("id", { count: "exact", head: true }).limit(1);
     $("db-disconnect-overlay").classList.toggle("show", !!error);
   }, 15000);
