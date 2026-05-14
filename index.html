@@ -27,7 +27,8 @@
       --accent: #F5F5F5; --accent-hover: #DDDDDD;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { font-family: 'SN Pro', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--fg); -webkit-font-smoothing: antialiased; transition: background-color var(--transition-duration), color var(--transition-duration); }
+    html, body { font-family: 'SN Pro', sans-serif; background: var(--bg); color: var(--fg); -webkit-font-smoothing: antialiased; transition: background-color var(--transition-duration), color var(--transition-duration); }
+* { font-family: inherit; }
     body { min-height: 100vh; width: 100vw; overflow-x: hidden; position: relative; }
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -115,13 +116,23 @@
     @supports (background: color-mix(in srgb, white, black)) {
       .header-blur { background: color-mix(in srgb, var(--bg) 82%, transparent); }
     }
-    .header-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; padding: 0 16px; }
-    @media(min-width: 1024px) { .header-inner { padding: 0 24px; } }
+    .header-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; padding: 0 24px; box-sizing: border-box; }
 
     .ctrl { height: var(--ctrl-h); border-radius: var(--ctrl-radius); border: 1px solid var(--line); background: var(--bg); display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; font-size: 13px; color: var(--fg); transition: all 0.2s; cursor: pointer; font-family: inherit; }
     .ctrl:hover { border-color: var(--fg-muted); }
     .ctrl-square { width: var(--ctrl-h); padding: 0; justify-content: center; gap: 0; }
-    .ctrl-logo { cursor: default; pointer-events: none; }
+    .group-switcher-wrap { position: relative; margin-left: 4px; }
+
+    /* Переключатель страниц приложения (Подбор / Пользователи / Биллинг) */
+    .page-switcher { display: inline-flex; gap: 4px; margin-left: 16px; padding: 3px; background: var(--bg-card); border: 1px solid var(--line); border-radius: 10px; }
+    .page-switcher-btn { background: transparent; border: none; color: var(--fg-secondary); padding: 0 14px; height: 30px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .page-switcher-btn:hover { color: var(--fg); }
+    .page-switcher-btn.active { background: var(--bg); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+    .page-switcher-btn .material-symbols-outlined { font-size: 16px; }
+
+    /* Скрытые/показанные страницы приложения */
+    .app-page { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; }
+    .app-page.active { display: flex; }
 
     .group-switcher-wrap { position: relative; margin-left: 4px; }
     .group-switcher-menu { display: none; position: absolute; left: 0; top: calc(100% + 8px); width: 280px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,.05); padding: 6px; z-index: 50; max-height: 320px; overflow-y: auto; }
@@ -198,6 +209,27 @@
     .toggle-text { color: var(--fg-secondary); font-size: 12px; white-space: nowrap; }
 
     .modal9-window { width: 100%; max-width: 1400px; padding: 20px 24px; box-sizing: border-box; margin: 0 auto 20px; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+    /* Карточки и таблицы внутри страниц «Пользователи» / «Биллинг» */
+    .page-section { width: 100%; max-width: 1400px; padding: 20px 24px; box-sizing: border-box; margin: 20px auto; overflow-y: auto; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 16px; }
+    .page-section h2 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
+    .page-card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 16px; padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; }
+    .page-card-title { font-size: 12px; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .page-card-big { font-size: 28px; font-weight: 700; }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--line); }
+    .data-table td { padding: 12px; border-bottom: 1px solid var(--line-light); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table .role-pill { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: var(--bg); border: 1px solid var(--line); color: var(--fg-secondary); }
+    .data-table .role-pill.role-owner { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .data-table .role-pill.role-admin { background: var(--bg); color: var(--fg); border-color: var(--fg-muted); }
+    .data-table .row-actions button { background: none; border: 1px solid var(--line); color: var(--fg-secondary); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .data-table .row-actions button:hover { background: var(--bg-alt); color: var(--fg); border-color: var(--fg-muted); }
+    .data-table .row-actions button.danger:hover { background: var(--error); color: #fff; border-color: var(--error); }
+    .data-table .row-actions { display: flex; gap: 6px; }
+
+    .empty-state { padding: 32px; text-align: center; color: var(--fg-muted); font-size: 13px; }
+    
     .modal9-content { width: 100%; flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
     .modal9-content::-webkit-scrollbar { height: 6px; }
 
@@ -435,13 +467,8 @@
   <header class="header-blur">
     <div class="header-inner">
       <!-- Left zone -->
-      <div style="display:flex; align-items:center; gap:8px;">
-        <a href="#" class="ctrl ctrl-square ctrl-logo" aria-label="AI Equipment Selection">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 20V4h6a4 4 0 0 1 0 8H7"/>
-            <path d="m13 12 4 8"/>
-          </svg>
-        </a>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span class="ctrl ctrl-square ctrl-logo" aria-label="AI Equipment Selection">AI</span>
         <span style="font-weight:600; font-size:14px; letter-spacing:-0.01em;" class="brand-name">AI Equipment Selection</span>
 
         <!-- Group switcher -->
@@ -456,6 +483,22 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div id="group-switcher-menu" class="group-switcher-menu"></div>
+        </div>
+
+        <!-- Page switcher -->
+        <div class="page-switcher" id="page-switcher">
+          <button class="page-switcher-btn active" data-page="specs">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <span>Подбор</span>
+          </button>
+          <button class="page-switcher-btn" data-page="members">
+            <span class="material-symbols-outlined">group</span>
+            <span>Пользователи</span>
+          </button>
+          <button class="page-switcher-btn" data-page="billing">
+            <span class="material-symbols-outlined">payments</span>
+            <span>Биллинг</span>
+          </button>
         </div>
       </div>
 
@@ -510,8 +553,9 @@
   </header>
 
   <!-- ============================================
-       MODAL 9 APP
+       PAGE: SPECS (подбор) — текущий функционал
        ============================================ -->
+  <div id="page-specs" class="app-page active">
   <div id="modal9-container" class="spec-modal">
     <div class="spec-context-menu" aria-hidden="true">
       <button type="button" data-action="copy">Скопировать спецификацию</button>
@@ -692,6 +736,62 @@
             <a class="icons" data-offer="3-url" target="_blank" rel="noopener"><span class="material-symbols-outlined">link</span></a>
           </div>
         </template>
+      </div>
+    </div>
+  </div>
+  </div><!-- /#page-specs -->
+
+  <!-- ============================================
+       PAGE: MEMBERS (пользователи группы)
+       ============================================ -->
+  <div id="page-members" class="app-page">
+    <div class="page-section">
+      <h2>Пользователи группы</h2>
+      <div class="page-card">
+        <div class="page-card-title">Участники</div>
+        <table class="data-table" id="members-table">
+          <thead>
+            <tr><th>EMAIL</th><th>ИМЯ</th><th>РОЛЬ</th><th>СТАТУС</th><th>ВСТУПИЛ</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="empty-state" id="members-empty" style="display:none">В группе пока никого нет.</div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-title">Действия (скоро)</div>
+        <p style="font-size:12px; color:var(--fg-muted); line-height:1.5;">Приглашение по email, удаление участника (с переносом его файлов на администратора), блокировка учётной записи появятся на следующем этапе.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       PAGE: BILLING (биллинг)
+       ============================================ -->
+  <div id="page-billing" class="app-page">
+    <div class="page-section">
+      <h2>Биллинг</h2>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="page-card">
+          <div class="page-card-title">Баланс группы</div>
+          <div class="page-card-big" id="billing-balance">—</div>
+          <p style="font-size:11px; color:var(--fg-muted);">Обновлено: <span id="billing-balance-updated">—</span></p>
+        </div>
+        <div class="page-card">
+          <div class="page-card-title">Тариф</div>
+          <div style="display:flex; gap:24px; flex-wrap:wrap;">
+            <div><div style="font-size:11px; color:var(--fg-muted);">за пользователя/мес</div><div style="font-size:18px; font-weight:700;" id="billing-user-price">—</div></div>
+            <div><div style="font-size:11px; color:var(--fg-muted);">наценка на AI</div><div style="font-size:18px; font-weight:700;" id="billing-markup">—</div></div>
+            <div><div style="font-size:11px; color:var(--fg-muted);">порог уведомления</div><div style="font-size:18px; font-weight:700;" id="billing-threshold">—</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-title">История транзакций</div>
+        <table class="data-table" id="billing-table">
+          <thead><tr><th>ДАТА</th><th>ТИП</th><th>СУММА USD</th><th>БАЛАНС ПОСЛЕ</th><th>КОММЕНТАРИЙ</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="empty-state" id="billing-empty" style="display:none">Транзакций пока нет.</div>
       </div>
     </div>
   </div>
@@ -1005,6 +1105,10 @@ function renderGroupSwitcher() {
       await refreshState();
       renderUserHeader();
       await loadHistory({ resetLimit: true });
+      // Если открыта вкладка «Пользователи» или «Биллинг» — перечитать их
+      const activePage = document.querySelector(".page-switcher-btn.active")?.dataset.page;
+      if (activePage === "members") loadMembersPage();
+      else if (activePage === "billing") loadBillingPage();
     });
   });
 }
@@ -1893,6 +1997,123 @@ function wireUI() {
     state.historyLimit += HISTORY_LIMIT_STEP;
     await loadHistory();
   });
+
+  // ============================================================
+  // Page switcher
+  // ============================================================
+  document.querySelectorAll(".page-switcher-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const pageId = btn.dataset.page;
+      setActivePage(pageId);
+    });
+  });
+}
+
+  // ============================================================
+// PAGES / NAVIGATION
+// ============================================================
+function setActivePage(pageId) {
+  document.querySelectorAll(".page-switcher-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.page === pageId);
+  });
+  document.querySelectorAll(".app-page").forEach(p => {
+    p.classList.toggle("active", p.id === `page-${pageId}`);
+  });
+  // Lazy-загрузка
+  if (pageId === "members") loadMembersPage();
+  else if (pageId === "billing") loadBillingPage();
+}
+
+async function loadMembersPage() {
+  if (!state.groupId) return;
+  const tbody = document.querySelector("#members-table tbody");
+  const emptyEl = $("members-empty");
+  tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Загрузка...</td></tr>';
+
+  const { data, error } = await supabase
+    .from("group_members")
+    .select("id, role, joined_at, invited_at, invited_email, user_id, profile:profiles!group_members_user_id_fkey(email, full_name)")
+    .eq("group_id", state.groupId)
+    .order("role", { ascending: true });
+
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Ошибка: ${escapeHtml(error.message)}</td></tr>`;
+    return;
+  }
+  if (!data?.length) {
+    tbody.innerHTML = "";
+    emptyEl.style.display = "block";
+    return;
+  }
+  emptyEl.style.display = "none";
+
+  const myRole = state.groups.find(g => g.id === state.groupId)?.role || "member";
+  const canManage = myRole === "owner" || myRole === "admin";
+
+  tbody.innerHTML = data.map(m => {
+    const email = m.profile?.email || m.invited_email || "—";
+    const name = m.profile?.full_name || "—";
+    const role = m.role || "member";
+    const status = m.joined_at ? "активен" : (m.invited_at ? "приглашён" : "—");
+    const joined = m.joined_at ? fmtDate(m.joined_at) : "—";
+    const rolePill = `<span class="role-pill role-${role}">${role}</span>`;
+    const actions = canManage && role !== "owner"
+      ? `<div class="row-actions"><button class="danger" data-action="remove" data-id="${m.id}" disabled title="Доступно на следующем этапе">Удалить</button><button data-action="block" data-id="${m.id}" disabled title="Доступно на следующем этапе">Блок.</button></div>`
+      : "";
+    return `<tr><td>${escapeHtml(email)}</td><td>${escapeHtml(name)}</td><td>${rolePill}</td><td>${escapeHtml(status)}</td><td>${escapeHtml(joined)}</td><td>${actions}</td></tr>`;
+  }).join("");
+}
+
+async function loadBillingPage() {
+  if (!state.groupId) return;
+
+  // Баланс
+  const { data: bal } = await supabase.from("billing_balance").select("*").eq("group_id", state.groupId).maybeSingle();
+  $("billing-balance").textContent = bal?.balance_usd != null ? "$" + ceilToFixed(bal.balance_usd, 2) : "—";
+  $("billing-balance-updated").textContent = bal?.updated_at ? fmtDate(bal.updated_at) : "—";
+
+  // Тарифные настройки
+  const { data: settings } = await supabase.from("app_settings").select("monthly_user_price_usd, markup_pct, upload_threshold_usd").eq("id", 1).maybeSingle();
+  if (settings) {
+    $("billing-user-price").textContent = settings.monthly_user_price_usd ? "$" + parseFloat(settings.monthly_user_price_usd).toFixed(2) : "—";
+    $("billing-markup").textContent = settings.markup_pct ? parseFloat(settings.markup_pct).toFixed(1) + " %" : "—";
+    $("billing-threshold").textContent = settings.upload_threshold_usd ? "$" + parseFloat(settings.upload_threshold_usd).toFixed(2) : "—";
+  }
+
+  // Транзакции
+  const tbody = document.querySelector("#billing-table tbody");
+  const emptyEl = $("billing-empty");
+  const { data: txns, error: txnErr } = await supabase
+    .from("billing_transactions")
+    .select("id, amount_usd, kind, balance_after_usd, notes, created_at")
+    .eq("group_id", state.groupId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (txnErr) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">Ошибка: ${escapeHtml(txnErr.message)}</td></tr>`;
+    return;
+  }
+  if (!txns?.length) {
+    tbody.innerHTML = "";
+    emptyEl.style.display = "block";
+    return;
+  }
+  emptyEl.style.display = "none";
+
+  const kindLabels = { payment: "пополнение", subscription: "подписка", ai_request: "AI-запрос", manual_adjustment: "ручная корр.", refund: "возврат" };
+  tbody.innerHTML = txns.map(t => {
+    const amt = parseFloat(t.amount_usd);
+    const amtStr = (amt >= 0 ? "+" : "") + "$" + amt.toFixed(4);
+    const color = amt >= 0 ? "var(--success)" : "var(--error)";
+    return `<tr>
+      <td>${escapeHtml(fmtDate(t.created_at))}</td>
+      <td>${escapeHtml(kindLabels[t.kind] || t.kind || "—")}</td>
+      <td style="color:${color}; font-variant-numeric:tabular-nums;">${amtStr}</td>
+      <td style="font-variant-numeric:tabular-nums;">$${parseFloat(t.balance_after_usd ?? 0).toFixed(2)}</td>
+      <td style="color:var(--fg-muted); font-size:12px;">${escapeHtml(t.notes || "")}</td>
+    </tr>`;
+  }).join("");
 }
 
 // ============================================================
