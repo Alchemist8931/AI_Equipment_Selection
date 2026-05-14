@@ -749,6 +749,14 @@ function fmtMoney(amount, currency = "USD", digits = 2) {
   return currency === "RUB" ? `${s} ${sym}` : `${sym}${s}`;
 }
 
+  // Округление вверх до N знаков после запятой
+function ceilToFixed(value, digits = 2) {
+  const n = parseFloat(value);
+  if (!Number.isFinite(n)) return "—";
+  const factor = Math.pow(10, digits);
+  return (Math.ceil(n * factor) / factor).toFixed(digits);
+}
+
 function fmtDate(d) {
   if (!d) return "";
   const date = typeof d === "string" ? new Date(d) : d;
@@ -956,7 +964,7 @@ function renderUserHeader() {
   $("menu-name").textContent = name;
   $("menu-email").textContent = state.user?.email || "";
   const bal = state.balance?.balance_usd;
-  $("menu-balance").textContent = bal != null ? `Баланс: ${fmtMoney(bal, "USD", 4)}` : "Баланс: —";
+  $("menu-balance").textContent = bal != null ? `Баланс: $${ceilToFixed(bal, 2)}` : "Баланс: —";
   $("current-group-name").textContent = state.groups.find(g => g.id === state.groupId)?.name || "—";
 }
 
@@ -1142,7 +1150,7 @@ function renderHistory(oldMap = {}) {
       let display;
 
       if (f === "created_at") { display = fmtDate(item.created_at); }
-      else if (f === "cost") { display = item.total_cost_usd_billed ? "$" + parseFloat(item.total_cost_usd_billed).toFixed(4) : "—"; }
+      else if (f === "cost") { display = item.total_cost_usd_billed ? "$" + ceilToFixed(item.total_cost_usd_billed, 2) : "—"; }
       else if (f === "user_login") { display = item.uploader?.full_name || item.uploader?.email || "—"; }
       else if (f === "status_parser") { display = STATUS_LABELS[v] || v || "—"; }
       else if (f === "status_selector") { display = triples.selTotal > 0 ? `${triples.selReceived} / ${triples.selTotal}` : "—"; }
@@ -1762,7 +1770,7 @@ function applyRealtimeRegistryUpdate(row) {
     let v = row[f];
     let display;
     if (f === "created_at") display = fmtDate(row.created_at);
-    else if (f === "cost") display = row.total_cost_usd_billed ? "$" + parseFloat(row.total_cost_usd_billed).toFixed(4) : "—";
+    else if (f === "cost") display = row.total_cost_usd_billed ? "$" + ceilToFixed(row.total_cost_usd_billed, 2) : "—";
     else if (f === "status_parser") display = STATUS_LABELS[v] || v || "—";
     else display = (v ?? "");
     if (el.tagName === "INPUT" && el.value !== display) {
