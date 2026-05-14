@@ -1,5 +1,5 @@
 // =====================================================================
-// config.js — public Supabase config (committed to git, no secrets)
+// config.js — public Supabase config  (committed to git, no secrets)
 // =====================================================================
 export const SUPABASE_URL = "https://ncdwlmgwljjwpuawlssr.supabase.co";
 
