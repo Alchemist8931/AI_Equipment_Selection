@@ -992,7 +992,7 @@ async function loadHistory(options = {}) {
 
   const oldMap = { ...state.lastStatuses };
   let query = supabase.from(TABLE)
-    .select("id, file_number, uploaded_by, file_name, file_ext, status_parser, status_selector, status_pricer, total_cost_usd_billed, last_error, created_at", { count: "exact" })
+    .select("id, file_number, uploaded_by, file_name, file_ext, status_parser, status_selector, status_pricer, total_cost_usd_billed, last_error, created_at, uploader:profiles!spec_uploads_uploaded_by_fkey(email, full_name)", { count: "exact" })
     .eq("group_id", state.groupId)
     .order("created_at", { ascending: false });
 
@@ -1097,6 +1097,7 @@ function renderHistory(oldMap = {}) {
       let v = item[f];
       if (f === "created_at") v = fmtDate(item.created_at);
       if (f === "cost") v = item.total_cost_usd_billed ? "$" + parseFloat(item.total_cost_usd_billed).toFixed(4) : "—";
+      if (f === "user_login") v = item.uploader?.full_name || item.uploader?.email || "—";
       const display = (["status_parser","status_selector","status_pricer"].includes(f)) ? (STATUS_LABELS[v] || v || "—") : (v ?? "");
       if (el.tagName === "INPUT") {
         if (el.value !== display) el.value = display;
@@ -1464,7 +1465,11 @@ async function handleFileUpload(file) {
     await supabase.from(TABLE).update({ status_parser: "error", last_error: "invoke: " + invErr.message }).eq("id", spec.id);
     toast("Парсер не запустился: " + invErr.message, "error", 6000);
   } else if (result?.ok === false) {
-    toast("Парсер отклонил: " + result.error, "error", 6000);
+    const detail = result.got_type ? ` (got ${result.got_type}=${JSON.stringify(result.got_value)})` : "";
+    const errMsg = `parser rejected: ${result.error}${detail}`;
+    await supabase.from(TABLE).update({ status_parser: "error", last_error: errMsg }).eq("id", spec.id);
+    toast(errMsg, "error", 8000);
+    console.error("process-spec response:", result);
   } else {
     toast("Парсер запущен", "success");
   }
@@ -1615,6 +1620,7 @@ function applyRealtimeRegistryUpdate(row) {
   if (!rowEl) return;
   rowEl.querySelectorAll("[data-field]").forEach(el => {
     const f = el.dataset.field;
+    if (f === "user_login") return; // join'а нет в realtime-payload, сохраняем текущее значение
     let v = row[f];
     if (f === "created_at") v = fmtDate(row.created_at);
     if (f === "cost") v = row.total_cost_usd_billed ? "$" + parseFloat(row.total_cost_usd_billed).toFixed(4) : "—";
