@@ -1,5 +1,5 @@
 // =====================================================================
-// upload.js — drag-drop ТЗ + realtime list + auto-trigger process-spec
+// upload.js — drag-drop ТЗ + realtime list + auto-trigger process-spec 
 // =====================================================================
 import { sb, state, toast, escapeHtml, fmtDate, statusBadge } from "../core.js";
 
