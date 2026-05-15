@@ -1048,6 +1048,10 @@ const state = {
   realtimeSub: null,
   contextSpecContent: null,
   ensureInProgress: false,
+// Single-session
+sessionChannel: null,
+sessionHeartbeat: null,
+evicted: false,
 };
 
   // ============================================================
@@ -2891,26 +2895,22 @@ async function bootstrap() {
 
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
-    state.session = session;
-    state.user = session.user;
-    const ok = await ensureUserHasGroup();
+  state.session = session;
+  state.user = session.user;
+  const ok = await ensureUserHasGroup();
+  if (ok) {
+    await refreshState();
+    renderUserHeader();
+    renderGroupSwitcher();
+    showApp();
+    await loadHistory({ resetLimit: true });
+    setupRealtime();
     const claimed = await claimSession();
-if (!claimed) toast("Не удалось зафиксировать сессию", "error");
-setupSessionWatch();
-startSessionHeartbeat();
-    if (ok) {
-      await refreshState();
-      renderUserHeader();
-      renderGroupSwitcher();
-      showApp();
-      await loadHistory({ resetLimit: true });
-      setupRealtime();
-      const claimed = await claimSession();
-if (!claimed) toast("Не удалось зафиксировать сессию", "error");
-setupSessionWatch();
-startSessionHeartbeat();
-    }
-  } else {
+    if (!claimed) toast("Не удалось зафиксировать сессию", "error");
+    setupSessionWatch();
+    startSessionHeartbeat();
+  }
+} else {
     showLogin();
   }
   setTimeout(() => { $("preloader").classList.remove("visible"); $("preloader").classList.add("fade-out"); }, 800);
@@ -2928,9 +2928,9 @@ startSessionHeartbeat();
       await loadHistory({ resetLimit: true });
       setupRealtime();
       const claimed = await claimSession();
-if (!claimed) toast("Не удалось зафиксировать сессию", "error");
-setupSessionWatch();
-startSessionHeartbeat();
+    if (!claimed) toast("Не удалось зафиксировать сессию", "error");
+    setupSessionWatch();
+    startSessionHeartbeat();
     } else if (event === "SIGNED_OUT") {
       state.session = null; state.user = null; state.profile = null;
       showLogin();
@@ -2954,35 +2954,36 @@ startSessionHeartbeat();
   // ============================================================
   let lastWake = 0;
   const handleWake = async () => {
-    // 1a. Проверяем, не вытеснили ли нас за время сна
-await verifySessionOwnership();
-if (state.evicted) return;
-    if (document.visibilityState !== "visible" || !state.user) return;
-    // debounce — события могут прилететь пачкой (visibility + focus + online)
-    const now = Date.now();
-    if (now - lastWake < 2000) return;
-    lastWake = now;
+  if (document.visibilityState !== "visible" || !state.user) return;
+  // debounce — события могут прилететь пачкой (visibility + focus + online)
+  const now = Date.now();
+  if (now - lastWake < 2000) return;
+  lastWake = now;
 
-    console.log("[wake] tab visible, reconnecting…");
+  console.log("[wake] tab visible, reconnecting…");
 
-    // 1. Проверяем сессию — за время сна токен мог истечь
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        console.warn("[wake] session lost during sleep");
-        const { data, error } = await supabase.auth.refreshSession();
-        if (error || !data.session) {
-          toast("Сессия истекла, требуется повторный вход", "error", 6000);
-          await handleSignOut();
-          return;
-        }
+  // 1. Проверяем сессию — за время сна токен мог истечь
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.warn("[wake] session lost during sleep");
+      const { data, error } = await supabase.auth.refreshSession();
+      if (error || !data.session) {
+        toast("Сессия истекла, требуется повторный вход", "error", 6000);
+        await handleSignOut();
+        return;
       }
-    } catch (err) { console.error("[wake] session check:", err); }
-
-    // 2. Пересоздаём Realtime-канал (мёртвый WS будет переразвёрнут начисто)
-    if (state.groupId) {
-      try { setupRealtime(); } catch (e) { console.error("[wake] setupRealtime:", e); }
     }
+  } catch (err) { console.error("[wake] session check:", err); }
+
+  // 1a. ✓ ПЕРЕНЕСТИ СЮДА: проверяем, не вытеснили ли нас за время сна
+  await verifySessionOwnership();
+  if (state.evicted) return;
+
+  // 2. Пересоздаём Realtime-канал
+  if (state.groupId) {
+    try { setupRealtime(); } catch (e) { console.error("[wake] setupRealtime:", e); }
+  }
 
     // 3. Догоняем пропущенные апдейты
     try { await loadHistory(); } catch (e) { console.error("[wake] loadHistory:", e); }
