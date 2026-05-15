@@ -395,6 +395,54 @@
     .mode-form-actions .btn-cancel { background: var(--bg); color: var(--fg-secondary); border: 1px solid var(--line); padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
     .mode-form-actions .btn-cancel:hover { background: var(--bg-card); color: var(--fg); }
     .mode-form-hint { font-size: 11px; color: var(--fg-muted); }
+
+    .mode-item-wrap {
+  display: flex; flex-direction: column;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.mode-item-wrap:hover { background: var(--bg-alt); }
+.mode-item-wrap.is-open { background: var(--bg-alt); }
+.mode-item-wrap .mode-item { padding: 5px 8px; gap: 6px; display: flex; align-items: center; }
+.mode-item-wrap .mode-details {
+  display: none;
+  padding: 10px 14px 14px;
+  border-top: 1px solid var(--line-light);
+  margin-top: 4px;
+  flex-direction: column;
+  gap: 10px;
+}
+.mode-item-wrap.is-open .mode-details { display: flex; }
+.mode-details textarea {
+  width: 100%; min-height: 70px; padding: 10px 12px;
+  font: inherit; font-size: 13px;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--bg); color: var(--fg); outline: none;
+  resize: vertical; transition: border-color 0.2s;
+  font-family: inherit;
+}
+.mode-details textarea:focus:not([readonly]) { border-color: var(--accent); }
+.mode-details textarea[readonly] {
+  background: var(--bg-card);
+  color: var(--fg-secondary);
+  cursor: default;
+}
+.mode-details .field-label {
+  font-size: 11px; color: var(--fg-muted);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  font-weight: 600; margin-bottom: 4px; display: block;
+}
+.mode-details-actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+.mode-details-actions .btn-save,
+.mode-details-actions .btn-cancel {
+  padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.mode-details-actions .btn-save { background: var(--accent); color: var(--bg); border: none; }
+.mode-details-actions .btn-save:hover { background: var(--accent-hover); }
+.mode-details-actions .btn-cancel { background: var(--bg); color: var(--fg-secondary); border: 1px solid var(--line); }
+.mode-details-actions .btn-cancel:hover { background: var(--bg-card); }
+.mode-details-hint { font-size: 11px; color: var(--fg-muted); flex: 1; }
     
 .confirm-modal h3 {
   font-size: 15px; font-weight: 700; margin-bottom: 14px;
@@ -816,47 +864,42 @@
           <div class="history-list" id="modes-list"></div>
           <div class="page-empty-state" id="modes-empty" style="display:none">Модов ещё нет.</div>
 
-          <template id="mode-row-template">
-            <div class="history-item mode-item">
-              <label class="switch" title="Активировать для своих файлов">
-                <input type="checkbox" data-mode-toggle>
-                <span class="toggle-slider"></span>
-              </label>
-              <div class="input-container"><input type="text" data-mf="code" class="styled_input_bar" readonly style="width:140px; text-transform:uppercase; text-align:center;" placeholder=" "><label class="input-label">код</label></div>
-              <div class="input-container"><input type="text" data-mf="title" class="styled_input_bar" readonly style="width:280px;" placeholder=" "><label class="input-label">название</label></div>
-              <span class="mode-creator-pill" data-mf="creator">—</span>
-              <div style="flex:1;"></div>
-              <button type="button" class="member-action-btn" data-action="edit" title="Редактировать"><span class="material-symbols-outlined">edit</span></button>
-              <button type="button" class="member-action-btn danger" data-action="delete" title="Удалить"><span class="material-symbols-outlined">delete</span></button>
-            </div>
-          </template>
-
-          <template id="mode-form-template">
-            <div class="mode-form-container mode-form">
-              <div class="mode-form-row">
-                <div class="input-container"><input type="text" data-ff="code" class="styled_input_bar" placeholder=" " style="width:100%; text-transform:uppercase;"><label class="input-label">код (CODE)</label></div>
-                <div class="input-container" style="flex:2;"><input type="text" data-ff="title" class="styled_input_bar" placeholder=" " style="width:100%;"><label class="input-label">название</label></div>
-              </div>
-              <div>
-                <span class="field-label">инструкции (instructions)</span>
-                <textarea data-ff="instructions" rows="6" placeholder="что должен делать селектор: как искать, какие параметры важны, что предпочитать"></textarea>
-              </div>
-              <div>
-                <span class="field-label">запреты (bans)</span>
-                <textarea data-ff="bans" rows="3" placeholder="что недопустимо: аналоги, конкретные бренды, формфакторы"></textarea>
-              </div>
-              <div>
-                <span class="field-label">источники (по одному на строку)</span>
-                <textarea data-ff="sources" rows="4" placeholder="onlinetrade.ru&#10;citilink.ru&#10;dns-shop.ru"></textarea>
-              </div>
-              <div class="mode-form-actions">
-                <span class="mode-form-hint" data-ff="hint"></span>
-                <div style="flex:1;"></div>
-                <button type="button" class="btn-cancel" data-ff-action="cancel">Отмена</button>
-                <button type="button" class="btn-save" data-ff-action="save">Сохранить</button>
-              </div>
-            </div>
-          </template>
+          <template id="mode-card-template">
+  <div class="mode-item-wrap">
+    <div class="history-item mode-item">
+      <label class="switch" title="Активировать для своих файлов">
+        <input type="checkbox" data-mode-toggle>
+        <span class="toggle-slider"></span>
+      </label>
+      <div class="input-container"><input type="text" data-mf="code" class="styled_input_bar" placeholder=" " style="width:140px; text-transform:uppercase; text-align:center;"><label class="input-label">код</label></div>
+      <div class="input-container"><input type="text" data-mf="title" class="styled_input_bar" placeholder=" " style="width:280px;"><label class="input-label">название</label></div>
+      <span class="mode-creator-pill" data-mf="creator">—</span>
+      <div style="flex:1;"></div>
+      <button type="button" class="member-action-btn" data-action="toggle-details" title="Показать детали"><span class="material-symbols-outlined">expand_more</span></button>
+      <button type="button" class="member-action-btn danger" data-action="delete" title="Удалить"><span class="material-symbols-outlined">delete</span></button>
+    </div>
+    <div class="mode-details">
+      <div>
+        <span class="field-label">инструкции (instructions)</span>
+        <textarea data-ff="instructions" rows="6" placeholder="что должен делать селектор: как искать, какие параметры важны, что предпочитать"></textarea>
+      </div>
+      <div>
+        <span class="field-label">запреты (bans)</span>
+        <textarea data-ff="bans" rows="3" placeholder="что недопустимо: аналоги, конкретные бренды, формфакторы"></textarea>
+      </div>
+      <div>
+        <span class="field-label">источники (по одному на строку)</span>
+        <textarea data-ff="sources" rows="4" placeholder="onlinetrade.ru&#10;citilink.ru&#10;dns-shop.ru"></textarea>
+      </div>
+      <div class="mode-details-actions">
+        <span class="mode-details-hint" data-ff="hint"></span>
+        <button type="button" class="btn-cancel" data-ff-action="cancel">Отмена</button>
+        <button type="button" class="btn-save"   data-ff-action="save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</template>
+          
         </div>
       </div>
     </div>
@@ -1007,6 +1050,21 @@ const state = {
   ensureInProgress: false,
 };
 
+  // ============================================================
+// DEVICE ID (стабильный per-browser, переживает релоад)
+// ============================================================
+const DEVICE_KEY = "ai-eq-device-id";
+function getDeviceId() {
+  let id = localStorage.getItem(DEVICE_KEY);
+  if (!id) {
+    id = (crypto?.randomUUID?.()
+       || ("d-" + Math.random().toString(36).slice(2) + Date.now().toString(36)));
+    localStorage.setItem(DEVICE_KEY, id);
+  }
+  return id;
+}
+const DEVICE_ID = getDeviceId();
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -1141,6 +1199,22 @@ async function handleGoogleSignIn() {
 }
 
 async function handleSignOut() {
+  // Останавливаем heartbeat
+  if (state.sessionHeartbeat) { clearInterval(state.sessionHeartbeat); state.sessionHeartbeat = null; }
+  // Снимаем session-канал
+  if (state.sessionChannel) {
+    try { supabase.removeChannel(state.sessionChannel); } catch {}
+    state.sessionChannel = null;
+  }
+  // Освобождаем запись (только если мы её хозяин — иначе нас вытеснили и удалять не надо)
+  if (state.user && !state.evicted) {
+    try {
+      await supabase.from("app_active_sessions")
+        .delete()
+        .eq("user_id", state.user.id)
+        .eq("device_id", DEVICE_ID);
+    } catch {}
+  }
   // 1. Отключаем realtime синхронно — он держит WS-соединение
   if (state.realtimeSub) {
     try { state.realtimeSub.unsubscribe(); } catch {}
@@ -1253,7 +1327,13 @@ async function refreshState() {
     .select("group_id, role, groups(id, name, status)")
     .eq("user_id", state.user.id);
   state.groups = (memberships || []).map(m => ({ id: m.group_id, role: m.role, ...m.groups }));
-  state.groupId = profile?.default_group_id || state.groups[0]?.id || null;
+
+  // Если текущий state.groupId всё ещё валиден — оставляем его, не сбрасываем на default
+  const stillValid = state.groupId && state.groups.some(g => g.id === state.groupId);
+  if (!stillValid) {
+    state.groupId = profile?.default_group_id || state.groups[0]?.id || null;
+  }
+
   if (state.groupId) {
     const { data: bal } = await supabase.from("billing_balance").select("*").eq("group_id", state.groupId).maybeSingle();
     state.balance = bal;
@@ -1283,17 +1363,21 @@ function renderGroupSwitcher() {
   `).join("");
   menu.querySelectorAll("[data-group-id]").forEach(el => {
     el.addEventListener("click", async () => {
-      state.groupId = el.dataset.groupId;
-      $("group-switcher-menu").classList.remove("open");
-      await refreshState();
-      renderUserHeader();
-      await loadHistory({ resetLimit: true });
-      // Если открыта вкладка «Пользователи» или «Биллинг» — перечитать их
-      const activePage = document.querySelector(".page-switcher-btn.active")?.dataset.page;
-      if (activePage === "members") loadMembersPage();
-      else if (activePage === "billing") loadBillingPage();
-      else if (activePage === "modes") loadModesPage();
-    });
+  if (state.groupId === el.dataset.groupId) {
+    $("group-switcher-menu").classList.remove("open");
+    return;
+  }
+  state.groupId = el.dataset.groupId;
+  $("group-switcher-menu").classList.remove("open");
+  await refreshState();
+  renderUserHeader();
+  await loadHistory({ resetLimit: true });
+  setupRealtime();           // ← НОВОЕ: пересоздаём подписку на новую группу
+  const activePage = document.querySelector(".page-switcher-btn.active")?.dataset.page;
+  if (activePage === "members") loadMembersPage();
+  else if (activePage === "billing") loadBillingPage();
+  else if (activePage === "modes") loadModesPage();
+});
   });
 }
 
@@ -2073,6 +2157,77 @@ function setupRealtime() {
     .subscribe();
 }
 
+  // Захватить сессию: UPSERT нашу запись (если кто-то другой — затрём её device_id).
+// Если в момент захвата мы видим device_id, отличный от нашего, — кто-то залогинился позже.
+// В норме (свежий логин) мы СТАНОВИМСЯ хозяином.
+async function claimSession() {
+  if (!state.user) return false;
+  try {
+    const { error } = await supabase.from("app_active_sessions").upsert({
+      user_id: state.user.id,
+      device_id: DEVICE_ID,
+      user_agent: navigator.userAgent.slice(0, 500),
+      last_seen_at: new Date().toISOString(),
+    }, { onConflict: "user_id" });
+    if (error) { console.error("claimSession:", error); return false; }
+    return true;
+  } catch (e) { console.error("claimSession ex:", e); return false; }
+}
+
+// Проверить, что текущая запись принадлежит нашему device_id.
+// Если нет — нас вытеснили; делаем signOut.
+async function verifySessionOwnership() {
+  if (!state.user || state.evicted) return;
+  const { data, error } = await supabase
+    .from("app_active_sessions").select("device_id")
+    .eq("user_id", state.user.id).maybeSingle();
+  if (error) { console.warn("verifySessionOwnership:", error); return; }
+  if (data && data.device_id !== DEVICE_ID) await forceEvict();
+}
+
+// Принудительный выход: показать тост, дождаться его, сделать signOut.
+async function forceEvict() {
+  if (state.evicted) return;
+  state.evicted = true;
+  toast("Аккаунт открыт на другом устройстве — эта сессия закрыта", "error", 7000);
+  await delay(1500);
+  await handleSignOut();
+}
+
+// Подписка на realtime: если кто-то перезапишет device_id — нас вытеснили.
+function setupSessionWatch() {
+  if (!state.user) return;
+  if (state.sessionChannel) {
+    try { supabase.removeChannel(state.sessionChannel); } catch {}
+    state.sessionChannel = null;
+  }
+  state.sessionChannel = supabase.channel(`session-${state.user.id}`)
+    .on("postgres_changes", {
+      event: "*", schema: "public", table: "app_active_sessions",
+      filter: `user_id=eq.${state.user.id}`,
+    }, (payload) => {
+      const newDev = payload.new?.device_id;
+      if (newDev && newDev !== DEVICE_ID) forceEvict();
+    })
+    .subscribe();
+}
+
+// Heartbeat: раз в 60 сек обновляем last_seen_at И проверяем, что мы всё ещё хозяин.
+function startSessionHeartbeat() {
+  if (state.sessionHeartbeat) { clearInterval(state.sessionHeartbeat); state.sessionHeartbeat = null; }
+  state.sessionHeartbeat = setInterval(async () => {
+    if (!state.user || state.evicted || document.visibilityState !== "visible") return;
+    // UPDATE only — не создаём новую запись, если её удалил кто-то другой,
+    // вместо этого через verifySessionOwnership поймаем eviction.
+    const { error } = await supabase.from("app_active_sessions")
+      .update({ last_seen_at: new Date().toISOString() })
+      .eq("user_id", state.user.id)
+      .eq("device_id", DEVICE_ID);
+    if (error) console.warn("heartbeat:", error);
+    await verifySessionOwnership();
+  }, 60_000);
+}
+
 function applyRealtimeRegistryUpdate(row) {
   if (!row) return;
   const idx = state.history.findIndex(h => h.id === row.id);
@@ -2430,53 +2585,10 @@ async function loadModesPage() {
   if (!modes.length) { emptyEl.style.display = "block"; return; }
   emptyEl.style.display = "none";
 
-  modes.forEach(m => list.appendChild(buildModeRow(m, activeMap.get(m.id) === true)));
+  modes.forEach(m => list.appendChild(buildModeCard(m, activeMap.get(m.id) === true)));
 }
 
-function buildModeRow(mode, isActive) {
-  const tpl = $("mode-row-template").content.cloneNode(true);
-  const row = tpl.querySelector(".mode-item");
-  row.dataset.modeId = mode.id;
-  if (mode.is_system_template) row.classList.add("is-system");
 
-  const setF = (f, v) => {
-    const el = row.querySelector(`[data-mf="${f}"]`);
-    if (!el) return;
-    if (el.tagName === "INPUT") el.value = v; else el.textContent = v;
-  };
-  setF("code", mode.code || "—");
-  setF("title", mode.title || "—");
-
-  const creatorPill = row.querySelector('[data-mf="creator"]');
-  if (mode.is_system_template) {
-    creatorPill.textContent = "СИСТЕМНЫЙ";
-    creatorPill.classList.add("system");
-  } else {
-    const creator = mode.author?.full_name || mode.author?.email || "—";
-    creatorPill.textContent = creator;
-  }
-
-  // Тогл активности (для текущего пользователя)
-  const toggle = row.querySelector("[data-mode-toggle]");
-  toggle.checked = !!isActive;
-  toggle.addEventListener("change", e => {
-    e.stopPropagation();
-    toggleModeActive(mode.id, e.target.checked, toggle);
-  });
-
-  // Кнопки edit/delete — только для своих модов
-  const isMine = !mode.is_system_template && mode.created_by === state.user?.id;
-  const btnEdit = row.querySelector('[data-action="edit"]');
-  const btnDelete = row.querySelector('[data-action="delete"]');
-  if (!isMine) {
-    btnEdit?.remove();
-    btnDelete?.remove();
-  } else {
-    btnEdit.addEventListener("click", e => { e.stopPropagation(); startEditMode(mode); });
-    btnDelete.addEventListener("click", e => { e.stopPropagation(); deleteModeAction(mode); });
-  }
-  return row;
-}
 
 async function toggleModeActive(modeId, enabled, toggleEl) {
   try {
@@ -2491,89 +2603,144 @@ async function toggleModeActive(modeId, enabled, toggleEl) {
   }
 }
 
+function buildModeCard(mode, isActive, isCreateForm = false) {
+  const tpl = $("mode-card-template").content.cloneNode(true);
+  const wrap = tpl.querySelector(".mode-item-wrap");
+  wrap.dataset.modeId = mode?.id || "";
+  if (mode?.is_system_template) wrap.classList.add("is-system");
+
+  const isMine    = !!mode && !mode.is_system_template && mode.created_by === state.user?.id;
+  const canEdit   = isCreateForm || isMine;
+  const canDelete = isMine;
+
+  // Поля шапки
+  const codeEl  = wrap.querySelector('[data-mf="code"]');
+  const titleEl = wrap.querySelector('[data-mf="title"]');
+  codeEl.value  = mode?.code  || "";
+  titleEl.value = mode?.title || "";
+  if (!canEdit) { codeEl.readOnly = true; titleEl.readOnly = true; }
+
+  // Creator pill
+  const pill = wrap.querySelector('[data-mf="creator"]');
+  if (mode?.is_system_template) {
+    pill.textContent = "СИСТЕМНЫЙ"; pill.classList.add("system");
+  } else if (mode) {
+    pill.textContent = mode.author?.full_name || mode.author?.email || "—";
+  } else {
+    pill.textContent = "НОВЫЙ"; pill.classList.add("system");
+  }
+
+  // Toggle active
+  const toggle = wrap.querySelector("[data-mode-toggle]");
+  if (isCreateForm) {
+    toggle.disabled = true;
+  } else {
+    toggle.checked = !!isActive;
+    toggle.addEventListener("change", e => {
+      e.stopPropagation();
+      toggleModeActive(mode.id, e.target.checked, toggle);
+    });
+  }
+
+  // Details (instructions / bans / sources)
+  const insEl = wrap.querySelector('[data-ff="instructions"]');
+  const banEl = wrap.querySelector('[data-ff="bans"]');
+  const srcEl = wrap.querySelector('[data-ff="sources"]');
+  insEl.value = mode?.instructions || "";
+  banEl.value = mode?.bans || "";
+  srcEl.value = (mode?.sources || []).join("\n");
+  if (!canEdit) {
+    insEl.readOnly = banEl.readOnly = srcEl.readOnly = true;
+  }
+
+  // Actions
+  const btnToggle = wrap.querySelector('[data-action="toggle-details"]');
+  const btnDelete = wrap.querySelector('[data-action="delete"]');
+  const btnSave   = wrap.querySelector('[data-ff-action="save"]');
+  const btnCancel = wrap.querySelector('[data-ff-action="cancel"]');
+  const hintEl    = wrap.querySelector('[data-ff="hint"]');
+  const actionsRow = wrap.querySelector(".mode-details-actions");
+
+  if (!canDelete) btnDelete.remove();
+  else btnDelete.addEventListener("click", e => { e.stopPropagation(); deleteModeAction(mode); });
+
+  if (!canEdit) {
+    // Read-only: убираем кнопки и подсказку, оставляем пустую actions-row скрытой
+    actionsRow.style.display = "none";
+  } else {
+    btnCancel.addEventListener("click", e => {
+      e.stopPropagation();
+      if (isCreateForm) wrap.remove();
+      else { wrap.classList.remove("is-open"); rotateExpandIcon(btnToggle, false); }
+    });
+    btnSave.addEventListener("click", async e => {
+      e.stopPropagation();
+      const code = codeEl.value.trim();
+      const title = titleEl.value.trim();
+      const instructions = insEl.value.trim();
+      const bans = banEl.value.trim();
+      const sources = srcEl.value.split("\n").map(s => s.trim()).filter(Boolean);
+      if (!code) { hintEl.textContent = "Код обязателен"; return; }
+      if (!title) { hintEl.textContent = "Название обязательно"; return; }
+      if (!instructions) { hintEl.textContent = "Инструкции обязательны"; return; }
+      btnSave.disabled = true; btnCancel.disabled = true; hintEl.textContent = "Сохранение…";
+      try {
+        const { error } = await supabase.rpc("upsert_mode", {
+          p_group_id: state.groupId,
+          p_mode_id: mode?.id || null,
+          p_code: code, p_title: title,
+          p_instructions: instructions,
+          p_bans: bans || null,
+          p_sources: sources,
+        });
+        if (error) throw error;
+        toast(mode ? "Мод обновлён" : "Мод создан", "success");
+        await loadModesPage();
+      } catch (err) {
+        const msg = err?.message || String(err);
+        const human = msg.includes("not_a_member") ? "Вы не участник группы"
+                    : msg.includes("not_mode_author") ? "Этот мод создан другим пользователем"
+                    : msg.includes("cannot_edit_system_template") ? "Системные шаблоны нельзя редактировать"
+                    : msg.includes("required") ? "Заполните обязательные поля"
+                    : msg;
+        hintEl.textContent = "Ошибка: " + human;
+        btnSave.disabled = false; btnCancel.disabled = false;
+      }
+    });
+  }
+
+  // Раскрытие / сворачивание
+  btnToggle.addEventListener("click", e => {
+    e.stopPropagation();
+    const open = !wrap.classList.contains("is-open");
+    wrap.classList.toggle("is-open", open);
+    rotateExpandIcon(btnToggle, open);
+  });
+
+  if (isCreateForm) {
+    wrap.classList.add("is-open");
+    rotateExpandIcon(btnToggle, true);
+  }
+  return wrap;
+}
+
+function rotateExpandIcon(btn, open) {
+  const i = btn.querySelector(".material-symbols-outlined");
+  if (i) i.textContent = open ? "expand_less" : "expand_more";
+  btn.title = open ? "Скрыть детали" : "Показать детали";
+}
+
+// startCreateMode — теперь просто вставляет карточку наверх в режиме создания
 function startCreateMode() {
   const list = $("modes-list");
   if (!list) return;
-  // Уже открытую форму не дублируем
-  if (list.querySelector(".mode-form-container[data-form-mode='create']")) {
-    list.querySelector(".mode-form-container[data-form-mode='create'] [data-ff='code']")?.focus();
+  if (list.querySelector(".mode-item-wrap[data-mode-id='']")) {
+    list.querySelector('.mode-item-wrap[data-mode-id=""] [data-mf="code"]')?.focus();
     return;
   }
-  const formEl = createModeFormElement(null);
-  formEl.dataset.formMode = "create";
-  list.insertBefore(formEl, list.firstChild);
-  setTimeout(() => formEl.querySelector('[data-ff="code"]')?.focus(), 50);
-}
-
-function startEditMode(mode) {
-  const list = $("modes-list");
-  if (!list) return;
-  const existingRow = list.querySelector(`.mode-item[data-mode-id="${mode.id}"]`);
-  if (!existingRow) return;
-  const formEl = createModeFormElement(mode);
-  formEl.dataset.formMode = "edit";
-  formEl.dataset.modeId = mode.id;
-  list.replaceChild(formEl, existingRow);
-  setTimeout(() => formEl.querySelector('[data-ff="code"]')?.focus(), 50);
-}
-
-function createModeFormElement(mode) {
-  const tpl = $("mode-form-template").content.cloneNode(true);
-  const formEl = tpl.querySelector(".mode-form-container");
-
-  if (mode) {
-    formEl.querySelector('[data-ff="code"]').value = mode.code || "";
-    formEl.querySelector('[data-ff="title"]').value = mode.title || "";
-    formEl.querySelector('[data-ff="instructions"]').value = mode.instructions || "";
-    formEl.querySelector('[data-ff="bans"]').value = mode.bans || "";
-    formEl.querySelector('[data-ff="sources"]').value = (mode.sources || []).join("\n");
-  }
-
-  const btnSave = formEl.querySelector('[data-ff-action="save"]');
-  const btnCancel = formEl.querySelector('[data-ff-action="cancel"]');
-  const hintEl = formEl.querySelector('[data-ff="hint"]');
-
-  btnCancel.addEventListener("click", e => { e.stopPropagation(); loadModesPage(); });
-  btnSave.addEventListener("click", async e => {
-    e.stopPropagation();
-    const code = formEl.querySelector('[data-ff="code"]').value.trim();
-    const title = formEl.querySelector('[data-ff="title"]').value.trim();
-    const instructions = formEl.querySelector('[data-ff="instructions"]').value.trim();
-    const bans = formEl.querySelector('[data-ff="bans"]').value.trim();
-    const sources = formEl.querySelector('[data-ff="sources"]').value
-      .split("\n").map(s => s.trim()).filter(Boolean);
-
-    if (!code) { hintEl.textContent = "Код обязателен"; return; }
-    if (!title) { hintEl.textContent = "Название обязательно"; return; }
-    if (!instructions) { hintEl.textContent = "Инструкции обязательны"; return; }
-
-    btnSave.disabled = true; btnCancel.disabled = true; hintEl.textContent = "Сохранение…";
-    try {
-      const { error } = await supabase.rpc("upsert_mode", {
-        p_group_id: state.groupId,
-        p_mode_id: mode?.id || null,
-        p_code: code,
-        p_title: title,
-        p_instructions: instructions,
-        p_bans: bans || null,
-        p_sources: sources,
-      });
-      if (error) throw error;
-      toast(mode ? "Мод обновлён" : "Мод создан", "success");
-      await loadModesPage();
-    } catch (err) {
-      const msg = err?.message || String(err);
-      const human = msg.includes("not_a_member") ? "Вы не участник группы"
-                  : msg.includes("not_mode_author") ? "Этот мод создан другим пользователем"
-                  : msg.includes("cannot_edit_system_template") ? "Системные шаблоны нельзя редактировать"
-                  : msg.includes("required") ? "Заполните обязательные поля"
-                  : msg;
-      hintEl.textContent = "Ошибка: " + human;
-      btnSave.disabled = false; btnCancel.disabled = false;
-    }
-  });
-
-  return formEl;
+  const card = buildModeCard(null, false, true);
+  list.insertBefore(card, list.firstChild);
+  setTimeout(() => card.querySelector('[data-mf="code"]')?.focus(), 50);
 }
 
 async function deleteModeAction(mode) {
@@ -2727,6 +2894,10 @@ async function bootstrap() {
     state.session = session;
     state.user = session.user;
     const ok = await ensureUserHasGroup();
+    const claimed = await claimSession();
+if (!claimed) toast("Не удалось зафиксировать сессию", "error");
+setupSessionWatch();
+startSessionHeartbeat();
     if (ok) {
       await refreshState();
       renderUserHeader();
@@ -2734,6 +2905,10 @@ async function bootstrap() {
       showApp();
       await loadHistory({ resetLimit: true });
       setupRealtime();
+      const claimed = await claimSession();
+if (!claimed) toast("Не удалось зафиксировать сессию", "error");
+setupSessionWatch();
+startSessionHeartbeat();
     }
   } else {
     showLogin();
@@ -2752,6 +2927,10 @@ async function bootstrap() {
       showApp();
       await loadHistory({ resetLimit: true });
       setupRealtime();
+      const claimed = await claimSession();
+if (!claimed) toast("Не удалось зафиксировать сессию", "error");
+setupSessionWatch();
+startSessionHeartbeat();
     } else if (event === "SIGNED_OUT") {
       state.session = null; state.user = null; state.profile = null;
       showLogin();
@@ -2775,6 +2954,9 @@ async function bootstrap() {
   // ============================================================
   let lastWake = 0;
   const handleWake = async () => {
+    // 1a. Проверяем, не вытеснили ли нас за время сна
+await verifySessionOwnership();
+if (state.evicted) return;
     if (document.visibilityState !== "visible" || !state.user) return;
     // debounce — события могут прилететь пачкой (visibility + focus + online)
     const now = Date.now();
@@ -2804,6 +2986,9 @@ async function bootstrap() {
 
     // 3. Догоняем пропущенные апдейты
     try { await loadHistory(); } catch (e) { console.error("[wake] loadHistory:", e); }
+
+    // Пересоздаём session-watch — WS мог умереть за время сна
+try { setupSessionWatch(); } catch (e) { console.error("[wake] setupSessionWatch:", e); }
 
     // 4. Триггерим проверку коннекта прямо сейчас
     try {
