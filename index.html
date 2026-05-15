@@ -109,7 +109,7 @@
 
     /* ============ DB DISCONNECT ============ */
     #db-disconnect-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.5s; z-index: 2000; }
-    #db-disconnect-overlay.show { opacity: 1; pointer-events: auto; }
+    #db-disconnect-overlay.show { opacity: 1; pointer-events: none; }
 
     /* ============ HEADER (RIVA) ============ */
     .header-blur { background: var(--bg); border-bottom: 1px solid var(--line); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 30; }
@@ -1052,6 +1052,14 @@ function formatNumeric(v) {
   return n.toLocaleString("ru-RU");
 }
 
+// Возвращает {label, isMissing}: если прайсер реально объехал РФ и пришёл пустой ответ — это «нет в РФ»; иначе пустое поле
+function pickPriceCell(pk, formattedValue) {
+  if (formattedValue) return formattedValue;
+  if (pk.pricer_status === "error" && pk.pricer_error === "no_offers") return "нет в РФ";
+  if (pk.pricer_status === "error") return "ошибка";
+  return "";
+}
+
 function toast(message, kind = "info", ms = 3500) {
   const c = $("toasts");
   if (!c) return;
@@ -1133,10 +1141,27 @@ async function handleGoogleSignIn() {
 }
 
 async function handleSignOut() {
-  if (state.realtimeSub) { try { state.realtimeSub.unsubscribe(); } catch {} state.realtimeSub = null; }
-  await supabase.auth.signOut();
+  // 1. Отключаем realtime синхронно — он держит WS-соединение
+  if (state.realtimeSub) {
+    try { state.realtimeSub.unsubscribe(); } catch {}
+    try { supabase.removeChannel(state.realtimeSub); } catch {}
+    state.realtimeSub = null;
+  }
+  // 2. signOut в local-режиме — НЕ ходит на /auth/v1/logout, не зависает на протухшем токене
+  try { await supabase.auth.signOut({ scope: "local" }); } catch (e) { console.warn("signOut:", e); }
+  // 3. Жёстко чистим всё, что Supabase оставил
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && (k.startsWith("sb-") || k.startsWith("supabase.auth"))) localStorage.removeItem(k);
+    }
+  } catch {}
+  // 4. Сброс in-memory state
   state.session = null; state.user = null; state.profile = null; state.groupId = null;
-  showLogin();
+  state.groups = []; state.history = []; state.specGroups = {}; state.picksByPos = {};
+  state.watchedSpecIds.clear();
+  // 5. Полная перезагрузка приложения с чистого листа
+  location.replace(window.location.pathname);
 }
 
   // ============================================================
@@ -1449,7 +1474,11 @@ function renderHistory(oldMap = {}) {
       if (f === "created_at") { display = fmtDate(item.created_at); }
       else if (f === "cost") { display = item.total_cost_usd_billed ? "$" + ceilToFixed(item.total_cost_usd_billed, 2) : "—"; }
       else if (f === "user_login") { display = item.uploader?.full_name || item.uploader?.email || "—"; }
-      else if (f === "status_parser") { display = STATUS_LABELS[v] || v || "—"; }
+      else if (f === "status_parser") {
+  if (v === "done") display = "1 / 1";
+  else if (v === "in_progress" || v === "queued" || v === "error") display = "0 / 1";
+  else display = "— / —";
+}
       else if (f === "status_selector") { display = triples.selTotal > 0 ? `${triples.selReceived} / ${triples.selTotal}` : "—"; }
       else if (f === "status_pricer")  { display = triples.priTotal > 0 ? `${triples.priReceived} / ${triples.priTotal}` : "—"; }
       else { display = (v ?? ""); }
@@ -1462,12 +1491,15 @@ function renderHistory(oldMap = {}) {
 
       // Иконки
       if (f === "status_parser") {
-        applyStatusIcon(rowEl, f, v);
-        if (oldMap[item.id] && oldMap[item.id][f] !== v) {
-          el.classList.add("fade");
-          setTimeout(() => el.classList.remove("fade"), 500);
-        }
-      } else if (f === "status_selector") {
+  const errFlag = v === "error";
+  const total = (v === "done" || v === "in_progress" || v === "queued" || v === "error") ? 1 : 0;
+  const received = v === "done" ? 1 : 0;
+  applyComputedStatusIcon(rowEl, f, received, total, errFlag);
+  if (oldMap[item.id] && oldMap[item.id][f] !== v) {
+    el.classList.add("fade");
+    setTimeout(() => el.classList.remove("fade"), 500);
+  }
+} else if (f === "status_selector") {
         applyComputedStatusIcon(rowEl, f, triples.selReceived, triples.selTotal, false);
       } else if (f === "status_pricer") {
         applyComputedStatusIcon(rowEl, f, triples.priReceived, triples.priTotal, false);
@@ -1510,9 +1542,9 @@ async function loadSpecData() {
   state.picksByPos = {};
   if (posIds.length) {
     const { data: picks } = await supabase
-      .from(PICK_TABLE)
-      .select("id, pos_id, spec_id, article, model_name, qty, unit, price, sum, pricer_status, price1_amount, price1_currency, price1_store, price1_url, price2_amount, price2_currency, price2_store, price2_url, price3_amount, price3_currency, price3_store, price3_url")
-      .in("pos_id", posIds);
+  .from(PICK_TABLE)
+  .select("id, pos_id, spec_id, article, model_name, qty, unit, price, sum, pricer_status, pricer_error, price1_amount, price1_currency, price1_store, price1_url, price2_amount, price2_currency, price2_store, price2_url, price3_amount, price3_currency, price3_store, price3_url")
+  .in("pos_id", posIds);
     (picks || []).forEach(p => { (state.picksByPos[p.pos_id] = state.picksByPos[p.pos_id] || []).push(p); });
   }
 }
@@ -1561,14 +1593,6 @@ function toggleSpecOpen(specId) {
   container.dataset.specId = idStr;
   const content = container.querySelector(".spec-content");
   content.classList.add("visible");
-
-  // Прогресс-степы
-  const progFrag = $("spec-progress-template").content.cloneNode(true);
-  const progressEl = progFrag.querySelector(".spec-progress");
-  progressEl.dataset.specId = idStr;
-  container.insertBefore(progFrag, content);
-  initProgressHandlers(progressEl, specId);
-  updateSpecProgress(idStr);
 
   // Action-кнопки (excel / copy)
   const actFrag = $("button-group-spec").content.cloneNode(true);
@@ -1640,8 +1664,8 @@ if (slide1) {
           setPick("model_name", pk.model_name);
           setPick("qty", pk.qty);
           setPick("unit", pk.unit);
-          setPick("price", pk.price ? formatNumeric(pk.price) : "");
-          setPick("sum", pk.sum ? formatNumeric(pk.sum) : "");
+          setPick("price", pickPriceCell(pk, pk.price ? formatNumeric(pk.price) : ""));
+          setPick("sum",   pickPriceCell(pk, pk.sum   ? formatNumeric(pk.sum)   : ""));
           slide2.appendChild(bf);
         });
       } else {
@@ -1656,16 +1680,18 @@ if (slide1) {
         picks.forEach(pk => {
           const bf = block3Tpl.content.cloneNode(true);
           const setOffer = (n, amt, curr, store, url) => {
-            const p = bf.querySelector(`[data-offer="${n}-price"]`);
-            const s = bf.querySelector(`[data-offer="${n}-store"]`);
-            const u = bf.querySelector(`[data-offer="${n}-url"]`);
-            if (p) p.value = amt ? formatNumeric(amt) : "";
-            if (s) s.value = store || "";
-            if (u) {
-              if (url) { u.href = url; u.style.opacity = "1"; u.style.pointerEvents = "auto"; }
-              else { u.href = "#"; u.style.opacity = "0.3"; u.style.pointerEvents = "none"; }
-            }
-          };
+  const p = bf.querySelector(`[data-offer="${n}-price"]`);
+  const s = bf.querySelector(`[data-offer="${n}-store"]`);
+  const u = bf.querySelector(`[data-offer="${n}-url"]`);
+  // «нет в РФ» только в первой ячейке (n===1), чтобы не дублировать на трёх колонках
+  const fallback = (n === 1) ? pickPriceCell(pk, "") : "";
+  if (p) p.value = amt ? formatNumeric(amt) : fallback;
+  if (s) s.value = store || "";
+  if (u) {
+    if (url) { u.href = url; u.style.opacity = "1"; u.style.pointerEvents = "auto"; }
+    else { u.href = "#"; u.style.opacity = "0.3"; u.style.pointerEvents = "none"; }
+  }
+};
           setOffer(1, pk.price1_amount, pk.price1_currency, pk.price1_store, pk.price1_url);
           setOffer(2, pk.price2_amount, pk.price2_currency, pk.price2_store, pk.price2_url);
           setOffer(3, pk.price3_amount, pk.price3_currency, pk.price3_store, pk.price3_url);
@@ -1728,8 +1754,6 @@ function updateRowTriples(specId) {
   };
   setTriple('status_selector', t.selReceived, t.selTotal);
   setTriple('status_pricer',  t.priReceived, t.priTotal);
-
-  updateSpecProgress(specId);
 }
 
 // ============================================================
@@ -2068,13 +2092,22 @@ function applyRealtimeRegistryUpdate(row) {
     let display;
     if (f === "created_at") display = fmtDate(row.created_at);
     else if (f === "cost") display = row.total_cost_usd_billed ? "$" + ceilToFixed(row.total_cost_usd_billed, 2) : "—";
-    else if (f === "status_parser") display = STATUS_LABELS[v] || v || "—";
+    else if (f === "status_parser") {
+  if (v === "done") display = "1 / 1";
+  else if (v === "in_progress" || v === "queued" || v === "error") display = "0 / 1";
+  else display = "— / —";
+}
     else display = (v ?? "");
     if (el.tagName === "INPUT" && el.value !== display) {
       el.classList.add("fade");
       setTimeout(() => { el.value = display; el.classList.remove("fade"); }, 250);
     }
-    if (f === "status_parser") applyStatusIcon(rowEl, f, v);
+    if (f === "status_parser") {
+  const errFlag = v === "error";
+  const total = (v === "done" || v === "in_progress" || v === "queued" || v === "error") ? 1 : 0;
+  const received = v === "done" ? 1 : 0;
+  applyComputedStatusIcon(rowEl, f, received, total, errFlag);
+}
   });
 
   // Триплеты + прогресс-бар через единую точку
