@@ -481,6 +481,55 @@
       .modalCONTEINERpost { flex-direction: column; }
       .slideshow-container { min-width: 100%; }
     }
+
+/* ===== notes-тултип + фиолетовое свечение слева на «наименование» (блок 2) ===== */
+.input-container.has-notes::after {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 45%;
+  border-radius: 8px 0 0 8px;
+  pointer-events: none;
+  z-index: 4;
+  background: radial-gradient(70% 75% at 0% 50%, rgba(139,92,246,.45) 0%, rgba(139,92,246,0) 100%);
+  filter: blur(5px);
+}
+.notes-tooltip {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 60;
+  min-width: 240px;
+  max-width: 380px;
+  padding: 10px 12px;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.12);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+  white-space: pre-line;        /* уважает \n из ". " */
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+}
+.input-container.has-notes:hover .notes-tooltip { opacity: 1; transform: none; }
+
+/* ===== стоимость одного комплекта позиции (блок 2), появляется с задержкой ===== */
+.kit-cost-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-top: 10px; padding: 10px 14px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--bg);
+  opacity: 0; transform: translateY(4px); pointer-events: none;
+  transition: opacity .45s, transform .45s;
+}
+.kit-cost-row.visible { opacity: 1; transform: none; pointer-events: auto; }
+.kit-cost-label { font-size: 11px; color: var(--fg-muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+.kit-cost-value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    
   </style>
 </head>
 <body>
@@ -1631,7 +1680,7 @@ async function loadSpecData() {
   if (posIds.length) {
     const { data: picks } = await supabase
   .from(PICK_TABLE)
-  .select("id, pos_id, spec_id, article, model_name, qty, unit, price, sum, pricer_status, pricer_error, price1_amount, price1_currency, price1_store, price1_url, price2_amount, price2_currency, price2_store, price2_url, price3_amount, price3_currency, price3_store, price3_url")
+  .select("id, pos_id, spec_id, article, model_name, qty, unit, price, sum, pricer_status, pricer_error, price1_amount, price1_currency, price1_store, price1_url, price2_amount, price2_currency, price2_store, price2_url, price3_amount, price3_currency, price3_store, price3_url, selector_notes, compliance_ok")
   .in("pos_id", posIds);
     (picks || []).forEach(p => { (state.picksByPos[p.pos_id] = state.picksByPos[p.pos_id] || []).push(p); });
   }
@@ -1700,6 +1749,45 @@ function toggleSpecOpen(specId) {
   setExpandState(rowEl, true);
 }
 
+// Тултип с notes + фиолетовое свечение слева на поле «наименование» (блок 2)
+function applyPickNotes(container, pk) {
+  if (!container) return;
+  const notes = (pk.selector_notes || "").trim();
+  if (!notes) return;
+
+  // Свечение: по умолчанию — когда есть notes.
+  // Чтобы подсвечивать ТОЛЬКО расхождения, замени строку ниже на:
+  if (pk.compliance_ok === false) container.classList.add("has-notes");
+  // container.classList.add("has-notes");
+
+  const text = notes
+    .replace(/\(\[[^\]]+\]\([^)]+\)\)/g, "") // убрать markdown-источники ([site](url))
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\.\s/g, ".\n");                // ". " → перенос строки
+  const tip = document.createElement("div");
+  tip.className = "notes-tooltip";
+  tip.textContent = text;
+  container.appendChild(tip);
+}
+
+// Строка «стоимость одного комплекта позиции». Показываем только когда всё проценено.
+// Делим суммарную стоимость всех строк позиции на количество комплектов (pos.qty),
+// поэтому 2 планки памяти на сборку учитываются автоматически (их qty уже = 2×комплектов).
+function buildKitCostRow(pos, picks) {
+  const qtyNum = parseFloat(String(pos.qty ?? "").replace(/[^\d.,]/g, "").replace(",", ".")) || 1;
+  const allPriced = picks.every(pk => pk.sum != null && pk.sum !== "" && Number.isFinite(parseFloat(pk.sum)));
+  if (!allPriced) return null;
+  const totalSum = picks.reduce((s, pk) => s + (parseFloat(pk.sum) || 0), 0);
+  const perKit = totalSum / qtyNum;
+  const el = document.createElement("div");
+  el.className = "kit-cost-row";
+  el.innerHTML =
+    `<span class="kit-cost-label">стоимость одного комплекта позиции</span>` +
+    `<span class="kit-cost-value">${perKit.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} ₽</span>`;
+  return el;
+}
+
 function renderSpecContent(content, specId) {
   const idStr = String(specId);
   const rows = (state.specGroups[idStr] || []).slice().sort((a, b) => toPosNum(a.pos_number_int ?? a.pos_number) - toPosNum(b.pos_number_int ?? b.pos_number));
@@ -1740,7 +1828,7 @@ if (slide1) {
       if (!pairs.length) slide1.innerHTML = '<div style="color:var(--fg-muted); font-size:12px; padding:10px;">Без характеристик</div>';
     }
 
-    // Slide 2: picks (block 2)
+    // Slide 2: picks (block 2) + стоимость одного комплекта
     const slide2 = rf.querySelector('.slide[data-slide="2"] .slide-content');
     const picks = state.picksByPos[pos.id] || [];
     if (slide2) {
@@ -1754,8 +1842,14 @@ if (slide1) {
           setPick("unit", pk.unit);
           setPick("price", pickPriceCell(pk, pk.price ? formatNumeric(pk.price) : ""));
           setPick("sum",   pickPriceCell(pk, pk.sum   ? formatNumeric(pk.sum)   : ""));
+          // тултип с notes + фиолетовое свечение на «наименование»
+          const nameInput = bf.querySelector('[data-pick="model_name"]');
+          if (nameInput) applyPickNotes(nameInput.closest(".input-container"), pk);
           slide2.appendChild(bf);
         });
+        // стоимость одного комплекта позиции
+        const kitEl = buildKitCostRow(pos, picks);
+        if (kitEl) slide2.appendChild(kitEl);
       } else {
         slide2.innerHTML = '<div style="color:var(--fg-muted); font-size:12px; padding:10px;">Подбор ещё не выполнен</div>';
       }
@@ -1809,16 +1903,27 @@ function parseAttrs(s) {
 }
 
 function setupSlideshow(container) {
-  // container = .modalCONTEINERpost (новая структура)
   const slides = container.querySelectorAll(".slide");
   const captionEl = container.querySelector(".slide-caption");
   const captions = ["Блок 1, требования ТЗ", "Блок 2, подобранная позиция", "Блок 3, ценовые источники"];
   let idx = 0;
+  let kitTimer = null;
+
+  // показ «стоимости комплекта» с задержкой 1с после перехода на блок 2
+  const revealKit = (on) => {
+    const kit = container.querySelector(".kit-cost-row");
+    if (kitTimer) { clearTimeout(kitTimer); kitTimer = null; }
+    if (!kit) return;
+    if (on) kitTimer = setTimeout(() => kit.classList.add("visible"), 1000);
+    else kit.classList.remove("visible");
+  };
+
   const show = (n) => {
     slides[idx]?.classList.remove("active");
     idx = (n + slides.length) % slides.length;
     slides[idx]?.classList.add("active");
     if (captionEl) captionEl.textContent = captions[idx] || "";
+    revealKit(idx === 1); // data-slide="2" = блок 2
   };
   container.querySelector(".slide-nav-prev")?.addEventListener("click", e => { e.stopPropagation(); show(idx - 1); });
   container.querySelector(".slide-nav-next")?.addEventListener("click", e => { e.stopPropagation(); show(idx + 1); });
