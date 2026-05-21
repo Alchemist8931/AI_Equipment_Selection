@@ -483,24 +483,50 @@
     }
 
 /* ===== notes-тултип + фиолетовое свечение слева на «наименование» (блок 2) ===== */
+/* ===== фиолетовое свечение слева на «наименование» при несоответствии (блок 2) ===== */
 .input-container.has-notes::after {
   content: "";
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 45%;
+  width: 11.25%;                /* было 45% — убавлено в 4 раза */
   border-radius: 8px 0 0 8px;
   pointer-events: none;
   z-index: 4;
   background: radial-gradient(70% 75% at 0% 50%, rgba(139,92,246,.45) 0%, rgba(139,92,246,0) 100%);
   filter: blur(5px);
 }
-.notes-tooltip {
+
+/* ===== строка «стоимость одного комплекта позиции» (блок 2), появляется с задержкой ===== */
+.kit-cost-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 10px; padding: 10px 14px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--bg);
+  opacity: 0; transform: translateY(4px); pointer-events: none;
+  transition: opacity .45s, transform .45s;
+}
+.kit-cost-row.visible { opacity: 1; transform: none; pointer-events: auto; }
+.kit-cost-label { font-size: 11px; color: var(--fg-muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+.kit-cost-value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; margin-left: auto; }
+
+/* чип «комментарий» + раскрывающийся тултип */
+.kit-notes-chip {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 999px;
+  background: rgba(139,92,246,.12);
+  border: 1px solid rgba(139,92,246,.4);
+  color: #7c5cd6;
+  font-size: 11px; font-weight: 600;
+  cursor: help; flex-shrink: 0;
+}
+.kit-notes-chip .material-symbols-outlined { font-size: 14px; line-height: 1; }
+.kit-notes-tooltip {
   position: absolute;
   left: 0;
   top: calc(100% + 6px);
   z-index: 60;
-  min-width: 240px;
-  max-width: 380px;
+  min-width: 260px;
+  max-width: 420px;
   padding: 10px 12px;
   background: var(--bg);
   color: var(--fg);
@@ -516,19 +542,7 @@
   pointer-events: none;
   transition: opacity .2s, transform .2s;
 }
-.input-container.has-notes:hover .notes-tooltip { opacity: 1; transform: none; }
-
-/* ===== стоимость одного комплекта позиции (блок 2), появляется с задержкой ===== */
-.kit-cost-row {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  margin-top: 10px; padding: 10px 14px;
-  border: 1px solid var(--line); border-radius: 8px; background: var(--bg);
-  opacity: 0; transform: translateY(4px); pointer-events: none;
-  transition: opacity .45s, transform .45s;
-}
-.kit-cost-row.visible { opacity: 1; transform: none; pointer-events: auto; }
-.kit-cost-label { font-size: 11px; color: var(--fg-muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
-.kit-cost-value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kit-notes-chip:hover .kit-notes-tooltip { opacity: 1; transform: none; }
     
   </style>
 </head>
@@ -1750,25 +1764,17 @@ function toggleSpecOpen(specId) {
 }
 
 // Тултип с notes + фиолетовое свечение слева на поле «наименование» (блок 2)
-function applyPickNotes(container, pk) {
-  if (!container) return;
-  const notes = (pk.selector_notes || "").trim();
-  if (!notes) return;
-
-  // Свечение: по умолчанию — когда есть notes.
-  // Чтобы подсвечивать ТОЛЬКО расхождения, замени строку ниже на:
-  if (pk.compliance_ok === false) container.classList.add("has-notes");
-  // container.classList.add("has-notes");
-
-  const text = notes
-    .replace(/\(\[[^\]]+\]\([^)]+\)\)/g, "") // убрать markdown-источники ([site](url))
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/\.\s/g, ".\n");                // ". " → перенос строки
-  const tip = document.createElement("div");
-  tip.className = "notes-tooltip";
-  tip.textContent = text;
-  container.appendChild(tip);
+// Достаёт текст notes позиции (одинаков на всех строках) и факт несоответствия
+function collectPosNotes(picks) {
+  const withNotes = picks.find(p => (p.selector_notes || "").trim());
+  const raw = withNotes ? withNotes.selector_notes.trim() : "";
+  const text = raw
+    ? raw.replace(/\(\[[^\]]+\]\([^)]+\)\)/g, "")  // убрать markdown-источники ([site](url))
+         .replace(/\s+/g, " ").trim()
+         .replace(/\.\s/g, ".\n")                   // ". " → перенос строки
+    : "";
+  const hasMismatch = picks.some(p => p.compliance_ok === false);
+  return { text, hasMismatch };
 }
 
 // Строка «стоимость одного комплекта позиции». Показываем только когда всё проценено.
@@ -1776,15 +1782,50 @@ function applyPickNotes(container, pk) {
 // поэтому 2 планки памяти на сборку учитываются автоматически (их qty уже = 2×комплектов).
 function buildKitCostRow(pos, picks) {
   const qtyNum = parseFloat(String(pos.qty ?? "").replace(/[^\d.,]/g, "").replace(",", ".")) || 1;
-  const allPriced = picks.every(pk => pk.sum != null && pk.sum !== "" && Number.isFinite(parseFloat(pk.sum)));
-  if (!allPriced) return null;
-  const totalSum = picks.reduce((s, pk) => s + (parseFloat(pk.sum) || 0), 0);
+  const { text: notesText, hasMismatch } = collectPosNotes(picks);
+
+  // Сумма по доступным ценам: строки без цены трактуем как 0, но считаем сумму всё равно
+  const pricedSums = picks
+    .map(pk => parseFloat(pk.sum))
+    .filter(n => Number.isFinite(n));
+  const anyPriced = pricedSums.length > 0;
+  const allPriced = pricedSums.length === picks.length;
+  const totalSum = pricedSums.reduce((s, n) => s + n, 0);
   const perKit = totalSum / qtyNum;
+
+  // Если ничего не проценено — строку с суммой не показываем (нечего считать),
+  // но при наличии notes всё равно показываем чип-комментарий.
+  if (!anyPriced && !notesText) return null;
+
   const el = document.createElement("div");
   el.className = "kit-cost-row";
-  el.innerHTML =
-    `<span class="kit-cost-label">стоимость одного комплекта позиции</span>` +
-    `<span class="kit-cost-value">${perKit.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} ₽</span>`;
+
+  // Чип «комментарий» в начале (если есть notes к позиции)
+  if (notesText) {
+    const chip = document.createElement("span");
+    chip.className = "kit-notes-chip";
+    if (hasMismatch) chip.classList.add("mismatch");
+    chip.innerHTML =
+      `<span class="material-symbols-outlined">chat_bubble</span>` +
+      `<span>комментарий</span>` +
+      `<span class="kit-notes-tooltip"></span>`;
+    chip.querySelector(".kit-notes-tooltip").textContent = notesText;
+    el.appendChild(chip);
+  }
+
+  const label = document.createElement("span");
+  label.className = "kit-cost-label";
+  label.textContent = anyPriced
+    ? (allPriced ? "стоимость одного комплекта позиции" : "стоимость комплекта (частично, без позиций без цены)")
+    : "стоимость комплекта недоступна";
+  el.appendChild(label);
+
+  if (anyPriced) {
+    const val = document.createElement("span");
+    val.className = "kit-cost-value";
+    val.textContent = perKit.toLocaleString("ru-RU", { maximumFractionDigits: 2 }) + " ₽";
+    el.appendChild(val);
+  }
   return el;
 }
 
@@ -1842,12 +1883,14 @@ if (slide1) {
           setPick("unit", pk.unit);
           setPick("price", pickPriceCell(pk, pk.price ? formatNumeric(pk.price) : ""));
           setPick("sum",   pickPriceCell(pk, pk.sum   ? formatNumeric(pk.sum)   : ""));
-          // тултип с notes + фиолетовое свечение на «наименование»
-          const nameInput = bf.querySelector('[data-pick="model_name"]');
-          if (nameInput) applyPickNotes(nameInput.closest(".input-container"), pk);
+          // фиолетовое свечение на «наименование» — только у строки с несоответствием
+          if (pk.compliance_ok === false) {
+            const nameInput = bf.querySelector('[data-pick="model_name"]');
+            nameInput?.closest(".input-container")?.classList.add("has-notes");
+          }
           slide2.appendChild(bf);
         });
-        // стоимость одного комплекта позиции
+        // строка стоимости комплекта + чип-комментарий
         const kitEl = buildKitCostRow(pos, picks);
         if (kitEl) slide2.appendChild(kitEl);
       } else {
